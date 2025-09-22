@@ -1,0 +1,79 @@
+.movieScroll {
+    display: inline-flex;
+}
+
+.movieCard {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 1%;
+    width: 90%;
+    align-items: flex-start;
+    border-color: white;
+    border-width: 2px;
+    border-radius: 8px;
+}
+
+.posterWrapper {
+    flex-shrink: 0;
+}
+
+.posterPreview {
+    width: 250px;   /* consistent width */
+    height: 375px;  /* consistent height */
+    position: relative; /* required for next/image fill */
+    overflow: visible;   /* crop overflow */
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.movieInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.movieType {
+    display: inline-flex;
+    gap: 2rem;
+}
+
+.crew {
+    display: inline-flex;
+    gap: 2rem;
+}
+
+.synopsis {
+    font-size: 0.9rem;
+    color: #444;
+    width: 80%;
+}
+
+.trailerWrapper {
+    margin: 2rem 3rem;
+}
+
+.showtimes {
+    border-color: white;
+    border-width: 1px;
+}
+
+.moviePreview {
+    padding: 3%;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    max-width: 250;
+    max-height: 375;
+    z-index: 1;
+}
+
+.moviePreview:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
