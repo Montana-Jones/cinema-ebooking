@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
 import Link from "next/link";
-import Movie from "./MovieDetails";
+import Movie from "@/components/Movie";
 
 const MoviePreview: React.FC<Movie.MovieProps> = ({ movie }) => {
   return (

@@ -3,7 +3,7 @@ const dummyMovies = [
   {
     _id: "0000000001",
     title: "Forrest Gump",
-    category: "Comedy, Romance",
+    genre: "Comedy, Romance",
     mpaa_rating: "PG-13",
     director: "Robert Zemeckis",
     producer: "Wendy Finerman, Steve Tisch, Steve Starkey",
@@ -21,7 +21,7 @@ const dummyMovies = [
   {
     _id: "0000000002",
     title: "The Matrix",
-    category: "Sci-Fi, Action",
+    genre: "Sci-Fi, Action",
     mpaa_rating: "R",
     director: "Lana Wachowski, Lilly Wachowski",
     producer: "Joel Silver",
@@ -38,7 +38,7 @@ const dummyMovies = [
   {
     _id: "0000000003",
     title: "Inception",
-    category: "Action, Sci-Fi, Thriller",
+    genre: "Action, Sci-Fi, Thriller",
     mpaa_rating: "PG-13",
     director: "Christopher Nolan",
     producer: "Emma Thomas, Christopher Nolan",
@@ -55,7 +55,7 @@ const dummyMovies = [
   {
     _id: "0000000004",
     title: "The Lion King",
-    category: "Kids, Animation, Adventure",
+    genre: "Kids, Animation, Adventure",
     mpaa_rating: "G",
     director: "Roger Allers, Rob Minkoff",
     producer: "Don Hahn",
@@ -72,7 +72,7 @@ const dummyMovies = [
   {
     _id: "0000000005",
     title: "Titanic",
-    category: "Drama, Romance",
+    genre: "Drama, Romance",
     mpaa_rating: "PG-13",
     director: "James Cameron",
     producer: "James Cameron, Jon Landau",

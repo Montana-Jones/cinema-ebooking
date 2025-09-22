@@ -3,7 +3,7 @@
 import styles from "@/components/Card.module.css";
 
 import React from "react";
-import Movie from "@/components/MovieDetails";
+import Movie from "@/components/Movie";
 import MoviePreview from "@/components/MoviePreview";
 import dummyMovies from "@/data/DummyMovies";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";

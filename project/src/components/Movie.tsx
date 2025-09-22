@@ -1,12 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
-import Link from "next/link";
-import YouTube from "react-youtube";
 import Trailer from "./Trailer";
 
 interface Showtime {
@@ -19,7 +16,7 @@ interface MovieProps {
   movie: {
     _id: string;
     title: string;
-    category: string;
+    genre: string;
     mpaa_rating: string;
     rating: number; //a star rating between 0 and 5
     director: string; //list all directors in a single string
@@ -54,7 +51,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
           <h2 className={styles.title}>{movie.title}</h2>
           <div className={styles.movieType}>
             <p>
-              <strong>Genre:</strong> {movie.category}
+              <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
               <strong>Rating:</strong> {movie.mpaa_rating}
