@@ -1,15 +1,14 @@
+
 .navbarContainer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: whitesmoke;
-    min-height: auto;
-    padding: 1rem;
-    position: sticky;
-    top: 0;
-    overflow: hidden;
-    width: 100%;
-    z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: whitesmoke;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .navbarLogo {
@@ -83,10 +82,10 @@
 }
 
 .posterPreview {
-    width: 250px;   /* consistent width */
-    height: 375px;  /* consistent height */
-    position: relative; /* required for next/image fill */
-    overflow: visible;   /* crop overflow */
+    width: 250px;
+    height: 375px;
+    position: relative;
+    overflow: visible;
     border-radius: 8px;
     z-index: 1;
 }

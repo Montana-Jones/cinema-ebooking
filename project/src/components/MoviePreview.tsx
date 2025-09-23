@@ -1,26 +1,34 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import React from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
-import Link from "next/link";
-import Movie from "@/components/Movie";
+import { MovieProps } from "./Movie";
 
-const MoviePreview: React.FC<Movie.MovieProps> = ({ movie }) => {
+interface MoviePreviewProps {
+  movie: MovieProps["movie"];
+}
+
+const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
   return (
-    <Card>
-      <div className={styles.moviePreview}>
-        {/* Poster */}
-        <Image
-          src={movie.poster_url}
-          alt={movie.title}
-          width={250}
-          height={375}
-          className={styles.posterPreview}
-        />
-      </div>
-    </Card>
+    <Link
+      href={`/movie-details/${movie._id}`}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      <Card style={{ cursor: "pointer" }}>
+        <div className={styles.moviePreview}>
+          <Image
+            src={movie.poster_url}
+            alt={movie.title}
+            width={250}
+            height={375}
+            className={styles.posterPreview}
+          />
+        </div>
+      </Card>
+    </Link>
   );
 };
 

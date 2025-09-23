@@ -1,14 +1,11 @@
 "use client";
 
-import styles from "@/components/Card.module.css";
-
 import React, { useState } from "react";
-import Movie from "@/components/Movie";
-import MoviePreview from "@/components/MoviePreview";
-import dummyMovies from "@/data/DummyMovies";
-import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
+import MoviePreview from "@/components/MoviePreview";
+import dummyMovies from "@/data/DummyMovies";
+import styles from "@/components/Card.module.css";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
@@ -19,22 +16,23 @@ export default function Home() {
   );
 
   return (
-    <main>
+    <main style={{ padding: 0, margin: 0 }}>
       <Navbar />
-      <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
-      <div style={{ padding: "2rem" }}>
-        <div className={styles.movieScroll}>
-          {filteredMovies.map((movie) => (
-            <MoviePreview key={movie._id} movie={movie} />
-          ))}
-        </div>
-        {/* {dummyMovies.map((movie, index) => (
-          <Movie key={index} movie={movie} />
-        ))} */}
+      <div>
+        <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1rem",
+          justifyContent: "center",
+        }}
+      >
+        {filteredMovies.map((movie) => (
+          <MoviePreview key={movie._id} movie={movie} />
+        ))}
       </div>
     </main>
   );
-}
-
-{
 }
