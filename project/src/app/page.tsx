@@ -2,26 +2,35 @@
 
 import styles from "@/components/Card.module.css";
 
-import React from "react";
+import React, { useState } from "react";
 import Movie from "@/components/Movie";
 import MoviePreview from "@/components/MoviePreview";
 import dummyMovies from "@/data/DummyMovies";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import Navbar from "@/components/Navbar";
+import ToggleSwitch from "@/components/ToggleSwitch";
 
 export default function Home() {
+  const [showNowShowing, setShowNowShowing] = useState(true);
+
+  // Filter movies based on toggle
+  const filteredMovies = dummyMovies.filter((movie) =>
+    showNowShowing ? movie.now_showing : movie.coming_soon
+  );
+
   return (
     <main>
       <Navbar />
+      <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div style={{ padding: "2rem" }}>
         <div className={styles.movieScroll}>
-          {dummyMovies.map((movie, index) => (
-            <MoviePreview key={index} movie={movie} />
+          {filteredMovies.map((movie) => (
+            <MoviePreview key={movie._id} movie={movie} />
           ))}
         </div>
-        {dummyMovies.map((movie, index) => (
+        {/* {dummyMovies.map((movie, index) => (
           <Movie key={index} movie={movie} />
-        ))}
+        ))} */}
       </div>
     </main>
   );
