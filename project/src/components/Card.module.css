@@ -1,3 +1,70 @@
+.navbarContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: whitesmoke;
+    min-height: auto;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    width: 100%;
+    z-index: 10;
+}
+
+.navbarLogo {
+    float: left;
+    height: 36px;
+    width: auto;
+    display: flex;
+    cursor: pointer;
+}
+
+.navbarProfile {
+    float: right;
+    height: 36px;
+    width: auto;
+    display: flex;
+    cursor: pointer;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: whitesmoke;
+  border-color: #afafaf;
+  border-width: 2px;
+  border-radius: 16px;
+  padding: 0.5rem 0.5rem;
+  width: 400px;
+  height: 36px;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 0 0.5rem;
+}
+
+.input::placeholder {
+  color: #ccc;
+}
+
+.button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+
 .movieScroll {
     display: inline-flex;
 }
