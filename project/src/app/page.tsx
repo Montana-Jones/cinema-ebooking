@@ -12,7 +12,7 @@ export default function Home() {
 
   // Filter movies based on toggle
   const filteredMovies = dummyMovies.filter((movie) =>
-    showNowShowing ? movie.now_showing : movie.coming_soon
+    showNowShowing ? movie.coming_soon : movie.now_showing
   );
 
   return (
@@ -26,6 +26,7 @@ export default function Home() {
           display: "flex",
           flexWrap: "wrap",
           gap: "1rem",
+          padding: "0 0 8rem 0",
           justifyContent: "center",
         }}
       >

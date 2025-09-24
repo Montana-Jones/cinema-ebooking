@@ -79,10 +79,10 @@
 }
 
 .posterPreview {
-    width: 250px;
-    height: 375px;
+    width: 233px;
+    height: 350px;
     position: relative;
-    overflow: visible;
+    /* overflow: visible; */
     border-radius: 8px;
     z-index: 1;
 }
@@ -97,6 +97,22 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 0.1rem;
+}
+
+.previewTitle {
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.1rem;
+}
+
+.previewDetails {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 8px 0 8px;
 }
 
 .movieType {
