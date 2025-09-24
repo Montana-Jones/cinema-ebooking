@@ -4,6 +4,7 @@ import dummyMovies from "@/data/DummyMovies";
 import React from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
+import styles from "./globals.css";
 
 interface MoviePageProps {
   params: { id: string };

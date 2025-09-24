@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import MoviePreview from "@/components/MoviePreview";
 import dummyMovies from "@/data/DummyMovies";
-import styles from "@/components/Card.module.css";
+import styles from "./globals.css";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
