@@ -26,13 +26,11 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
             height={350}
             className={styles.posterPreview}
           />
-          {/* <div className={styles.previewInfo}> */}
           <h2 className={styles.previewTitle}>{movie.title}</h2>
           <div className={styles.previewDetails}>
             <p>{movie.mpaa_rating}</p>
             <p>{movie.genre}</p>
           </div>
-          {/* </div> */}
         </div>
       </Card>
     </Link>
