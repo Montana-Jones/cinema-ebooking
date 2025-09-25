@@ -30,7 +30,9 @@
 
 .searchBar {
   display: flex;
+ 
   align-items: center;
+  gap: .5rem; /* added the gap */
   background-color: whitesmoke;
   border-color: #afafaf;
   border-width: 2px;
@@ -38,6 +40,30 @@
   padding: 0.5rem 0.5rem;
   width: 400px;
   height: 36px;
+}
+
+/* added genreBar */
+.genreContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* space between label and dropdown */
+}
+
+.genreLabel {
+  font-weight: bold;
+  color:#000000;
+}
+
+.genreBar {
+  color: #000000;
+ 
+  background-color: whitesmoke;
+  border: 2px solid #afafaf;
+  border-radius: 16px;
+  padding: 0.5rem;
+  width: 120px;
+  height: 36px;
+  cursor: pointer;
 }
 
 .input {

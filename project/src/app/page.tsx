@@ -12,15 +12,20 @@ import ToggleSwitch from "@/components/ToggleSwitch";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
-
+  const [selectedGenre, setSelectedGenre] = useState("All"); // for genre filtering
   // Filter movies based on toggle
-  const filteredMovies = dummyMovies.filter((movie) =>
-    showNowShowing ? movie.now_showing : movie.coming_soon
-  );
+  const filteredMovies = dummyMovies.filter((movie) => {
+    
+    const filteredGenre = selectedGenre === "All" || movie.genre.includes(selectedGenre);
+    return filteredGenre && (showNowShowing ? movie.now_showing : movie.coming_soon);
+
+});
 
   return (
     <main>
-      <Navbar />
+      <Navbar 
+      selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} 
+      />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div style={{ padding: "2rem" }}>
         <div className={styles.movieScroll}>

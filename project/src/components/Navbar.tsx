@@ -7,8 +7,14 @@ import theatre from "@/assets/theatre.png";
 import Link from "next/link";
 import styles from "@/components/Card.module.css";
 import SearchBar from "@/components/SearchBar";
+import GenreBar from "@/components/GenreBar";
 
-export default function Navbar() {
+interface NavbarProps {
+  selectedGenre: string;
+  setSelectedGenre: (genre: string) => void;
+}
+
+export default function Navbar({ selectedGenre, setSelectedGenre }: NavbarProps) {
   return (
     <nav className={styles.navbarContainer}>
       <div>
@@ -22,7 +28,14 @@ export default function Navbar() {
         </Link>
       </div>
       <div>
-        <SearchBar />
+        <SearchBar/>
+        
+      </div>
+      <div>
+       <GenreBar
+         selected={selectedGenre}
+         onChange={setSelectedGenre}
+       />
       </div>
       <div>
         <Image
