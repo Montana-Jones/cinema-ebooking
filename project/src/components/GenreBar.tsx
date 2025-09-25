@@ -21,6 +21,11 @@ export default function GenreBar({ selected, onChange }: GenreBarProps) {
         <option>Action</option>
         <option>Comedy</option>
         <option>Drama</option>
+        <option>Thriller</option>
+        <option>Sci-Fi</option>
+        <option>Kids</option>
+        <option>Animation</option>
+        <option>Adventure</option>
       </select>
     </div>
   );
