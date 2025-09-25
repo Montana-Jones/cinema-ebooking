@@ -9,6 +9,7 @@ import Trailer from "./Trailer";
 interface Showtime {
   id: number;
   movieId: number;
+  theatreNum: number;
   startTime: Date;
 }
 
