@@ -1,0 +1,143 @@
+.navbarContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: whitesmoke;
+    min-height: auto;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    width: 100%;
+    z-index: 10;
+}
+
+.navbarLogo {
+    float: left;
+    height: 36px;
+    width: auto;
+    display: flex;
+    cursor: pointer;
+}
+
+.navbarProfile {
+    float: right;
+    height: 36px;
+    width: auto;
+    display: flex;
+    cursor: pointer;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: whitesmoke;
+  border-color: #afafaf;
+  border-width: 2px;
+  border-radius: 16px;
+  padding: 0.5rem 0.5rem;
+  width: 400px;
+  height: 36px;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 0 0.5rem;
+}
+
+.input::placeholder {
+  color: #ccc;
+}
+
+.button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.movieScroll {
+    display: inline-flex;
+}
+
+.movieCard {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 1%;
+    width: 90%;
+    align-items: flex-start;
+    border-color: white;
+    border-width: 2px;
+    border-radius: 8px;
+}
+
+.posterWrapper {
+    flex-shrink: 0;
+}
+
+.posterPreview {
+    width: 250px;   /* consistent width */
+    height: 375px;  /* consistent height */
+    position: relative; /* required for next/image fill */
+    overflow: visible;   /* crop overflow */
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.movieInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.movieType {
+    display: inline-flex;
+    gap: 2rem;
+}
+
+.crew {
+    display: inline-flex;
+    gap: 2rem;
+}
+
+.synopsis {
+    font-size: 0.9rem;
+    color: #444;
+    width: 80%;
+}
+
+.trailerWrapper {
+    margin: 2rem 3rem;
+}
+
+.showtimes {
+    border-color: white;
+    border-width: 1px;
+}
+
+.moviePreview {
+    padding: 3%;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    max-width: 250;
+    max-height: 375;
+    z-index: 1;
+}
+
+.moviePreview:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}

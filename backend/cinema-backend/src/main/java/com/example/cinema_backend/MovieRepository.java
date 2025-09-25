@@ -1,13 +1,6 @@
-package com.example.cinema_backend.repository;
+package com.example.cinema_backend;
 
-import com.example.cinema_backend.model.Movie;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
-
-@Repository
-public interface MovieRepository extends JpaRepository<Movie, Long> {
-    List<Movie> findByTitleContainingIgnoreCase(String title);
-    List<Movie> findByGenreIgnoreCase(String genre);
+public interface MovieRepository extends MongoRepository<Movie, String> {
 }
