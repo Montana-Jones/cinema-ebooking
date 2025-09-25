@@ -10,7 +10,7 @@ export default function SearchBar() {
   return (
     <form className={styles.searchBar}>
       <input type="text" placeholder="Search..." className={styles.input} />
-      <button type="submit" className={styles.button}>
+      <button type="submit" className={styles.searchButton}>
         <Image src={search} alt="search" width={18} height={18} />
       </button>
     </form>

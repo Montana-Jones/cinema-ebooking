@@ -5,6 +5,7 @@ import React from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
 import Trailer from "./Trailer";
+import ShowtimePanel from "./ShowtimePanel";
 
 interface Showtime {
   id: number;
@@ -82,7 +83,9 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
             <Trailer trailerUrl={movie.trailer_url} />
           </div>
         </div>
-        <div className={styles.showtimes}></div>
+        <div className={styles.showtimes}>
+          <ShowtimePanel movie={movie} />
+        </div>
       </div>
     </Card>
   );
