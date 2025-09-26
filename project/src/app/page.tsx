@@ -8,7 +8,7 @@ import dummyMovies from "@/data/DummyMovies";
 import styles from "./globals.css";
 
 export default function Home() {
-  const [showNowShowing, setShowNowShowing] = useState(true);
+  const [showNowShowing, setShowNowShowing] = useState(false);
 
   // Filter movies based on toggle
   const filteredMovies = dummyMovies.filter((movie) =>

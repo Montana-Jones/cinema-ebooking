@@ -1,9 +1,8 @@
-
 .navbarContainer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #4C3B4D;
+  background-color: #4c3b4d;
   border-bottom: 4px solid #675068;
   padding: 1.5rem 1rem;
   position: sticky;
@@ -13,19 +12,19 @@
 }
 
 .navbarLogo {
-    float: left;
-    height: 36px;
-    width: auto;
-    display: flex;
-    cursor: pointer;
+  float: left;
+  height: 36px;
+  width: auto;
+  display: flex;
+  cursor: pointer;
 }
 
 .navbarProfile {
-    float: right;
-    height: 36px;
-    width: auto;
-    display: flex;
-    cursor: pointer;
+  float: right;
+  height: 36px;
+  width: auto;
+  display: flex;
+  cursor: pointer;
 }
 
 .searchBar {
@@ -54,7 +53,6 @@
 }
 
 .showtimeButton {
-    
 }
 
 .searchButton {
@@ -67,90 +65,90 @@
 }
 
 .movieCard {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1rem;
-    margin: 1rem auto;
-    width: 80%;
-    min-width: 700px;
-    max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 1rem auto;
+  width: 80%;
+  min-width: 700px;
+  max-width: 1200px;
 }
 
 .posterWrapper {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .posterPreview {
-    width: 233px;
-    height: 350px;
-    position: relative;
-    border-radius: 8px;
-    z-index: 1;
+  width: 233px;
+  height: 350px;
+  position: relative;
+  border-radius: 8px;
+  z-index: 1;
 }
 
 .movieInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.1rem;
 }
 
 .previewTitle {
-    display: flex;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
+  display: flex;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .previewDetails {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0 8px 0 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 8px 0 8px;
 }
 
 .movieType {
-    display: inline-flex;
-    gap: 2rem;
+  display: inline-flex;
+  gap: 2rem;
 }
 
 .crew {
-    display: inline-flex;
-    gap: 2rem;
+  display: inline-flex;
+  gap: 2rem;
 }
 
 .synopsis {
-    margin-top: 0.5rem;
-    color: #444;
-    width: 80%;
+  margin-top: 0.5rem;
+  color: #444;
+  width: 80%;
 }
 
 .trailerWrapper {
-    margin: 2rem 3rem;
+  margin: 2rem 3rem;
 }
 
 .showtimes {
-    border-color: white;
-    border-width: 1px;
+  border-color: white;
+  border-width: 1px;
 }
 
 .moviePreview {
-    padding: 3%;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    max-width: 250;
-    max-height: 375;
-    z-index: 1;
+  padding: 3%;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  max-width: 250;
+  max-height: 375;
+  z-index: 1;
 }
 
 .moviePreview:hover {
-    transform: scale(1.1);
-    z-index: 10;
+  transform: scale(1.1);
+  z-index: 10;
 }
