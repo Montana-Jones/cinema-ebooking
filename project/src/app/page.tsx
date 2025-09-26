@@ -36,10 +36,11 @@ export default function Home() {
             </Link>
           ))}
         </div>
-        {dummyMovies.map((movie, index) => (
+
+         {/* {dummyMovies.map((movie, index) => (
           <Movie key={index} movie={movie} />
-        ))}
-      </div>
+        ))}  */}
+      </div> 
     </main>
   );
 }

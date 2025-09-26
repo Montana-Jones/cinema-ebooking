@@ -1,12 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import styles from "@/app/page.module.css";
 import MoviePreview from "@/components/MoviePreview";
-import Movie from "@/components/Movie";
-import GenreBar from "@/components/GenreBar";
-import SearchBar from "@/components/SearchBar";
 import { useParams } from "next/navigation";
 import dummyMovies from "@/data/DummyMovies";
+import TopBar from "@/app/booking/part/topBar";
+import MovieBar from "@/app/booking/part/movieBar";
+import TheatreScreen from "@/assets/TheaterScreen.png";
+import Image from "next/image";
+
 type Seat = {
   id: string;
   occupied: boolean;
@@ -26,9 +27,19 @@ const generateSeats = (): Seat[][] => {
 };
 
 export default function SeatSelection() {
-  const [seats, setSeats] = useState(generateSeats());
+  const [seats, setSeats] = useState<Seat[][]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
 
+  const params = useParams();
+  const { id } = params; // grabs the [id] from the URL
+
+  const movie = dummyMovies.find((m) => m._id === id);
+
+   useEffect(() => {
+    // Generate seats only on client
+    const newSeats = generateSeats();
+    setSeats(newSeats);
+  }, []);
   const toggleSeat = (seatId: string) => {
     setSelectedSeats((prev) =>
       prev.includes(seatId) ? prev.filter((id) => id !== seatId) : [...prev, seatId]
@@ -37,12 +48,40 @@ export default function SeatSelection() {
 
   return (
     <main style={{ padding: "2rem", textAlign: "center" }}>
-      <h1>Select Seats</h1>
-      <div style={{ margin: "1rem 0" }}>SCREEN</div>
+      <TopBar />
+      <MovieBar movieId={typeof id === "string" ? id : ""} />
+        <div
+  style={{
+    display: "flex",
+    justifyContent: "center", // keeps things centered
+    alignItems: "center",     // vertical alignment
+    gap: "2rem",              // spacing between poster, seats, summary
+  }}
+>
+  {/* Poster */}
+  <div style={{ flex: "0 0 auto" }}>
+    <MoviePreview movie={movie} />
+  </div>
 
+  {/* Seat grid block */}
+  <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
+    <div>
+      {/* Screen */}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <Image
+          src={TheatreScreen}
+          alt="screen"
+          style={{ width: "130%", height: "auto", margin: "1rem 0" }}
+        />
+      </div>
+
+      {/* Seats */}
       <div style={{ display: "inline-block" }}>
         {seats.map((row, rowIndex) => (
-          <div key={rowIndex} style={{ display: "flex", justifyContent: "center", marginBottom: "5px" }}>
+          <div
+            key={rowIndex}
+            style={{ display: "flex", justifyContent: "center", marginBottom: "5px" }}
+          >
             {row.map((seat) => {
               const isSelected = selectedSeats.includes(seat.id);
               return (
@@ -67,24 +106,41 @@ export default function SeatSelection() {
           </div>
         ))}
       </div>
+    </div>
+  </div>
 
-      <div style={{ marginTop: "1rem" }}>
-        <button
-          disabled={selectedSeats.length === 0}
-          style={{
-            padding: "0.75rem 1.5rem",
-            fontSize: "1rem",
-            backgroundColor: "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
-          }}
-          onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
-        >
-          Continue
-        </button>
-      </div>
+  {/* Selected seats + button */}
+  <div
+    style={{
+      flex: "0 0 auto",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      padding: "1rem",
+      minWidth: "200px",
+    }}
+  >
+    <h3>Selected Seats</h3>
+    <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
+    <button
+      disabled={selectedSeats.length === 0}
+      style={{
+        marginTop: "1rem",
+        padding: "0.75rem 1.5rem",
+        fontSize: "1rem",
+        backgroundColor: "#0070f3",
+        color: "white",
+        border: "none",
+        borderRadius: "6px",
+        cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
+      }}
+      onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
+    >
+      Continue
+    </button>
+  </div>
+</div>
+
+
     </main>
   );
 }
