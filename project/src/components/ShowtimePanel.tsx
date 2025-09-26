@@ -36,11 +36,39 @@ interface MovieProps {
 const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
   return (
     <div className={styles.showtimeContainer}>
-      <Button className={styles.showtimeButton} text="11:00am"></Button>
-      <Button className={styles.showtimeButton} text="2:00pm"></Button>
-      <Button className={styles.showtimeButton} text="5:00pm"></Button>
-      <Button className={styles.showtimeButton} text="8:00pm"></Button>
-      <Button className={styles.showtimeButton} text="11:00pm"></Button>
+      <h1>Showtimes</h1>
+      <div className={styles.showtimes}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking-nav/${movie._id}`}
+        >
+          <p>11:00am</p>
+        </Link>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking-nav/${movie._id}`}
+        >
+          <p>2:00pm</p>
+        </Link>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking-nav/${movie._id}`}
+        >
+          <p>5:00pm</p>
+        </Link>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking-nav/${movie._id}`}
+        >
+          <p>8:00pm</p>
+        </Link>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking-nav/${movie._id}`}
+        >
+          <p>11:00pm</p>
+        </Link>
+      </div>
     </div>
   );
 };

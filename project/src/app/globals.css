@@ -31,3 +31,8 @@ html, body {
   padding: 0;
   box-sizing: border-box;
 }
+
+main {
+  padding-top: 80px;
+  padding-bottom: 4rem;
+}

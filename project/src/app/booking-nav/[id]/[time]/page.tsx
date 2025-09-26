@@ -1,14 +1,16 @@
+"use client";
+
 import dummyMovies from "@/data/DummyMovies";
+import React from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 
 interface MoviePageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
-export default async function MoviePage({ params }: MoviePageProps) {
-  const { id } = await params;
-  const movie = dummyMovies.find((m) => m._id === id);
+export default function MoviePage({ params }: MoviePageProps) {
+  const movie = dummyMovies.find((m) => m._id === params.id);
 
   if (!movie) return <p>Movie not found.</p>;
 
@@ -22,7 +24,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
       }}
     >
       <Navbar />
-      <Movie movie={movie} />
+      <h1 style={{ margin: "auto" }}>Replace this with the booking</h1>
     </main>
   );
 }
