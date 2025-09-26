@@ -9,6 +9,7 @@ import dummyMovies from "@/data/DummyMovies";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
+import Link from "next/link";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
@@ -30,12 +31,14 @@ export default function Home() {
       <div style={{ padding: "2rem" }}>
         <div className={styles.movieScroll}>
           {filteredMovies.map((movie) => (
-            <MoviePreview key={movie._id} movie={movie} />
+            <Link key={movie._id} href={`/selecting/${movie._id}`}>
+              <MoviePreview movie={movie} />
+            </Link>
           ))}
         </div>
-        {/* {dummyMovies.map((movie, index) => (
+        {dummyMovies.map((movie, index) => (
           <Movie key={index} movie={movie} />
-        ))} */}
+        ))}
       </div>
     </main>
   );

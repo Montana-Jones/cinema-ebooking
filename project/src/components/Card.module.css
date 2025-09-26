@@ -1,6 +1,7 @@
 .navbarContainer {
     display: flex;
     align-items: center;
+    gap : 1px;
     justify-content: space-between;
     background-color: whitesmoke;
     min-height: auto;
@@ -32,7 +33,7 @@
   display: flex;
  
   align-items: center;
-  gap: .5rem; /* added the gap */
+  /*gap: .5rem;  added the gap */
   background-color: whitesmoke;
   border-color: #afafaf;
   border-width: 2px;
@@ -46,7 +47,7 @@
 .genreContainer {
   display: flex;
   align-items: center;
-  gap: 0.25rem; /* space between label and dropdown */
+  /*gap: 0.25rem; /* space between label and dropdown */
 }
 
 .genreLabel {
