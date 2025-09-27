@@ -3,6 +3,7 @@
 import styles from "@/components/Card.module.css";
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
+import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
@@ -33,29 +34,37 @@ export default function Home() {
 
   // Fetch movies from backend
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/movies")
-      .then((res) => res.json())
-      .then((data) => setMovies(data))
-      .catch((err) => console.error(err));
-  }, []);
+  fetch("http://localhost:8080/api/v1/movies")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Movies fetched:", data); // debug
+      setMovies(data); // <-- this was missing
+    })
+    .catch((err) => console.error(err));
+}, []);
+
 
   // Filter movies based on toggle and genre
   const filteredMovies = movies.filter((movie) => {
-    const genreMatch =
-      selectedGenre === "All" || movie.genre.includes(selectedGenre);
-    const toggleMatch = showNowShowing ? movie.now_showing : movie.coming_soon;
-    return genreMatch && toggleMatch;
-  });
+  const genreMatch =
+    selectedGenre === "All" || movie.genre.includes(selectedGenre);
+  const toggleMatch = showNowShowing ? movie.now_showing : movie.coming_soon;
+  return genreMatch && toggleMatch;
+});
 
+console.log("Filtered movies:", filteredMovies);
+console.log("Number of filtered movies:", filteredMovies.length);
   return (
     <main>
+      
       <Navbar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div style={{ padding: "2rem" }}>
         <div className={styles.movieScroll}>
-          {filteredMovies.map((movie) => (
-            <Link key={movie._id} href={`/selecting/${movie._id}`}>
-              <MoviePreview movie={movie} />
+          
+          {filteredMovies.map((m) => (
+            <Link key={m._id} href={`/selecting/${m._id}`}>
+              <MoviePreview movie={m} />
             </Link>
           ))}
         </div>
