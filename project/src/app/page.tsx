@@ -31,6 +31,7 @@ export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState("All");
+  const [searched, setSearched] = useState("");
 
   // Fetch movies from backend
   useEffect(() => {
@@ -46,27 +47,30 @@ export default function Home() {
 
   // Filter movies based on toggle and genre
   const filteredMovies = movies.filter((movie) => {
-  const genreMatch =
-    selectedGenre === "All" || movie.genre.includes(selectedGenre);
-  const toggleMatch = showNowShowing ? movie.now_showing : movie.coming_soon;
-  return genreMatch && toggleMatch;
-});
+    const searchMatch = movie.title.toLowerCase().includes(searched.toLowerCase());    
+    const genreMatch =
+      selectedGenre === "All" || movie.genre.includes(selectedGenre);
+    const toggleMatch = showNowShowing ? movie.now_showing : movie.coming_soon;
+    return genreMatch && toggleMatch && searchMatch;
+  });
+
+
 
 console.log("Filtered movies:", filteredMovies);
 console.log("Number of filtered movies:", filteredMovies.length);
   return (
     <main>
       
-      <Navbar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} />
+      <Navbar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} searched={searched} setSearched={setSearched} />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div style={{ padding: "2rem" }}>
         <div className={styles.movieScroll}>
           
-          {filteredMovies.map((m) => (
+          {filteredMovies ? filteredMovies.map((m) => (
             <Link key={m._id} href={`/selecting/${m._id}`}>
               <MoviePreview movie={m} />
             </Link>
-          ))}
+          )) : <p>No movies available. Try again!</p>}
         </div>
       </div>
     </main>

@@ -12,9 +12,11 @@ import GenreBar from "@/components/GenreBar";
 interface NavbarProps {
   selectedGenre: string;
   setSelectedGenre: (genre: string) => void;
+  searched: string;
+  setSearched: (searched: string) => void;
 }
 
-export default function Navbar({ selectedGenre, setSelectedGenre }: NavbarProps) {
+export default function Navbar({ selectedGenre, setSelectedGenre, searched, setSearched }: NavbarProps) {
   return (
     <nav className={styles.navbarContainer}>
       <div>
@@ -28,7 +30,9 @@ export default function Navbar({ selectedGenre, setSelectedGenre }: NavbarProps)
         </Link>
       </div>
       <div>
-        <SearchBar/>
+        <SearchBar 
+          searched={searched}
+          onChange={setSearched}/>
         
       </div>
       <div>
