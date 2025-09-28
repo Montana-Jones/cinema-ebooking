@@ -24,7 +24,7 @@ export default function MovieBar({ movieId }: MovieBarProps) {
     <div style={{ padding: "1rem", border: "1px solid #ccc", borderRadius: "8px" }}>
       <h2 style={{ marginBottom: "0.5rem", fontSize: "1.25rem",fontWeight: 1000 }}>{movie.title}</h2>
       <p>Genre: {movie.genre}</p>
-      <p>Date: {now.toLocaleDateString()}</p>
+      <p>Time: {now.toLocaleDateString()} at 10:00 PM</p>
     </div>
   );
 }

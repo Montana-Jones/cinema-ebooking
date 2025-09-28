@@ -96,7 +96,7 @@ export default function SeatSelection() {
               <Image
                 src={TheatreScreen}
                 alt="screen"
-                style={{ width: "130%", height: "auto", margin: "1rem 0" }}
+                style={{ width: "144%", height: "auto", margin: "1rem 0" }}
               />
             </div>
 
@@ -148,7 +148,7 @@ export default function SeatSelection() {
             zIndex: 1,
           }}
         >
-          <h3>Selected Seats</h3>
+          <h3 style={{ marginBottom: "0.5rem", fontSize: "1.1rem",fontWeight: 1000 }}>Selected Seats:</h3>
           <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
           <button
             disabled={selectedSeats.length === 0}
@@ -159,8 +159,8 @@ export default function SeatSelection() {
               fontSize: "1rem",
               backgroundColor: "#0070f3",
               color: "white",
-              border: "none",
-              
+              border: "1px solid #ddd",
+              borderRadius: "6px",
               cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
             }}
 
