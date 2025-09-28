@@ -1,12 +1,25 @@
+// src/app/booking/[id]/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import { useParams } from "next/navigation";
-import dummyMovies from "@/data/DummyMovies";
 import TopBar from "@/app/booking/part/topBar";
 import MovieBar from "@/app/booking/part/movieBar";
 import TheatreScreen from "@/assets/TheaterScreen.png";
 import Image from "next/image";
+
+
+
+interface MovieP {
+ 
+    _id: string;
+    title: string;
+    poster_url: string | null;
+    trailer_url: string | null;
+    rating: number;
+    genre: string;
+
+}
 
 type Seat = {
   id: string;
@@ -27,15 +40,25 @@ const generateSeats = (): Seat[][] => {
 };
 
 export default function SeatSelection() {
+  const [movie, setMovie] = useState<MovieP | null>(null);
   const [seats, setSeats] = useState<Seat[][]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-
+  
   const params = useParams();
   const { id } = params; // grabs the [id] from the URL
 
-  const movie = dummyMovies.find((m) => m._id === id);
-
-   useEffect(() => {
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/v1/movies/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Movie fetched:", data); // debug
+        setMovie(data);
+      })
+      .catch((err) => console.error(err));
+  },[id]);
+  
+  
+  useEffect(() => {
     // Generate seats only on client
     const newSeats = generateSeats();
     setSeats(newSeats);
@@ -45,100 +68,108 @@ export default function SeatSelection() {
       prev.includes(seatId) ? prev.filter((id) => id !== seatId) : [...prev, seatId]
     );
   };
+  
+
 
   return (
     <main style={{ padding: "2rem", textAlign: "center" }}>
       <TopBar />
       <MovieBar movieId={typeof id === "string" ? id : ""} />
         <div
-  style={{
-    display: "flex",
-    justifyContent: "center", // keeps things centered
-    alignItems: "center",     // vertical alignment
-    gap: "2rem",              // spacing between poster, seats, summary
-  }}
->
-  {/* Poster */}
-  <div style={{ flex: "0 0 auto" }}>
-    <MoviePreview movie={movie} />
-  </div>
+          style={{
+            display: "flex",
+            justifyContent: "center", // keeps things centered
+            alignItems: "center",     // vertical alignment
+            gap: "2rem",              // spacing between poster, seats, summary
+          }}
+        >
+        {/* Poster */}
+        <div style={{ flex: "0 0 auto" }}>
+          {movie ? <MoviePreview movie={movie}/> : <h2>Loading movie...</h2> }
+        </div>
 
-  {/* Seat grid block */}
-  <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
-    <div>
-      {/* Screen */}
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Image
-          src={TheatreScreen}
-          alt="screen"
-          style={{ width: "130%", height: "auto", margin: "1rem 0" }}
-        />
-      </div>
+        {/* Seat grid block */}
+        <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
+          <div>
+            {/* Screen */}
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Image
+                src={TheatreScreen}
+                alt="screen"
+                style={{ width: "130%", height: "auto", margin: "1rem 0" }}
+              />
+            </div>
 
-      {/* Seats */}
-      <div style={{ display: "inline-block" }}>
-        {seats.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            style={{ display: "flex", justifyContent: "center", marginBottom: "5px" }}
-          >
-            {row.map((seat) => {
-              const isSelected = selectedSeats.includes(seat.id);
-              return (
+            {/* Seats */}
+            <div style={{ display: "inline-block" }}>
+              {seats.map((row, rowIndex) => (
                 <div
-                  key={seat.id}
-                  onClick={() => !seat.occupied && toggleSeat(seat.id)}
-                  style={{
-                    width: "25px",
-                    height: "25px",
-                    margin: "3px",
-                    backgroundColor: seat.occupied
-                      ? "#555"
-                      : isSelected
-                      ? "#f00"
-                      : "#0af",
-                    cursor: seat.occupied ? "not-allowed" : "pointer",
-                    borderRadius: "4px",
-                  }}
-                ></div>
-              );
-            })}
+                  key={rowIndex}
+                  style={{ display: "flex", justifyContent: "center", marginBottom: "5px" }}
+                >
+                  {row.map((seat) => {
+                    const isSelected = selectedSeats.includes(seat.id);
+                    return (
+                      <div
+                        key={seat.id}
+                        onClick={() => !seat.occupied && toggleSeat(seat.id)}
+                        style={{
+                          width: "25px",
+                          height: "25px",
+                          margin: "3px",
+                          backgroundColor: seat.occupied
+                            ? "#555"
+                            : isSelected
+                            ? "#f00"
+                            : "#0af",
+                          cursor: seat.occupied ? "not-allowed" : "pointer",
+                          borderRadius: "4px",
+                        }}
+                      ></div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
+        </div>
 
-  {/* Selected seats + button */}
-  <div
-    style={{
-      flex: "0 0 auto",
-      border: "1px solid #ddd",
-      borderRadius: "8px",
-      padding: "1rem",
-      minWidth: "200px",
-    }}
-  >
-    <h3>Selected Seats</h3>
-    <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
-    <button
-      disabled={selectedSeats.length === 0}
-      style={{
-        marginTop: "1rem",
-        padding: "0.75rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#0070f3",
-        color: "white",
-        border: "none",
-        borderRadius: "6px",
-        cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
-      }}
-      onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
-    >
-      Continue
-    </button>
-  </div>
-</div>
+        {/* Selected seats + button */}
+        <div
+          style={{
+            flex: "0 0 auto",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "1rem",
+            width: "247px",
+            height: "375px",
+            position: "relative",
+            overflow: "visible",
+            zIndex: 1,
+          }}
+        >
+          <h3>Selected Seats</h3>
+          <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
+          <button
+            disabled={selectedSeats.length === 0}
+            style={{
+              
+              marginTop: "1rem",
+              padding: "0.75rem 1.5rem",
+              fontSize: "1rem",
+              backgroundColor: "#0070f3",
+              color: "white",
+              border: "none",
+              
+              cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
+            }}
+
+            onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
 
 
     </main>
