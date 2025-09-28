@@ -142,12 +142,31 @@ export default function SeatSelection() {
             borderRadius: "8px",
             padding: "1rem",
             width: "247px",
-            height: "375px",
+            minHeight: "400",
             position: "relative",
             overflow: "visible",
             zIndex: 1,
+            display: "flex",             // <-- make the block flex
+            flexDirection: "column",     // <-- stack items vertically
+            alignItems: "center",        // <-- center horizontally
           }}
         >
+          {/* Legend */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "0.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}>
+              <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor:"#555", borderRadius: "4px" }} />
+              <span style={{ marginLeft: "8px" }}>Occupied</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}>
+              <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor:"#0af", borderRadius: "4px" }} />
+              <span style={{ marginLeft: "8px" }}>Available</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}>
+              <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor:"#f00", borderRadius: "4px" }} />
+              <span style={{ marginLeft: "8px" }}>Selected</span>
+            </div>
+          </div>
+          <span>--------------</span>
           <h3 style={{ marginBottom: "0.5rem", fontSize: "1.1rem",fontWeight: 1000 }}>Selected Seats:</h3>
           <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
           <button
@@ -168,7 +187,9 @@ export default function SeatSelection() {
           >
             Continue
           </button>
+
         </div>
+
       </div>
 
 
