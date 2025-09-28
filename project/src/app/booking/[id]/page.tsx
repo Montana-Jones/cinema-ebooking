@@ -124,8 +124,10 @@ export default function SeatSelection() {
                             : "#0af",
                           cursor: seat.occupied ? "not-allowed" : "pointer",
                           borderRadius: "4px",
+                          fontSize: ".7rem",
+                          fontWeight: "bold"
                         }}
-                      ></div>
+                      >{seat.id}</div>
                     );
                   })}
                 </div>
