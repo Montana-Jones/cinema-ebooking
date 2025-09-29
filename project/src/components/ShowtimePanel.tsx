@@ -5,7 +5,6 @@ import React from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
 import Link from "next/link";
-import Button from "./Button";
 
 interface Showtime {
   id: number;

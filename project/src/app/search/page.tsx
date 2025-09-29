@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 // The main App component that contains the search bar.
 const App = () => {
@@ -169,24 +170,27 @@ const App = () => {
         <div className="w-full mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMovies.length > 0 ? (
             filteredMovies.map((movie, index) => (
-              <div
+              <Link
                 key={index}
-                className="bg-[#1f1f1f] p-6 rounded-2xl shadow-lg border border-gray-700 hover:scale-105 transition-transform"
+                href={`/movie-details/${movie.id}`} // assuming each movie has a unique 'id'
+                className="block bg-[#1f1f1f] rounded-2xl shadow-lg border border-gray-700 hover:scale-105 transition-transform"
               >
-                <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
-                <div className="space-y-1 text-gray-300">
-                  <p>
-                    <strong>Genre:</strong> {movie.genre}
-                  </p>
-                  <p>
-                    <strong>Year:</strong> {movie.year}
-                  </p>
-                  <p>
-                    <strong>Rating:</strong> {movie.rating}
-                  </p>
-                  <p className="mt-2 text-sm italic">{movie.description}</p>
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+                  <div className="space-y-1 text-gray-300">
+                    <p>
+                      <strong>Genre:</strong> {movie.genre}
+                    </p>
+                    <p>
+                      <strong>Year:</strong> {movie.year}
+                    </p>
+                    <p>
+                      <strong>Rating:</strong> {movie.rating}
+                    </p>
+                    <p className="mt-2 text-sm italic">{movie.description}</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center text-gray-500 text-lg py-12">
