@@ -11,15 +11,18 @@ import Image from "next/image";
 
 
 interface MovieP {
- 
-    _id: string;
+  
+    id: string;
     title: string;
-    poster_url: string | null;
-    trailer_url: string | null;
+    nowShowing: boolean;
+    comingSoon: boolean;
+    posterUrl: string | null;
+    trailerUrl: string | null;
     rating: number;
     genre: string;
-
+  
 }
+
 
 type Seat = {
   id: string;

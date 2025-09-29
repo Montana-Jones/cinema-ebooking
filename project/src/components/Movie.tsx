@@ -14,22 +14,23 @@ interface Showtime {
 
 interface MovieProps {
   movie: {
-    _id: string;
+    id: string;
     title: string;
     genre: string;
-    mpaa_rating: string;
-    rating: number; //a star rating between 0 and 5
-    director: string; //list all directors in a single string
-    producer: string; //list all producers in a single string
-    cast: string; //list all major cast members in a single string
-    synopsis: string;
-    poster_url: string;
-    trailer_url: string;
-    now_showing: boolean;
-    coming_soon: boolean;
+    mpaaRating: string | null;
+    rating: number;
+    director: string;
+    producer: string;
+    cast: string;
+    synopsis: string | null;
+    posterUrl: string | null;
+    trailerUrl: string | null;
+    nowShowing: boolean;
+    comingSoon: boolean;
     showtimes: Showtime[];
   };
 }
+
 
 const Movie: React.FC<MovieProps> = ({ movie }) => {
   return (
@@ -37,14 +38,19 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
       <div className={styles.movieCard}>
         {/* Poster */}
         <div className={styles.posterWrapper}>
-          <Image
-            src={movie.poster_url}
-            alt={movie.title}
-            width={350}
-            height={525}
-            className={styles.poster}
-          />
+          {movie.posterUrl ? (
+            <Image
+              src={movie.posterUrl}
+              alt={movie.title}
+              width={350}
+              height={525}
+              className={styles.poster}
+            />
+          ) : (
+            <div className={styles.noPoster}>No Image</div>
+          )}
         </div>
+
 
         {/* Movie Info */}
         <div className={styles.movieInfo}>
@@ -54,7 +60,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
               <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
-              <strong>Rating:</strong> {movie.mpaa_rating}
+              <strong>Rating:</strong> {movie.mpaaRating}
             </p>
             <p>
               <strong>Stars:</strong> {movie.rating} ⭐
@@ -77,9 +83,12 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
           </p>
 
           {/* Trailer Link */}
-          <div className={styles.trailerWrapper}>
-            <Trailer trailerUrl={movie.trailer_url} />
-          </div>
+          {movie.trailerUrl && (
+            <div className={styles.trailerWrapper}>
+              <Trailer trailerUrl={movie.trailerUrl} />
+            </div>
+          )}
+
         </div>
         <div className={styles.showtimes}></div>
       </div>

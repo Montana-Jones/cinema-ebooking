@@ -11,46 +11,33 @@ public class Movie {
 
     @Id
     @Field("_id")
-    @JsonProperty("_id")
     private String id;
 
     private String title;
     private String genre;
 
-    @Field("mpaa_rating")
-    @JsonProperty("mpaa_rating")
+    @Field("mpaaRating")
     private String mpaaRating;
 
     private String director;
     private String producer;
     private String cast;
-
-    @Field("synopsis")
-    @JsonProperty("synopsis")
     private String synopsis;
-
-    @Field("description")
-    @JsonProperty("description")
     private String description;
 
-    @Field("poster_url")
-    @JsonProperty("poster_url")
+    @Field("posterUrl")  
     private String posterUrl;
 
-    @Field("trailer_url")
-    @JsonProperty("trailer_url")
+    @Field("trailerUrl")
     private String trailerUrl;
 
-    @Field("release_date")
-    @JsonProperty("release_date")
+    @Field("releaseDate")
     private String releaseDate;
 
-    @Field("now_showing")
-    @JsonProperty("now_showing")
+    @Field("nowShowing")
     private boolean nowShowing;
 
-    @Field("coming_soon")
-    @JsonProperty("coming_soon")
+    @Field("comingSoon")
     private boolean comingSoon;
 
     private List<String> showtimes;

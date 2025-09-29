@@ -9,23 +9,24 @@ import ToggleSwitch from "@/components/ToggleSwitch";
 import Link from "next/link";
 
 interface Movie {
-  _id: string;
+  id: string;
   title: string;
   genre: string;
-  mpaa_rating: string | null;
+  mpaaRating: string | null;
   director: string;
   producer: string;
   cast: string;
   synopsis: string | null;
   description: string | null;
-  poster_url: string | null;
-  trailer_url: string | null;
-  release_date: string | null;
-  now_showing: boolean;
-  coming_soon: boolean;
+  posterUrl: string | null;
+  trailerUrl: string | null;
+  releaseDate: string | null;   // ✅ fix: was release_date
+  nowShowing: boolean;
+  comingSoon: boolean;
   showtimes: string[];
   rating: number;
 }
+
 
 export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -38,11 +39,30 @@ export default function Home() {
   fetch("http://localhost:8080/api/v1/movies")
     .then((res) => res.json())
     .then((data) => {
-      console.log("Movies fetched:", data); // debug
-      setMovies(data); // <-- this was missing
+      const mapped = data.map((m: any) => ({
+        id: m._id, // map _id → id
+        title: m.title,
+        genre: m.genre,
+        mpaaRating: m.mpaaRating ?? "",
+        director: m.director ?? "",
+        producer: m.producer ?? "",
+        cast: m.cast ?? "",
+        synopsis: m.synopsis ?? "",
+        description: m.description ?? "",
+        posterUrl: m.posterUrl ?? null,
+        trailerUrl: m.trailerUrl ?? null,
+        release_date: m.releaseDate ?? null,
+        nowShowing: m.nowShowing,
+        comingSoon: m.comingSoon,
+        showtimes: m.showtimes ?? [],
+        rating: m.rating ?? 0,
+      }));
+      console.log("Movies mapped:", mapped);
+      setMovies(mapped);
     })
     .catch((err) => console.error(err));
 }, []);
+
 
 
   // Filter movies based on toggle and genre
@@ -50,7 +70,7 @@ export default function Home() {
     const searchMatch = movie.title.toLowerCase().includes(searched.toLowerCase());    
     const genreMatch =
       selectedGenre === "All" || movie.genre.includes(selectedGenre);
-    const toggleMatch = showNowShowing ? movie.now_showing : movie.coming_soon;
+    const toggleMatch = showNowShowing ? movie.nowShowing : movie.comingSoon;
     return genreMatch && toggleMatch && searchMatch;
   });
 
@@ -67,7 +87,7 @@ console.log("Number of filtered movies:", filteredMovies.length);
         <div className={styles.movieScroll}>
           
           {filteredMovies ? filteredMovies.map((m) => (
-            <Link key={m._id} href={`/selecting/${m._id}`}>
+            <Link key={m.id} href={`/selecting/${m.id}`}>
               <MoviePreview movie={m} />
             </Link>
           )) : <p>No movies available. Try again!</p>}

@@ -15,19 +15,19 @@ interface Showtime {
 
 interface MovieP {
  
-    _id: string;
+    id: string;
     title: string;
     genre: string;
-    mpaa_rating: string;
+    mpaaRating: string;
     rating: number; //a star rating between 0 and 5
     director: string; //list all directors in a single string
     producer: string; //list all producers in a single string
     cast: string; //list all major cast members in a single string
     synopsis: string;
-    poster_url: string;
-    trailer_url: string;
-    now_showing: boolean;
-    coming_soon: boolean;
+    posterUrl: string;
+    trailerUrl: string;
+    nowShowing: boolean;
+    comingSoon: boolean;
     showtimes: Showtime[];
 
 }
