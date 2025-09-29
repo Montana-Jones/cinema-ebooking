@@ -44,7 +44,16 @@ export default function Home() {
     <main>
       <Navbar />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
-      <div style={{ padding: "2rem" }}>
+      <div
+        style={{
+          padding: "2rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2rem",
+          alignItems: "center",
+        }}
+      >
+        {" "}
         <div className={styles.movieScroll}>
           {filteredMovies.map((movie) => (
             <MoviePreview key={movie.id} movie={movie} />

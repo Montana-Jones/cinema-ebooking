@@ -36,7 +36,7 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
           </div>
         </Card>
       </Link>
-      {movie.now_showing && <ShowtimePanel movie={movie} />}
+      {movie.now_showing ? "" : <ShowtimePanel movie={movie} />}
     </div>
   );
 };
