@@ -16,7 +16,7 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
   return (
     <div className={styles.previewContainer}>
       <Link
-        href={`/movie-details/${movie._id}`}
+        href={`/movie-details/${movie.id}`}
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <Card style={{ cursor: "pointer" }}>
