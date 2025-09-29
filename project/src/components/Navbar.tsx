@@ -6,31 +6,22 @@ import avatar from "@/assets/avatar.png";
 import theatre from "@/assets/theatre.png";
 import Link from "next/link";
 import styles from "@/components/Card.module.css";
-import SearchBar from "@/components/SearchBar";
+import search from "@/assets/search.png";
 
 export default function Navbar() {
   return (
     <nav className={styles.navbarContainer}>
-      <div>
+      <div className={styles.navbarLeft}>
         <Link href="/">
-          <Image
-            src={theatre}
-            alt="logo"
-            className={styles.navbarLogo}
-            priority
-          />
+          <Image src={theatre} alt="logo" priority />
         </Link>
       </div>
-      <div>
-        <SearchBar />
-      </div>
-      <div>
-        <Image
-          src={avatar}
-          alt="profile"
-          className={styles.navbarProfile}
-          priority
-        />
+
+      <div className={styles.navbarRight}>
+        <Link href="/search">
+          <Image src={search} alt="logo" priority />
+        </Link>
+        <Image src={avatar} alt="profile" priority />
       </div>
     </nav>
   );

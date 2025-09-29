@@ -1,38 +1,39 @@
 .navbarContainer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: whitesmoke;
-    min-height: auto;
-    padding: 1rem;
-    position: sticky;
-    top: 0;
-    overflow: hidden;
-    width: 100%;
-    z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #4c3b4d;
+  border-bottom: 4px solid #675068;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
 }
 
-.navbarLogo {
+.navbarLeft {
     float: left;
-    height: 36px;
-    width: auto;
     display: flex;
-    cursor: pointer;
+    flex-direction: row;
 }
 
-.navbarProfile {
+.navbarContainer img {
+  height: 36px;
+  width: auto;
+}
+
+.navbarRight {
     float: right;
-    height: 36px;
-    width: auto;
     display: flex;
-    cursor: pointer;
+    flex-direction: row;
+    gap: 20px;
 }
 
 .searchBar {
   display: flex;
   align-items: center;
   background-color: whitesmoke;
-  border-color: #afafaf;
+  border-color: #675068;
   border-width: 2px;
   border-radius: 16px;
   padding: 0.5rem 0.5rem;
@@ -45,7 +46,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: white;
+  color: rgb(61, 61, 61);
   padding: 0 0.5rem;
 }
 
@@ -53,7 +54,40 @@
   color: #ccc;
 }
 
-.button {
+.showtimeContainer {
+    border: 2px solid white;
+    border-radius: 2rem;
+    padding: 1rem;
+    height: fit-content;
+    margin: auto;
+    margin-left: 3rem;
+}
+
+.showtimeContainer h1 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.showtimes {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap: 0.5rem;
+}
+
+.showtimeButton {
+    background-color: #4c3b4d;
+    border: 3px solid #675068;
+    border-radius: 2rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.searchButton {
   background: none;
   border: none;
   cursor: pointer;
@@ -62,82 +96,91 @@
   justify-content: center;
 }
 
-.movieScroll {
-    display: inline-flex;
-}
-
 .movieCard {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    margin: 1%;
-    width: 90%;
-    align-items: flex-start;
-    border-color: white;
-    border-width: 2px;
-    border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 1rem auto;
+  width: 80%;
+  min-width: 700px;
+  max-width: 1200px;
 }
 
 .posterWrapper {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .posterPreview {
-    width: 250px;   /* consistent width */
-    height: 375px;  /* consistent height */
-    position: relative; /* required for next/image fill */
-    overflow: visible;   /* crop overflow */
-    border-radius: 8px;
-    z-index: 1;
+  width: 233px;
+  height: 350px;
+  position: relative;
+  border-radius: 8px;
+  z-index: 1;
 }
 
 .movieInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.1rem;
+}
+
+.previewContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.previewTitle {
+  display: flex;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.previewDetails {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 8px 0 8px;
 }
 
 .movieType {
-    display: inline-flex;
-    gap: 2rem;
+  display: inline-flex;
+  gap: 2rem;
 }
 
 .crew {
-    display: inline-flex;
-    gap: 2rem;
+  display: inline-flex;
+  gap: 2rem;
 }
 
 .synopsis {
-    font-size: 0.9rem;
-    color: #444;
-    width: 80%;
+  margin-top: 0.5rem;
+  color: #444;
+  width: 80%;
 }
 
 .trailerWrapper {
-    margin: 2rem 3rem;
-}
-
-.showtimes {
-    border-color: white;
-    border-width: 1px;
+  margin: 2rem 3rem;
 }
 
 .moviePreview {
-    padding: 3%;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    max-width: 250;
-    max-height: 375;
-    z-index: 1;
+  padding: 3%;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  max-width: 250;
+  max-height: 375;
+  z-index: 1;
 }
 
 .moviePreview:hover {
-    transform: scale(1.1);
-    z-index: 10;
+  transform: scale(1.1);
+  z-index: 10;
 }

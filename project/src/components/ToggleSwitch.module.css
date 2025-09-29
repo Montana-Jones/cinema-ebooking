@@ -1,8 +1,8 @@
 .switchContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
 }
 
 .switchWide {
@@ -22,12 +22,8 @@
 .sliderWide {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0; /* shorthand for top/left/right/bottom: 0 */
   background-color: #2e2e2e;
-  transition: 0.4s;
   border-radius: 50px;
   display: flex;
   align-items: center;
@@ -35,6 +31,7 @@
   padding: 0 15px;
   font-weight: 600;
   color: white;
+  transition: 0.3s ease;
 }
 
 .sliderWide::before {
@@ -46,52 +43,41 @@
   left: 0;
   background-color: white;
   border-radius: 50px;
+  transform: translateX(0);
   transition: transform 0.3s ease;
   z-index: 1;
 }
 
-input:checked + .sliderWide .showing {
+.showing,
+.soon {
+  flex: 1;
+  text-align: center;
+  z-index: 2;
+  transition: opacity 0.3s, color 0.3s;
+}
+
+/* Default state (now showing active) */
+.showing {
+  opacity: 1;
+  color: #75D1A6;
+}
+
+.soon {
+  opacity: 0;
   color: gray;
 }
 
-input:checked + .sliderWide .coming {
-  color: gray;
-}
-
-input:not(:checked) + .sliderWide .showing {
-  color: gray; /* inactive side */
-}
-
-input:not(:checked) + .sliderWide .soon {
-  color: gray; /* active side */
-}
-
+/* Checked state (coming soon active) */
 input:checked + .sliderWide::before {
   transform: translateX(200px);
 }
 
-.showing, .soon {
-  flex: 1;
-  text-align: center;
-  z-index: 2;
-  transition: opacity 0.3s;
-}
-
-.showing {
-  color: gray;
-  opacity: 0;
-}
-
-.soon {
-  color: #999;
-  opacity: 1;
-}
-
 input:checked + .sliderWide .showing {
-  opacity: 1;
+  opacity: 0;
   color: gray;
 }
 
 input:checked + .sliderWide .soon {
-  opacity: 0;
+  opacity: 1;
+  color: #75D1A6;
 }
