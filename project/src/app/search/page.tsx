@@ -64,21 +64,26 @@ const App = () => {
     const searchResults = allMovies.filter((movie) => {
       let movieValue;
       if (filterType === "title") {
-        movieValue = movie.title.toLowerCase();
+        movieValue = String(movie.title).toLowerCase();
       } else if (filterType === "genre") {
-        movieValue = movie.genre.toLowerCase();
+        movieValue = String(movie.genre).toLowerCase();
       } else if (filterType === "year") {
-        movieValue = movie.year.toLowerCase();
+        movieValue = String(movie.year).toLowerCase();
       }
-      return movieValue.includes(lowerCaseTerm);
+      return String(movieValue).includes(lowerCaseTerm);
     });
 
     // Apply additional filters from the other dropdowns
     const finalFilteredList = searchResults.filter((movie) => {
       const matchesGenre =
         !newGenre || movie.genre.toLowerCase() === newGenre.toLowerCase();
-      const matchesYear = !newYear || movie.year === newYear;
-      const matchesRating = !newRating || movie.rating === newRating;
+
+      const matchesYear = !newYear || String(movie.year) === String(newYear);
+
+      const matchesRating =
+        !newRating ||
+        String(movie.rating).toLowerCase() === String(newRating).toLowerCase();
+
       return matchesGenre && matchesYear && matchesRating;
     });
 
@@ -123,8 +128,12 @@ const App = () => {
         <div className="w-full bg-background p-6 rounded-2xl shadow-lg border border-gray-700">
           {/* Main search and title bar */}
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 w-full mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold">Movie Search</h1>
-            {/* input box */}
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">
+              Movie Search
+            </h1>
+
+            {/* Search Input */}
             <div className="relative flex-grow w-full md:w-auto">
               <input
                 type="text"
@@ -132,11 +141,10 @@ const App = () => {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter")
                     handleSearch(searchTerm, genre, year, rating);
-                  }
                 }}
-                className="w-full pl-12 pr-5 py-3 text-lg rounded-full border border-gray-600 bg-[#1f1f1f] text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-12 pr-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
                 className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400"
@@ -153,16 +161,65 @@ const App = () => {
                 />
               </svg>
             </div>
-            {/* dropdown */}
+
+            {/* Filter Type Dropdown */}
             <select
               value={filterType}
               onChange={handleFilterChange}
-              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-[#1f1f1f] text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="title">Title</option>
               <option value="genre">Genre</option>
               <option value="year">Year</option>
             </select>
+
+            {/* Genre Dropdown */}
+            <select
+              value={genre}
+              onChange={handleGenreChange}
+              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Genres</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Drama">Drama</option>
+              <option value="Romance">Romance</option>
+              {/* Add more genres here */}
+            </select>
+
+            {/* Year Dropdown */}
+            <select
+              value={year}
+              onChange={handleYearChange}
+              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Years</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              {/* Add more years dynamically if needed */}
+            </select>
+
+            {/* Rating Dropdown */}
+            <select
+              value={rating}
+              onChange={handleRatingChange}
+              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Ratings</option>
+              <option value="G">G</option>
+              <option value="PG">PG</option>
+              <option value="PG-13">PG-13</option>
+              <option value="R">R</option>
+            </select>
+
+            {/* Search button */}
+            <button
+              onClick={() => handleSearch(searchTerm, genre, year, rating)}
+              className="px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out w-full sm:w-auto mt-4 sm:mt-0"
+            >
+              Search
+            </button>
           </div>
         </div>
 
@@ -172,7 +229,7 @@ const App = () => {
             filteredMovies.map((movie, index) => (
               <Link
                 key={index}
-                href={`/movie-details/${movie.id}`} // assuming each movie has a unique 'id'
+                href={`/movie-details/${movie.id}`}
                 className="block bg-[#1f1f1f] rounded-2xl shadow-lg border border-gray-700 hover:scale-105 transition-transform"
               >
                 <div className="p-6">
