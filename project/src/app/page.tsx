@@ -27,7 +27,6 @@ interface Movie {
 }
 
 export default function Home() {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +59,7 @@ export default function Home() {
     return (
       <div>
         <Navbar />
-        <div class="h-screen flex justify-center items-center">
+        <div className="h-screen flex justify-center items-center">
           Loading movies...
         </div>
       </div>
@@ -69,12 +68,7 @@ export default function Home() {
 
   return (
     <main>
-      <Navbar
-        selectedGenre={selectedGenre}
-        setSelectedGenre={setSelectedGenre}
-        searched={searched}
-        setSearched={setSearched}
-      />
+      <Navbar />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div
         style={{
