@@ -6,9 +6,22 @@ import avatar from "@/assets/avatar.png";
 import theatre from "@/assets/theatre.png";
 import Link from "next/link";
 import styles from "@/components/Card.module.css";
-import search from "@/assets/search.png";
+import SearchBar from "@/components/SearchBar";
+import GenreBar from "@/components/GenreBar";
 
-export default function Navbar() {
+interface NavbarProps {
+  selectedGenre: string;
+  setSelectedGenre: (genre: string) => void;
+  searched: string;
+  setSearched: (searched: string) => void;
+}
+
+export default function Navbar({
+  selectedGenre,
+  setSelectedGenre,
+  searched,
+  setSearched,
+}: NavbarProps) {
   return (
     <nav className={styles.navbarContainer}>
       <div className={styles.navbarLeft}>
@@ -16,12 +29,19 @@ export default function Navbar() {
           <Image src={theatre} alt="logo" priority />
         </Link>
       </div>
-
-      <div className={styles.navbarRight}>
-        <Link href="/search">
-          <Image src={search} alt="logo" priority />
-        </Link>
-        <Image src={avatar} alt="profile" priority />
+      <div>
+        <SearchBar searched={searched} onChange={setSearched} />
+      </div>
+      <div>
+        <GenreBar selected={selectedGenre} onChange={setSelectedGenre} />
+      </div>
+      <div>
+        <Image
+          src={avatar}
+          alt="profile"
+          className={styles.navbarProfile}
+          priority
+        />
       </div>
     </nav>
   );

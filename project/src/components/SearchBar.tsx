@@ -1,12 +1,26 @@
 "use client";
 
 import React from "react";
-import Button from "@/components/Button";
 import search from "@/assets/search.png";
 import Image from "next/image";
 import styles from "@/components/Card.module.css";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  searched: string;
+  onChange: (value: string) => void;
+  onSubmit?: () => void;
+}
+
+export default function SearchBar({
+  searched,
+  onChange,
+  onSubmit,
+}: SearchBarProps) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSubmit) onSubmit();
+  };
+
   return (
     <form className={styles.searchBar}>
       <input type="text" placeholder="Search..." className={styles.input} />

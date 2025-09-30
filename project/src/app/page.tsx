@@ -1,13 +1,33 @@
 "use client";
 
 import styles from "@/components/Card.module.css";
-
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
+import Link from "next/link";
+
+interface Movie {
+  id: string;
+  title: string;
+  genre: string;
+  mpaaRating: string | null;
+  director: string;
+  producer: string;
+  cast: string;
+  synopsis: string | null;
+  description: string | null;
+  posterUrl: string | null;
+  trailerUrl: string | null;
+  releaseDate: string | null; // ✅ fix: was release_date
+  nowShowing: boolean;
+  comingSoon: boolean;
+  showtimes: string[];
+  rating: number;
+}
 
 export default function Home() {
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +69,12 @@ export default function Home() {
 
   return (
     <main>
-      <Navbar />
+      <Navbar
+        selectedGenre={selectedGenre}
+        setSelectedGenre={setSelectedGenre}
+        searched={searched}
+        setSearched={setSearched}
+      />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div
         style={{

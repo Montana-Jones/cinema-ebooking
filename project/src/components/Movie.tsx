@@ -16,7 +16,7 @@ interface Showtime {
 
 interface MovieProps {
   movie: {
-    _id: string;
+    id: string;
     title: string;
     genre: string;
     mpaaRating: string;
@@ -39,13 +39,17 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
       <div className={styles.movieCard}>
         {/* Poster */}
         <div className={styles.posterWrapper}>
-          <Image
-            src={movie.poster_url}
-            alt={movie.title}
-            width={350}
-            height={525}
-            className={styles.poster}
-          />
+          {movie.posterUrl ? (
+            <Image
+              src={movie.posterUrl}
+              alt={movie.title}
+              width={350}
+              height={525}
+              className={styles.poster}
+            />
+          ) : (
+            <div className={styles.noPoster}>No Image</div>
+          )}
         </div>
 
         {/* Movie Info */}
@@ -56,6 +60,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
               <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
+              <strong>Rating:</strong> {movie.mpaaRating}
               <strong>Rating:</strong> {movie.mpaaRating}
             </p>
             <p>
@@ -79,9 +84,11 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
           </p>
 
           {/* Trailer Link */}
-          <div className={styles.trailerWrapper}>
-            <Trailer trailerUrl={movie.trailer_url} />
-          </div>
+          {movie.trailerUrl && (
+            <div className={styles.trailerWrapper}>
+              <Trailer trailerUrl={movie.trailerUrl} />
+            </div>
+          )}
         </div>
       </div>
       <div className={styles.showtimesContainer}>

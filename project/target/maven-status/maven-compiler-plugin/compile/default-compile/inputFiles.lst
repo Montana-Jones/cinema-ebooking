@@ -1,0 +1,6 @@
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/CinemaBackendApplication.java
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/controller/MovieController.java
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/exception/MovieNotFoundException.java
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/model/Movie.java
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/repository/MovieRepository.java
+/Users/uynguyen/Desktop/CS4050GitHub/project/src/main/java/com/example/cinema_backend/service/MovieService.java
