@@ -233,6 +233,6 @@ export default function MoviePage({ params }: { params: Promise<{ id: string; ti
         </div>
 
       </div>
-    </main>
+   </main>
   );
 }

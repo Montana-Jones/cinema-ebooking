@@ -14,12 +14,12 @@ interface Showtime {
   startTime: Date;
 }
 
-interface MovieProps {
+export interface MovieProps {
   movie: {
-    _id: string;
+    id: string;
     title: string;
     genre: string;
-    mpaaRating: string;
+    mpaa_rating: string;
     rating: number; //a star rating between 0 and 5
     director: string; //list all directors in a single string
     producer: string; //list all producers in a single string
@@ -56,7 +56,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
               <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
-              <strong>Rating:</strong> {movie.mpaaRating}
+              <strong>Rating:</strong> {movie.mpaa_rating}
             </p>
             <p>
               <strong>Stars:</strong> {movie.rating} ⭐
