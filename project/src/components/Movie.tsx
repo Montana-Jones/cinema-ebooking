@@ -19,7 +19,7 @@ interface MovieProps {
     _id: string;
     title: string;
     genre: string;
-    mpaa_rating: string;
+    mpaaRating: string;
     rating: number; //a star rating between 0 and 5
     director: string; //list all directors in a single string
     producer: string; //list all producers in a single string
@@ -56,7 +56,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
               <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
-              <strong>Rating:</strong> {movie.mpaa_rating}
+              <strong>Rating:</strong> {movie.mpaaRating}
             </p>
             <p>
               <strong>Stars:</strong> {movie.rating} ⭐

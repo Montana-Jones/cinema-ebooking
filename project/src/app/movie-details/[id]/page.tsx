@@ -1,16 +1,26 @@
-import dummyMovies from "@/data/DummyMovies";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 
 interface MoviePageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default async function MoviePage({ params }: MoviePageProps) {
-  const { id } = await params;
-  const movie = dummyMovies.find((m) => m._id === id);
+  const { id } = params;
 
-  if (!movie) return <p>Movie not found.</p>;
+  const res = await fetch(`http://localhost:8080/api/movies/${id}`, {
+    cache: "no-store", // ensures fresh data each time
+  });
+
+  if (!res.ok) {
+    return <p>Movie not found.</p>;
+  }
+
+  const movie = await res.json();
+
+  if (!movie) {
+    return <p>Movie not found.</p>;
+  }
 
   return (
     <main

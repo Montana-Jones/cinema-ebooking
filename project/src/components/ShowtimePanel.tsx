@@ -15,7 +15,7 @@ interface Showtime {
 
 interface MovieProps {
   movie: {
-    _id: string;
+    id: string;
     title: string;
     genre: string;
     mpaa_rating: string;
@@ -39,31 +39,31 @@ const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
       <div className={styles.showtimes}>
         <Link
           className={styles.showtimeButton}
-          href={`/booking-nav/${movie._id}`}
+          href={`/booking-nav/${movie.id}`}
         >
           <p>11:00am</p>
         </Link>
         <Link
           className={styles.showtimeButton}
-          href={`/booking-nav/${movie._id}`}
+          href={`/booking-nav/${movie.id}`}
         >
           <p>2:00pm</p>
         </Link>
         <Link
           className={styles.showtimeButton}
-          href={`/booking-nav/${movie._id}`}
+          href={`/booking-nav/${movie.id}`}
         >
           <p>5:00pm</p>
         </Link>
         <Link
           className={styles.showtimeButton}
-          href={`/booking-nav/${movie._id}`}
+          href={`/booking-nav/${movie.id}`}
         >
           <p>8:00pm</p>
         </Link>
         <Link
           className={styles.showtimeButton}
-          href={`/booking-nav/${movie._id}`}
+          href={`/booking-nav/${movie.id}`}
         >
           <p>11:00pm</p>
         </Link>

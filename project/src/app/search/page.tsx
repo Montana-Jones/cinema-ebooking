@@ -4,22 +4,18 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
-// The main App component that contains the search bar.
 const App = () => {
-  // Mock movie data to simulate a database. In a real-world app, this would come from an API.
   const [allMovies, setAllMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
 
-  // State to hold the value of the search input field and the selected filter types.
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("title"); // Default filter to 'title'
   const [genre, setGenre] = useState("");
-  const [year, setYear] = useState("");
-  const [rating, setRating] = useState("");
+  const [mpaaRating, setmpaaRating] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/movies") // adjust if backend runs on a different port
+    fetch("http://localhost:8080/api/movies")
       .then((res) => res.json())
       .then((data) => {
         setAllMovies(data);
@@ -33,9 +29,8 @@ const App = () => {
     const value = event.target.value;
     setSearchTerm(value);
 
-    // If the search box is cleared, reset the movie list based on the dropdowns
     if (value.length === 0) {
-      handleSearch("", genre, year, rating);
+      handleSearch("", genre, mpaaRating);
     }
 
     if (value.length > 0) {
@@ -56,35 +51,31 @@ const App = () => {
   };
 
   // Function to handle the search action.
-  const handleSearch = (term, newGenre, newYear, newRating) => {
+  const handleSearch = (term, newGenre, newRating) => {
     const lowerCaseTerm = (term || "").toLowerCase();
     setSuggestions([]); // Clear suggestions on search
 
-    // Primary filter based on the main search bar and filter dropdown
     const searchResults = allMovies.filter((movie) => {
       let movieValue;
       if (filterType === "title") {
         movieValue = String(movie.title).toLowerCase();
       } else if (filterType === "genre") {
         movieValue = String(movie.genre).toLowerCase();
-      } else if (filterType === "year") {
-        movieValue = String(movie.year).toLowerCase();
       }
       return String(movieValue).includes(lowerCaseTerm);
     });
 
-    // Apply additional filters from the other dropdowns
+    // Apply additional filters from genre + mpaaRating only
     const finalFilteredList = searchResults.filter((movie) => {
       const matchesGenre =
-        !newGenre || movie.genre.toLowerCase() === newGenre.toLowerCase();
-
-      const matchesYear = !newYear || String(movie.year) === String(newYear);
+        !newGenre || movie.genre.toLowerCase().includes(newGenre.toLowerCase());
 
       const matchesRating =
         !newRating ||
-        String(movie.rating).toLowerCase() === String(newRating).toLowerCase();
+        String(movie.mpaaRating).toLowerCase() ===
+          String(newRating).toLowerCase();
 
-      return matchesGenre && matchesYear && matchesRating;
+      return matchesGenre && matchesRating;
     });
 
     setFilteredMovies(finalFilteredList);
@@ -93,32 +84,21 @@ const App = () => {
   const handleGenreChange = (event) => {
     const newGenre = event.target.value;
     setGenre(newGenre);
-    setSearchTerm(""); // Clear search term to show all movies for the new genre
-    handleSearch("", newGenre, year, rating);
-  };
-
-  const handleYearChange = (event) => {
-    const newYear = event.target.value;
-    setYear(newYear);
     setSearchTerm("");
-    handleSearch("", genre, newYear, rating);
+    handleSearch("", newGenre, mpaaRating);
   };
 
   const handleRatingChange = (event) => {
     const newRating = event.target.value;
-    setRating(newRating);
+    setmpaaRating(newRating);
     setSearchTerm("");
-    handleSearch("", genre, year, newRating);
+    handleSearch("", genre, newRating);
   };
 
-  // Function to handle clicking on a suggestion
   const handleSuggestionClick = (title) => {
     setSearchTerm(title);
-    // Explicitly set the filter type to 'title' when a suggestion is clicked.
-    // This ensures the search works correctly, overriding any other filter selected.
     setFilterType("title");
-    // Now call handleSearch with the new term. The logic inside handleSearch will correctly use the new filterType.
-    handleSearch(title, genre, year, rating);
+    handleSearch(title, genre, mpaaRating);
   };
 
   return (
@@ -128,7 +108,6 @@ const App = () => {
         <div className="w-full bg-background p-6 rounded-2xl shadow-lg border border-gray-700">
           {/* Main search and title bar */}
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 w-full mb-6">
-            {/* Title */}
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
               Movie Search
             </h1>
@@ -142,7 +121,7 @@ const App = () => {
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
                   if (e.key === "Enter")
-                    handleSearch(searchTerm, genre, year, rating);
+                    handleSearch(searchTerm, genre, mpaaRating);
                 }}
                 className="w-full pl-12 pr-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -170,7 +149,6 @@ const App = () => {
             >
               <option value="title">Title</option>
               <option value="genre">Genre</option>
-              <option value="year">Year</option>
             </select>
 
             {/* Genre Dropdown */}
@@ -184,25 +162,11 @@ const App = () => {
               <option value="Comedy">Comedy</option>
               <option value="Drama">Drama</option>
               <option value="Romance">Romance</option>
-              {/* Add more genres here */}
-            </select>
-
-            {/* Year Dropdown */}
-            <select
-              value={year}
-              onChange={handleYearChange}
-              className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Years</option>
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              {/* Add more years dynamically if needed */}
             </select>
 
             {/* Rating Dropdown */}
             <select
-              value={rating}
+              value={mpaaRating}
               onChange={handleRatingChange}
               className="flex-shrink-0 px-5 py-3 text-lg rounded-full border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -215,7 +179,7 @@ const App = () => {
 
             {/* Search button */}
             <button
-              onClick={() => handleSearch(searchTerm, genre, year, rating)}
+              onClick={() => handleSearch(searchTerm, genre, mpaaRating)}
               className="px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out w-full sm:w-auto mt-4 sm:mt-0"
             >
               Search
@@ -239,12 +203,9 @@ const App = () => {
                       <strong>Genre:</strong> {movie.genre}
                     </p>
                     <p>
-                      <strong>Year:</strong> {movie.year}
+                      <strong>Rating:</strong> {movie.mpaaRating}
                     </p>
-                    <p>
-                      <strong>Rating:</strong> {movie.rating}
-                    </p>
-                    <p className="mt-2 text-sm italic">{movie.description}</p>
+                    <p className="mt-2 text-sm italic">{movie.synopsis}</p>
                   </div>
                 </div>
               </Link>

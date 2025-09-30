@@ -37,7 +37,14 @@ export default function Home() {
   );
 
   if (loading) {
-    return <div>Loading movies...</div>;
+    return (
+      <div>
+        <Navbar />
+        <div class="h-screen flex justify-center items-center">
+          Loading movies...
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -54,7 +61,7 @@ export default function Home() {
         }}
       >
         {" "}
-        <div className={styles.movieScroll}>
+        <div>
           {filteredMovies.map((movie) => (
             <MoviePreview key={movie.id} movie={movie} />
           ))}

@@ -1,7 +1,6 @@
 "use client";
 
-import dummyMovies from "@/data/DummyMovies";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 
@@ -10,9 +9,35 @@ interface MoviePageProps {
 }
 
 export default function MoviePage({ params }: MoviePageProps) {
-  const movie = dummyMovies.find((m) => m._id === params.id);
+  const [movie, setMovie] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!movie) return <p>Movie not found.</p>;
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/movies/${id}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch movie");
+        }
+        const data = await res.json();
+        setMovie(data);
+      } catch (err) {
+        console.error("Error fetching movie:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovie();
+  }, [params.id]);
+
+  if (loading) {
+    return <p>Loading movie...</p>;
+  }
+
+  if (!movie) {
+    return <p>Movie not found.</p>;
+  }
 
   return (
     <main
@@ -24,7 +49,9 @@ export default function MoviePage({ params }: MoviePageProps) {
       }}
     >
       <Navbar />
-      <h1 style={{ margin: "auto" }}>Replace this with the booking</h1>
+      {/* Replace with booking navigation later */}
+      <h1 style={{ margin: "auto" }}>{movie.title}</h1>
+      {/* You can also render <Movie movie={movie} /> here */}
     </main>
   );
 }
