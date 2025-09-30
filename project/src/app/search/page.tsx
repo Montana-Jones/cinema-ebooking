@@ -71,9 +71,7 @@ const App = () => {
         !newGenre || movie.genre.toLowerCase().includes(newGenre.toLowerCase());
 
       const matchesRating =
-        !newRating ||
-        String(movie.mpaaRating).toLowerCase() ===
-          String(newRating).toLowerCase();
+        !newRating || String(movie.mpaaRating) === String(newRating);
 
       return matchesGenre && matchesRating;
     });
@@ -205,7 +203,9 @@ const App = () => {
                     <p>
                       <strong>Rating:</strong> {movie.mpaaRating}
                     </p>
-                    <p className="mt-2 text-sm italic">{movie.synopsis}</p>
+                    <p className="mt-2 text-[0.9rem] text-[#444]">
+                      {movie.synopsis}
+                    </p>
                   </div>
                 </div>
               </Link>
