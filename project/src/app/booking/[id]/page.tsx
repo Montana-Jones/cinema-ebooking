@@ -1,12 +1,14 @@
-// src/app/booking/[id]/page.tsx
 "use client";
+
 import React, { useEffect, useState } from "react";
-import MoviePreview from "@/components/MoviePreview";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import Image from "next/image";
+
 import TopBar from "@/app/booking/part/topBar";
 import MovieBar from "@/app/booking/part/movieBar";
+import MoviePreview from "@/components/MoviePreview";
+
 import TheatreScreen from "@/assets/TheaterScreen.png";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
 
 interface MovieP {
@@ -28,15 +30,13 @@ type Seat = {
 const rows = 10;
 const cols = 12;
 
-// Generate dummy seats
-const generateSeats = (): Seat[][] => {
-  return Array.from({ length: rows }, (_, rowIndex) =>
+const generateSeats = (): Seat[][] =>
+  Array.from({ length: rows }, (_, rowIndex) =>
     Array.from({ length: cols }, (_, colIndex) => ({
       id: `${rowIndex}-${colIndex}`,
-      occupied: Math.random() < 0.2, // 20% seats occupied
+      occupied: Math.random() < 0.2, // 20% occupied
     }))
   );
-};
 
 export default function SeatSelection() {
   const [movie, setMovie] = useState<MovieP | null>(null);
@@ -44,23 +44,23 @@ export default function SeatSelection() {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
 
   const params = useParams();
-  const { id } = params; // grabs the [id] from the URL
+  const searchParams = useSearchParams();
+
+  const { id } = params;
+  const showtime = searchParams.get("time") || "Not selected";
+  const selectedTime = searchParams.get("time"); // <-- picked from query param
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/movies/${id}`)
       .then((res) => res.json())
-      .then((data) => {
-        console.log("Movie fetched:", data); // debug
-        setMovie(data);
-      })
+      .then((data) => setMovie(data))
       .catch((err) => console.error(err));
   }, [id]);
 
   useEffect(() => {
-    // Generate seats only on client
-    const newSeats = generateSeats();
-    setSeats(newSeats);
+    setSeats(generateSeats());
   }, []);
+
   const toggleSeat = (seatId: string) => {
     setSelectedSeats((prev) =>
       prev.includes(seatId)
@@ -72,13 +72,15 @@ export default function SeatSelection() {
   return (
     <main style={{ textAlign: "center" }}>
       <Navbar />
-      <MovieBar movieId={typeof id === "string" ? id : ""} />
+      <MovieBar movieId={params.id} showtime={showtime} />
+
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-start", // align items to left
-          alignItems: "flex-start", // top-align vertically
-          gap: "2rem", // spacing between poster, seats, summary
+          justifyContent: "center",
+          alignItems: "flex-start",
+          gap: "1rem",
+          marginTop: "2rem",
         }}
       >
         {/* Poster */}
@@ -86,7 +88,7 @@ export default function SeatSelection() {
           {movie ? <MoviePreview movie={movie} /> : <h2>Loading movie...</h2>}
         </div>
 
-        {/* Seat grid block */}
+        {/* Seat grid */}
         <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
           <div>
             {/* Screen */}
@@ -94,7 +96,7 @@ export default function SeatSelection() {
               <Image
                 src={TheatreScreen}
                 alt="screen"
-                style={{ width: "144%", height: "auto", margin: "1rem 0" }}
+                style={{ width: "144%", height: "auto", margin: "0.5rem 0" }}
               />
             </div>
 
@@ -111,6 +113,9 @@ export default function SeatSelection() {
                 >
                   {row.map((seat) => {
                     const isSelected = selectedSeats.includes(seat.id);
+                    const [rowIndex, colIndex] = seat.id.split("-").map(Number);
+                    const rowLabel = rowIndex;
+                    const seatLabel = `${rowLabel + "-"}${colIndex + 1}`;
                     return (
                       <div
                         key={seat.id}
@@ -126,11 +131,12 @@ export default function SeatSelection() {
                             : "#0af",
                           cursor: seat.occupied ? "not-allowed" : "pointer",
                           borderRadius: "4px",
+                          color: "white",
                           fontSize: ".7rem",
                           fontWeight: "bold",
                         }}
                       >
-                        {seat.id}
+                        {seatLabel}
                       </div>
                     );
                   })}
@@ -140,7 +146,7 @@ export default function SeatSelection() {
           </div>
         </div>
 
-        {/* Selected seats + button */}
+        {/* Summary panel */}
         <div
           style={{
             flex: "0 0 auto",
@@ -148,31 +154,15 @@ export default function SeatSelection() {
             borderRadius: "8px",
             padding: "1rem",
             width: "247px",
-            minHeight: "400",
-            position: "relative",
-            overflow: "visible",
-            zIndex: 1,
-            display: "flex", // <-- make the block flex
-            flexDirection: "column", // <-- stack items vertically
-            alignItems: "center", // <-- center horizontally
+            minHeight: "400px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           {/* Legend */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
+          <div style={{ marginBottom: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 style={{
                   width: "25px",
@@ -184,13 +174,7 @@ export default function SeatSelection() {
               />
               <span style={{ marginLeft: "8px" }}>Occupied</span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 style={{
                   width: "25px",
@@ -202,13 +186,7 @@ export default function SeatSelection() {
               />
               <span style={{ marginLeft: "8px" }}>Available</span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 style={{
                   width: "25px",
@@ -221,17 +199,24 @@ export default function SeatSelection() {
               <span style={{ marginLeft: "8px" }}>Selected</span>
             </div>
           </div>
-          <span>--------------</span>
-          <h3
-            style={{
-              marginBottom: "0.5rem",
-              fontSize: "1.1rem",
-              fontWeight: 1000,
-            }}
-          >
+
+          <h3 style={{ marginBottom: "0.5rem" }}>Showtime</h3>
+          <p>{selectedTime ?? "Not selected"}</p>
+
+          <h3 style={{ marginTop: "1rem", marginBottom: "0.5rem" }}>
             Selected Seats:
           </h3>
-          <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
+          <p>
+            {selectedSeats.length > 0
+              ? selectedSeats
+                  .map((id) => {
+                    const [r, c] = id.split("-").map(Number);
+                    return `${r}-${c + 1}`; // ✅ display properly
+                  })
+                  .join(", ")
+              : "None"}
+          </p>
+
           <button
             disabled={selectedSeats.length === 0}
             style={{
@@ -244,7 +229,11 @@ export default function SeatSelection() {
               borderRadius: "6px",
               cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
             }}
-            onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
+            onClick={() =>
+              alert(
+                `Seats booked: ${selectedSeats.join(", ")} at ${selectedTime}`
+              )
+            }
           >
             Continue
           </button>

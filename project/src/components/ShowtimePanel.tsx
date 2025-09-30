@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React from "react";
-import Card from "./Card";
 import styles from "./Card.module.css";
 import Link from "next/link";
 
@@ -19,10 +18,10 @@ interface MovieProps {
     title: string;
     genre: string;
     mpaa_rating: string;
-    rating: number; //a star rating between 0 and 5
-    director: string; //list all directors in a single string
-    producer: string; //list all producers in a single string
-    cast: string; //list all major cast members in a single string
+    rating: number; // star rating between 0 and 5
+    director: string;
+    producer: string;
+    cast: string;
     synopsis: string;
     poster_url: string;
     trailer_url: string;
@@ -37,19 +36,34 @@ const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
     <div className={styles.showtimeContainer}>
       <h1>Showtimes</h1>
       <div className={styles.showtimes}>
-        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking/${movie.id}?time=11:00am`}
+        >
           <p>11:00am</p>
         </Link>
-        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking/${movie.id}?time=2:00pm`}
+        >
           <p>2:00pm</p>
         </Link>
-        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking/${movie.id}?time=5:00pm`}
+        >
           <p>5:00pm</p>
         </Link>
-        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking/${movie.id}?time=8:00pm`}
+        >
           <p>8:00pm</p>
         </Link>
-        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
+        <Link
+          className={styles.showtimeButton}
+          href={`/booking/${movie.id}?time=11:00pm`}
+        >
           <p>11:00pm</p>
         </Link>
       </div>
