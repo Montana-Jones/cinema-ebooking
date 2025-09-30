@@ -1,30 +1,12 @@
 "use client";
 
 import styles from "@/components/Card.module.css";
+
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
-import Link from "next/link";
-
-interface Movie {
-  id: string;
-  title: string;
-  genre: string;
-  mpaaRating: string | null;
-  director: string;
-  producer: string;
-  cast: string;
-  synopsis: string | null;
-  description: string | null;
-  posterUrl: string | null;
-  trailerUrl: string | null;
-  releaseDate: string | null; // ✅ fix: was release_date
-  nowShowing: boolean;
-  comingSoon: boolean;
-  showtimes: string[];
-  rating: number;
-}
+import ShowtimePanel from "@/components/ShowtimePanel";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
@@ -82,7 +64,19 @@ export default function Home() {
         {" "}
         <div>
           {filteredMovies.map((movie) => (
-            <MoviePreview key={movie.id} movie={movie} />
+            <div
+              key={movie.id}
+              style={{
+                display: "flex",
+                alignItems: "flex-start", // align top edges
+                gap: "3rem", // space between MoviePreview and ShowtimePanel
+                width: "100%",
+                justifyContent: "flex-start",
+              }}
+            >
+              <MoviePreview movie={movie} />
+              {!movie.now_showing && <ShowtimePanel movie={movie} />}
+            </div>
           ))}
         </div>
       </div>

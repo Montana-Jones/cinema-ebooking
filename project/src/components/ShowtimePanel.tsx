@@ -37,34 +37,19 @@ const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
     <div className={styles.showtimeContainer}>
       <h1>Showtimes</h1>
       <div className={styles.showtimes}>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking-nav/${movie.id}`}
-        >
+        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
           <p>11:00am</p>
         </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking-nav/${movie.id}`}
-        >
+        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
           <p>2:00pm</p>
         </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking-nav/${movie.id}`}
-        >
+        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
           <p>5:00pm</p>
         </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking-nav/${movie.id}`}
-        >
+        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
           <p>8:00pm</p>
         </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking-nav/${movie.id}`}
-        >
+        <Link className={styles.showtimeButton} href={`/booking/${movie.id}`}>
           <p>11:00pm</p>
         </Link>
       </div>

@@ -16,10 +16,10 @@ interface Showtime {
 
 interface MovieProps {
   movie: {
-    id: string;
+    _id: string;
     title: string;
     genre: string;
-    mpaaRating: string;
+    mpaa_rating: string;
     rating: number; //a star rating between 0 and 5
     director: string; //list all directors in a single string
     producer: string; //list all producers in a single string
@@ -39,17 +39,13 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
       <div className={styles.movieCard}>
         {/* Poster */}
         <div className={styles.posterWrapper}>
-          {movie.posterUrl ? (
-            <Image
-              src={movie.posterUrl}
-              alt={movie.title}
-              width={350}
-              height={525}
-              className={styles.poster}
-            />
-          ) : (
-            <div className={styles.noPoster}>No Image</div>
-          )}
+          <Image
+            src={movie.poster_url}
+            alt={movie.title}
+            width={350}
+            height={525}
+            className={styles.poster}
+          />
         </div>
 
         {/* Movie Info */}
@@ -60,8 +56,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
               <strong>Genre:</strong> {movie.genre}
             </p>
             <p>
-              <strong>Rating:</strong> {movie.mpaaRating}
-              <strong>Rating:</strong> {movie.mpaaRating}
+              <strong>Rating:</strong> {movie.mpaa_rating}
             </p>
             <p>
               <strong>Stars:</strong> {movie.rating} ⭐
@@ -84,15 +79,13 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
           </p>
 
           {/* Trailer Link */}
-          {movie.trailerUrl && (
-            <div className={styles.trailerWrapper}>
-              <Trailer trailerUrl={movie.trailerUrl} />
-            </div>
-          )}
+          <div className={styles.trailerWrapper}>
+            <Trailer trailerUrl={movie.trailer_url} />
+          </div>
         </div>
       </div>
       <div className={styles.showtimesContainer}>
-        {movie.now_showing ? "" : <ShowtimePanel movie={movie} />}
+        <ShowtimePanel movie={movie} />
       </div>
     </Card>
   );
