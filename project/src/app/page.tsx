@@ -40,7 +40,7 @@ export default function Home() {
     return (
       <div>
         <Navbar />
-        <div class="h-screen flex justify-center items-center">
+        <div className="h-screen flex justify-center items-center">
           Loading movies...
         </div>
       </div>
