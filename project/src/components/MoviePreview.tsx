@@ -6,7 +6,6 @@ import React from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
 import { MovieProps } from "./Movie";
-import ShowtimePanel from "./ShowtimePanel";
 
 interface MoviePreviewProps {
   movie: MovieProps["movie"];
@@ -37,7 +36,6 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
           </div>
         </Card>
       </Link>
-      {movie.now_showing ? "" : <ShowtimePanel movie={movie} />}
     </div>
   );
 };

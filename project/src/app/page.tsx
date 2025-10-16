@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
+import ShowtimePanel from "@/components/ShowtimePanel";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
@@ -63,7 +64,19 @@ export default function Home() {
         {" "}
         <div>
           {filteredMovies.map((movie) => (
-            <MoviePreview key={movie.id} movie={movie} />
+            <div
+              key={movie.id}
+              style={{
+                display: "flex",
+                alignItems: "flex-start", // align top edges
+                gap: "3rem", // space between MoviePreview and ShowtimePanel
+                width: "100%",
+                justifyContent: "flex-start",
+              }}
+            >
+              <MoviePreview movie={movie} />
+              {!movie.now_showing && <ShowtimePanel movie={movie} />}
+            </div>
           ))}
         </div>
       </div>

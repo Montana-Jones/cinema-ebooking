@@ -85,7 +85,7 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
         </div>
       </div>
       <div className={styles.showtimesContainer}>
-        {movie.now_showing ? "" : <ShowtimePanel movie={movie} />}
+        {!movie.now_showing && <ShowtimePanel movie={movie} />}
       </div>
     </Card>
   );
