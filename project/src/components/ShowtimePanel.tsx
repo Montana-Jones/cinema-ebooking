@@ -1,5 +1,5 @@
 "use client";
-
+//src/components/ShowtimePanel.tsx
 import Image from "next/image";
 import React from "react";
 import styles from "./Card.module.css";
@@ -31,41 +31,22 @@ interface MovieProps {
   };
 }
 
+const hardcodedShowtimes = ["11:00am", "2:00pm", "5:00pm", "8:00pm", "11:00pm"];
+
 const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
   return (
     <div className={styles.showtimeContainer}>
       <h1>Showtimes</h1>
       <div className={styles.showtimes}>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking/${movie.id}?time=11:00am`}
-        >
-          <p>11:00am</p>
-        </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking/${movie.id}?time=2:00pm`}
-        >
-          <p>2:00pm</p>
-        </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking/${movie.id}?time=5:00pm`}
-        >
-          <p>5:00pm</p>
-        </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking/${movie.id}?time=8:00pm`}
-        >
-          <p>8:00pm</p>
-        </Link>
-        <Link
-          className={styles.showtimeButton}
-          href={`/booking/${movie.id}?time=11:00pm`}
-        >
-          <p>11:00pm</p>
-        </Link>
+        {hardcodedShowtimes.map((time) => (
+          <Link
+            key={time}
+            className={styles.showtimeButton}
+            href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
+          >
+            <p>{time}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );

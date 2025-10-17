@@ -19,6 +19,7 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <Card style={{ cursor: "pointer" }}>
+          
           <div className={styles.moviePreview}>
             <Image
               src={movie.poster_url}

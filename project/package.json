@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start:all": "concurrently \"npm run dev\" \"mvn spring-boot:run\"",
+    "start:all": "concurrently \"npm run dev\" \"cd .. && mvn spring-boot:run\"", 
     "lint": "eslint"
   },
   "dependencies": {
@@ -19,8 +19,8 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.1.15",
+    "@types/react-dom": "^19.1.9",
     "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",

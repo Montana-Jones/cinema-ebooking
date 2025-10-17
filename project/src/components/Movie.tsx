@@ -14,9 +14,9 @@ interface Showtime {
   startTime: Date;
 }
 
-interface MovieProps {
+export interface MovieProps {
   movie: {
-    _id: string;
+    id: string;
     title: string;
     genre: string;
     mpaa_rating: string;
