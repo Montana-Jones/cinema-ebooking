@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
@@ -25,6 +26,8 @@ public class Movie {
     private String trailerUrl;
     private boolean nowShowing;
     private boolean comingSoon;
-    private List<Showtime> showtimes; // Added to match the frontend data structure
     private double rating;
+
+    @DBRef
+    private List<Showtime> showtimes; // Added to match the frontend data structure
 }
