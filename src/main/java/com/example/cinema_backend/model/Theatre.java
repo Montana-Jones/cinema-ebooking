@@ -17,4 +17,7 @@ public class Theatre {
 
     @DBRef
     private List<Showroom> showrooms;
+
+    @DBRef
+    private Cinema cinema;
 }

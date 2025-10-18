@@ -2,6 +2,7 @@ package com.example.cinema_backend.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
@@ -14,4 +15,7 @@ public class Ticket {
 
     private double ticketPrice;
     private TicketType ticketType;
+
+    @DBRef
+    private Booking booking;
 }

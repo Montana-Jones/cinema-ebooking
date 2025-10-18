@@ -19,4 +19,7 @@ public class Showroom {
 
     @DBRef
     private List<Showtime> showtimes;
+
+    @DBRef
+    private Theatre theatre;
 }

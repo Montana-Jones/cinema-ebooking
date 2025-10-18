@@ -2,6 +2,7 @@ package com.example.cinema_backend.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
@@ -15,4 +16,7 @@ public class PaymentInfo {
     private int cardNumber;
     private String BillingAddress;
     private String expirationDate;
+
+    @DBRef
+    private Customer customer;
 }

@@ -18,9 +18,11 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String email;
+    private Status status;
+    
     @DBRef
     private List<Booking> bookings;
-    private Status status;
+    
     @DBRef
     private List<PaymentInfo> paymentInfo;
 }

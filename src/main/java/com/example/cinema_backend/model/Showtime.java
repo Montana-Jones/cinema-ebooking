@@ -23,6 +23,7 @@ public class Showtime {
 
     @DBRef
     private Movie movie;
+    
     @DBRef
     private Showroom showroom;
 }

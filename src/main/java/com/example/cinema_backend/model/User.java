@@ -2,7 +2,6 @@ package com.example.cinema_backend.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
@@ -13,9 +12,6 @@ public class User {
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
 
-    private int userID;
     private String password;
-
-    @DBRef
-    private Customer customer;
+    private String role; // Customer or Admin
 }
