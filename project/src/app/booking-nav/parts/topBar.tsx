@@ -16,14 +16,13 @@ export default function Navbar() {
           <Image src={theatre} alt="logo" priority />
         </Link>
       </div>
-        
-        <div>
-          <strong style={{ color: "#000000", fontSize: "1.25rem" }}>Select Seats</strong>
-      
-        </div>
 
-        
-      
+      <div>
+        <strong style={{ color: "#ffffffff", fontSize: "1.25rem" }}>
+          Select Seats
+        </strong>
+      </div>
+
       <div className={styles.navbarRight}>
         <Image src={avatar} alt="profile" priority />
       </div>

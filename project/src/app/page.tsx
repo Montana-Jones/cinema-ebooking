@@ -52,33 +52,15 @@ export default function Home() {
     <main>
       <Navbar />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
-      <div
-        style={{
-          padding: "2rem",
-          display: "flex",
-          flexDirection: "column",
-          gap: "2rem",
-          alignItems: "center",
-        }}
-      >
-        {" "}
-        <div>
-          {filteredMovies.map((movie) => (
-            <div
-              key={movie.id}
-              style={{
-                display: "flex",
-                alignItems: "flex-start", // align top edges
-                gap: "3rem", // space between MoviePreview and ShowtimePanel
-                width: "100%",
-                justifyContent: "flex-start",
-              }}
-            >
-              <MoviePreview movie={movie} />
-              {!movie.now_showing && <ShowtimePanel movie={movie} />}
-            </div>
-          ))}
-        </div>
+      <div className={styles.moviePreviews}>
+        {/* <div> */}
+        {filteredMovies.map((movie) => (
+          <div key={movie.id}>
+            <MoviePreview movie={movie} />
+            {movie.now_showing && <ShowtimePanel movie={movie} />}
+          </div>
+        ))}
+        {/* </div> */}
       </div>
     </main>
   );

@@ -81,25 +81,22 @@
 }
 
 .showtimeContainer {
-    border: 2px solid white;
-    border-radius: 2rem;
-    padding: 1rem;
+    width: 266px;
     height: fit-content;
-    margin: auto;
-    margin-left: 3rem;
+    margin: 1rem auto;
 }
 
 .showtimeContainer h1 {
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 500;
 }
 
 .showtimes {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-evenly;
     gap: 0.5rem;
 }
@@ -108,8 +105,9 @@
     background-color: #4c3b4d;
     border: 3px solid #675068;
     border-radius: 2rem;
-    padding: 0.75rem 1rem;
-    font-size: 1.2rem;
+    height: fit-content;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
@@ -130,8 +128,6 @@
   padding: 1rem;
   margin: 1rem auto;
   width: 80%;
-  min-width: 700px;
-  max-width: 1200px;
 }
 
 .posterWrapper {
@@ -139,8 +135,6 @@
 }
 
 .posterPreview {
-  width: 233px;
-  height: 350px;
   position: relative;
   border-radius: 8px;
   z-index: 1;
@@ -158,9 +152,16 @@
   margin-bottom: 0.1rem;
 }
 
+.moviePreviews {
+  padding: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+}
+
 .previewContainer {
   display: flex;
-  flex-direction: row;
 }
 
 .previewTitle {
@@ -189,7 +190,7 @@
 
 .synopsis {
   margin-top: 0.5rem;
-  color: #444;
+  color: #838383;
   width: 80%;
 }
 
@@ -201,8 +202,6 @@
   padding: 3%;
   border-radius: 0.5rem;
   object-fit: cover;
-  max-width: 250;
-  max-height: 375;
   z-index: 1;
 }
 

@@ -19,13 +19,12 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <Card style={{ cursor: "pointer" }}>
-          
           <div className={styles.moviePreview}>
             <Image
               src={movie.poster_url}
               alt={movie.title}
-              width={233}
-              height={350}
+              width={266}
+              height={400}
               className={styles.posterPreview}
             />
             <h2 className={styles.previewTitle}>{movie.title}</h2>

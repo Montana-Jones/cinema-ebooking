@@ -2,16 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https', // Or 'http' if needed, but 'https' is recommended
-        hostname: '**', // This wildcard allows images from any domain
-      },
-    ],
+    unoptimized: true, // ← allows all external image URLs, bypassing domain checks
   },
 };
-
-module.exports = nextConfig;
-
 
 export default nextConfig;

@@ -25,8 +25,8 @@ export default function ToggleSwitch({
       <label className={styles.switchWide}>
         <input type="checkbox" checked={isChecked} onChange={handleChange} />
         <span className={styles.sliderWide}>
-          <span className={styles.showing}>Now Showing</span>
-          <span className={styles.soon}>Coming Soon</span>
+          <span className={styles.showing}>Coming Soon</span>
+          <span className={styles.soon}>Now Showing</span>
         </span>
       </label>
     </div>

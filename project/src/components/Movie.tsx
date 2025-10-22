@@ -47,7 +47,6 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
             className={styles.poster}
           />
         </div>
-
         {/* Movie Info */}
         <div className={styles.movieInfo}>
           <h2 className={styles.title}>{movie.title}</h2>
@@ -83,9 +82,9 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
             <Trailer trailerUrl={movie.trailer_url} />
           </div>
         </div>
-      </div>
-      <div className={styles.showtimesContainer}>
-        {!movie.now_showing && <ShowtimePanel movie={movie} />}
+        <div className={styles.showtimesContainer}>
+          {movie.now_showing && <ShowtimePanel movie={movie} />}
+        </div>
       </div>
     </Card>
   );
