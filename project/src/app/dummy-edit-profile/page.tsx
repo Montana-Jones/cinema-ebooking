@@ -1,6 +1,8 @@
+// app/dummy-edit-profile/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import TopBar from "@/app/dummy-edit-profile/parts/topBar";
+import dummyCustomer from "@/data/DummyCustomers"; 
 
 interface Customer {
   id: string;
@@ -18,31 +20,11 @@ const EditProfile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Dummy "database" data
   useEffect(() => {
-    const dummyCustomer: Customer = {
-      id: "CUST001",
-      firstName: "Emma",
-      lastName: "Stone",
-      email: "emma.stone@example.com",
-      status: "ACTIVE",
-      bookings: [
-        { id: "B001", movieTitle: "Inception", date: "2025-08-01" },
-        { id: "B002", movieTitle: "Interstellar", date: "2025-07-20" },
-        { id: "B003", movieTitle: "Oppenheimer", date: "2025-05-12" },
-        { id: "B004", movieTitle: "Dune 2", date: "2025-02-28" },
-      ],
-      paymentInfo: [
-        { cardNumber: "**** **** **** 4242", cardHolder: "Emma Stone", expiry: "12/26" },
-        { cardNumber: "**** **** **** 1111", cardHolder: "Emma Stone", expiry: "08/25" },
-        { cardNumber: "**** **** **** 9999", cardHolder: "Emma Stone", expiry: "10/27" },
-      ],
-    };
-
     setTimeout(() => {
-      setCustomer(dummyCustomer);
+      setCustomer(dummyCustomer); // ✅ Use imported dummy data
       setLoading(false);
-    }, 800); // Simulate loading delay
+    }, 800);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +68,7 @@ const EditProfile: React.FC = () => {
     <TopBar />
 
     {/* Add padding-top to prevent overlap with TopBar */}
-    <div className="max-w-md w-full pt-20"> {/* 👈 Adjust padding if TopBar is taller */}
+    <div className="max-w-md w-full pt-20"> 
         <form onSubmit={handleSubmit} className="space-y-4 p-6 rounded-2xl shadow">
         <div>
             <label className="block font-medium mb-1">First Name</label>
@@ -132,6 +114,16 @@ const EditProfile: React.FC = () => {
             />
         </div>
 
+        {/* Change Password Link */}
+        <div className="text-right">
+          <a
+            href="/change-password"
+            className="text-blue-600 text-sm hover:underline"
+          >
+            Change Password
+          </a>
+        </div>
+
         <button
             type="submit"
             disabled={saving}
@@ -165,11 +157,12 @@ const EditProfile: React.FC = () => {
         <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-lg">Saved Payment Cards</h3>
             <button
-            onClick={handleEditCards}
-            className="text-blue-600 text-sm hover:underline"
+              onClick={() => (window.location.href = "/edit-cards")}
+              className="text-blue-600 text-sm hover:underline"
             >
-            Edit Cards
+              Edit Cards
             </button>
+
         </div>
 
         {customer?.paymentInfo && customer.paymentInfo.length > 0 ? (
