@@ -36,11 +36,12 @@
 
 .movieForm {
   display: flex;
-  margin: 2rem;
+  justify-content: center;
+  margin: 3rem 1rem;
+  font-size: 20px;
 }
 
-.movieForm input {
-  width: fit-content;
+.textInput {
   border: 1px solid #afafaf;
   border-radius: 16rem;
   padding: 4px;

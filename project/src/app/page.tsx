@@ -12,7 +12,8 @@ export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isAdmin, setIsAdmin] = useState(false);
   // Fetch movies from backend
   useEffect(() => {
     fetch("http://localhost:8080/api/movies") // backend endpoint
