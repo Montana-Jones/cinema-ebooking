@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
@@ -18,9 +21,14 @@ public class Booking {
     private int numTickets;
     private String showTime;
 
+    
+
+
     @DBRef
     private List<Ticket> tickets;
 
     @DBRef
     private Customer customer;
+
+   
 }

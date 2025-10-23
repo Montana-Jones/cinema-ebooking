@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;

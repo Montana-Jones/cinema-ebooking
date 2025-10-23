@@ -14,7 +14,7 @@ interface Customer {
   paymentInfo?: { cardNumber: string; cardHolder: string; expiry: string }[];
 }
 
-const EditProfile: React.FC = () => {
+const DEditProfile: React.FC = () => {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -188,4 +188,4 @@ const EditProfile: React.FC = () => {
   );
 };
 
-export default EditProfile;
+export default DEditProfile;
