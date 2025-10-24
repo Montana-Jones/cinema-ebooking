@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -22,10 +22,12 @@ public class Customer {
     private String lastName;
     private String email;
     private Status status;
+    private Promotion promotion;
+    private String billingAddress;
+
     
-    @DBRef
     private List<Booking> bookings;
     
-    @DBRef
+    
     private List<PaymentInfo> paymentInfo;
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -21,7 +20,8 @@ public class Booking {
     private int numTickets;
     private String showTime;
 
-    
+    // uy added here
+    private String movieTitle;
 
 
     @DBRef
