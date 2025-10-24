@@ -17,10 +17,9 @@ public class Booking {
 
     private int numTickets;
     private String showTime;
+    // uy added here
+    private String movieTitle;
 
     @DBRef
     private List<Ticket> tickets;
-
-    @DBRef
-    private Customer customer;
 }

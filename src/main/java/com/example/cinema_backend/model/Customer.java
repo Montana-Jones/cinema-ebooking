@@ -19,10 +19,15 @@ public class Customer {
     private String lastName;
     private String email;
     private Status status;
+    private Promotion promotion;
+    private String phoneNumber;
+    private String password;
+    private String homeAddress;
+    private String billingAddress;
+
     
-    @DBRef
     private List<Booking> bookings;
     
-    @DBRef
+    
     private List<PaymentInfo> paymentInfo;
 }
