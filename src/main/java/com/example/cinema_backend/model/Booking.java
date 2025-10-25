@@ -22,9 +22,6 @@ public class Booking {
     // uy added here
     private String movieTitle;
 
-    // uy added here
-    private String movieTitle;
-
 
     @DBRef
     private List<Ticket> tickets;

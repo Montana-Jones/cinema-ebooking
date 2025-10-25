@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
+
 
 import lombok.Data;
 
@@ -25,10 +25,6 @@ public class Customer {
     private Status status;
     private Promotion promotion;
     private String phoneNumber;
-<<<<<<< HEAD
-    private String password;
-=======
->>>>>>> private-uy
     private String homeAddress;
     private String billingAddress;
 
