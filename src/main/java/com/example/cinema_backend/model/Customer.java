@@ -21,8 +21,11 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String email;
+    private String password;
     private Status status;
     private Promotion promotion;
+    private String phoneNumber;
+    private String homeAddress;
     private String billingAddress;
 
     

@@ -9,10 +9,10 @@ import lombok.Data;
 public class PaymentInfo {
 
     
-
+    private String cardHolder;
     private String cardNumber;
     private String expirationDate;
-
+    private String cvv;
 
 
 }

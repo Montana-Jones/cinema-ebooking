@@ -16,7 +16,7 @@ public class Booking {
 
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
-
+    private String bookingNum;
     private int numTickets;
     private String showTime;
 
