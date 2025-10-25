@@ -21,7 +21,7 @@ interface Customer {
     showTime: string;
     movieTitle: string;
   }[];
-  paymentInfo?: { cardNumber: string; expirationDate: string }[];
+  paymentInfo?: { cardHolder: string; cardNumber: string; expirationDate: string; cvv?: string }[];
 }
 
 export default function EditProfile({
@@ -47,6 +47,8 @@ export default function EditProfile({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+
+  const [showCardEditor, setShowCardEditor] = useState(false);
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -76,6 +78,7 @@ export default function EditProfile({
             movieTitle: b.movie_title,
           })),
           paymentInfo: data.payment_info?.map((p: any) => ({
+            cardHolder: p.card_holder,
             cardNumber: p.card_number,
             expirationDate: p.expiration_date,
           })),
@@ -90,6 +93,44 @@ export default function EditProfile({
     };
     fetchCustomer();
   }, [email]);
+
+
+// Handle card input changes
+type PaymentCard = {
+  cardHolder: string;
+  cardNumber: string;
+  expirationDate: string;
+  cvv?: string;
+};
+
+const handleCardChange = (index: number, field: keyof PaymentCard, value: string) => {
+  setCustomer((prev) => {
+    if (!prev) return prev;
+    const updated = [...(prev.paymentInfo || [])] as PaymentCard[];
+    while (updated.length < 3) updated.push({ cardHolder: "", cardNumber: "", expirationDate: "", cvv: "" });
+    updated[index] = {
+      ...(updated[index] || { cardHolder: "", cardNumber: "", expirationDate: "", cvv: "" }),
+      [field]: value,
+    };
+    return { ...prev, paymentInfo: updated };
+  });
+};
+
+
+// Detect duplicate card numbers
+const hasDuplicateCard = (index: number): boolean => {
+  if (!customer?.paymentInfo) return false;
+  const currentCard = customer.paymentInfo[index]?.cardNumber?.trim();
+  if (!currentCard) return false;
+  return customer.paymentInfo.some(
+    (c, i) => i !== index && c.cardNumber.trim() === currentCard
+  );
+};
+
+// Save updated cards to backend — removed duplicate; the validated handleSaveCards implementation appears later in the file.
+
+
+
 
   const validateAddress = (address: string) => {
     const pattern = /^[\w\s.]+,\s*[\w\s.]+,\s*[A-Z]{2}\s*\d{5}$/i;
@@ -113,57 +154,146 @@ export default function EditProfile({
     setCustomer({ ...customer, [name]: newValue });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customer) return;
 
-    if (!isPhoneValid || !isHomeAddressValid || !isBillingAddressValid) {
-      alert("Please correct invalid fields before saving.");
-      return;
-    }
+    const validateCardFields = (card: Partial<PaymentCard> = {}, index: number): Record<string, string> => {
+      const errors: Record<string, string> = {};
 
-    setSaving(true);
-    setSuccess(false);
+      const cardNumber = (card.cardNumber || "").replace(/\s+/g, "");
+      const name = card.cardHolder?.trim() || "";
+      const exp = card.expirationDate?.trim() || "";
+      const cvv = card.cvv?.trim() || "";
 
-    try {
-      const payload = {
-        id: customer.id,
-        first_name: customer.firstName,
-        last_name: customer.lastName,
-        promotion: customer.promotion,
-        home_address: customer.homeAddress,
-        billing_address: customer.billingAddress,
-        phone_number: customer.phoneNumber,
-        ...(verifiedOldPassword && newPassword
-          ? { password: newPassword }
-          : {password: customer.password}), // only update password if verified
-      };
+      // If all fields are blank — skip validation
+      if (!cardNumber && !name && !exp && !cvv) return errors;
 
-      const res = await fetch(
-        `http://localhost:8080/api/customers/email/${customer.email}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+      // Card number: must be digits 13–19
+      if (!/^\d{13,19}$/.test(cardNumber)) {
+        errors.cardNumber = "Invalid card number (must be 13–19 digits).";
+      } else if (hasDuplicateCard(index)) {
+        errors.cardNumber = "This card number is already used.";
+      }
+
+      // Card holder: must have at least two names
+      if (!/^[A-Za-z]+(\s[A-Za-z]+)+$/.test(name)) {
+        errors.cardHolder = "Enter a valid full name (first and last).";
+      }
+
+      // Expiration: MM/YY format and not expired
+      const expMatch = exp.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+      if (!expMatch) {
+        errors.expirationDate = "Invalid format (MM/YY).";
+      } else {
+        const [_, month, year] = expMatch;
+        const expYear = Number(`20${year}`);
+        const expMonthIndex = Number(month) - 1; // convert to 0-based month index
+        // Card is valid through the end of the expiration month — build a Date at the
+        // last millisecond of that month for a correct comparison against now.
+        const expDate = new Date(expYear, expMonthIndex + 1, 0, 23, 59, 59, 999);
+        if (expDate < new Date()) {
+          errors.expirationDate = "Card has expired.";
         }
-      );
+      }
 
-      if (!res.ok) throw new Error("Failed to update customer");
-      setSuccess(true);
-      setAttempts(0);
-      setCustomer((prev) => (prev ? { ...prev, password: newPassword || prev.password } : prev));
-      setOldPasswordInput("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setVerifiedOldPassword(false);
-      setShowOldPasswordPrompt(false);
-    } catch (err) {
-      console.error(err);
-      alert("Error saving customer profile.");
-    } finally {
-      setSaving(false);
-    }
-  };
+      // CVV: 3–4 digits
+      if (!/^\d{3,4}$/.test(cvv)) {
+        errors.cvv = "Invalid CVV (must be 3–4 digits).";
+      }
+
+      return errors;
+    };
+
+    const handleSaveCards = async () => {
+      if (!customer) return;
+
+      // Validate all cards
+      const hasErrors = (customer.paymentInfo || [])
+        .slice(0, 3)
+        .some((card, i) => Object.keys(validateCardFields(card, i)).length > 0);
+
+      if (hasErrors) {
+        alert("Please fix validation errors before saving.");
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/customers/email/${customer.email}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...customer,
+              payment_info: (customer.paymentInfo || []).map((c) => ({
+                card_holder: c.cardHolder,
+                card_number: c.cardNumber,
+                expiration_date: c.expirationDate,
+                cvv: c.cvv,
+              })),
+            }),
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to update cards");
+        alert("Cards saved successfully!");
+        setShowCardEditor(false);
+      } catch (err) {
+        console.error(err);
+        alert("Error saving cards.");
+      }
+    };
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!customer) return;
+
+      if (!isPhoneValid || !isHomeAddressValid || !isBillingAddressValid) {
+        alert("Please correct invalid fields before saving.");
+        return;
+      }
+
+      setSaving(true);
+      setSuccess(false);
+
+      try {
+        const payload = {
+          id: customer.id,
+          first_name: customer.firstName,
+          last_name: customer.lastName,
+          promotion: customer.promotion,
+          home_address: customer.homeAddress,
+          billing_address: customer.billingAddress,
+          phone_number: customer.phoneNumber,
+          ...(verifiedOldPassword && newPassword
+            ? { password: newPassword }
+            : {password: customer.password}), // only update password if verified
+        };
+
+        const res = await fetch(
+          `http://localhost:8080/api/customers/email/${customer.email}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to update customer");
+        setSuccess(true);
+        setAttempts(0);
+        setCustomer((prev) => (prev ? { ...prev, password: newPassword || prev.password } : prev));
+        setOldPasswordInput("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setVerifiedOldPassword(false);
+        setShowOldPasswordPrompt(false);
+      } catch (err) {
+        console.error(err);
+        alert("Error saving customer profile.");
+      } finally {
+        setSaving(false);
+      }
+    };
 
   const handleOldPasswordSubmit = () => {
     if (!customer) return;
@@ -279,25 +409,143 @@ export default function EditProfile({
               </p>
             )}
           </div>
-          
+
           {/* Payment Info Section */} 
             <div className="mt-10 p-6 rounded-2xl shadow"> 
               <div className="flex justify-between items-center mb-2"> 
                 <h3 className="font-semibold text-lg">Saved Payment Cards</h3> 
-                <button onClick={
-                  () => (window.location.href = "/edit-cards/${customer?.email}")} 
-                  className="text-blue-600 text-sm hover:underline" > Edit Cards </button> 
-                  </div> 
-                  {customer?.paymentInfo && customer.paymentInfo.length > 0 ? ( 
-                    <ul className="divide-y divide-gray-200"> 
-                      {customer.paymentInfo.map((p, index) => ( 
-                        <li key={index} className="py-2 text-sm"> 
-                          <p className="font-medium">{p.cardNumber}</p>
-                          <p className="text-gray-500">Experation Date: {p.expirationDate}</p> 
-                        </li> ))} 
-                    </ul> ) 
+                <button
+                  onClick={() => setShowCardEditor(true)}
+                  className="text-blue-600 text-sm hover:underline"
+                >
+                  Edit Cards
+                </button>
+ 
+              </div> 
+              {customer?.paymentInfo && customer.paymentInfo.length > 0 ? ( 
+                <ul className="divide-y divide-gray-200"> 
+                  {customer.paymentInfo.map((p, index) => ( 
+                    <li key={index} className="py-2 text-sm"> 
+                      <p className="font-medium">Card Number: {p.cardNumber}</p>
+                      <p className="text-gray-500">Experation Date: {p.expirationDate}</p>
+                      <p className="text-gray-500">Card Holder Name: {p.cardHolder}</p> 
+                    </li> ))} 
+                </ul> ) 
                   : ( <p className="text-gray-500 text-sm">No payment methods saved.</p> )} 
             </div>
+
+            {showCardEditor && (
+              <div className=" inset-0 flex items-center justify-center z-50">
+                <div className=" p-6 rounded-2xl shadow-lg w-full max-w-lg relative">
+                  <button
+                    onClick={() => setShowCardEditor(false)}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
+
+                  <h2 className="text-xl font-semibold mb-4">Edit Payment Cards</h2>
+
+                  {Array.from({ length: 3 }).map((_, index) => {
+                    const card = customer?.paymentInfo?.[index] || {
+                      cardHolder: "",
+                      cardNumber: "",
+                      expirationDate: "",
+                      cvv: "",
+                    };
+
+                    const errors = validateCardFields(card, index);
+
+                    return (
+                      <div key={index} className="border p-4 rounded-lg mb-3">
+                        <h3 className="font-medium mb-2">Card {index + 1}</h3>
+
+                        {/* Card Number */}
+                        <label className="block text-sm font-medium mb-1">Card Number</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 4111111111111111"
+                          value={card.cardNumber ?? ""}
+                          onChange={(e) => handleCardChange(index, "cardNumber", e.target.value)}
+                          className={`w-full border rounded-lg px-3 py-2 mb-1 ${
+                            errors.cardNumber ? "border-red-500" : "border-gray-300"
+                          }`}
+                          maxLength={19}
+                        />
+                        {errors.cardNumber && (
+                          <p className="text-red-500 text-sm mb-2">{errors.cardNumber}</p>
+                        )}
+
+                        {/* Card Holder */}
+                        <label className="block text-sm font-medium mb-1">Card Holder Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. John Doe"
+                          value={card.cardHolder ?? ""}
+                          onChange={(e) => handleCardChange(index, "cardHolder", e.target.value)}
+                          className={`w-full border rounded-lg px-3 py-2 mb-1 ${
+                            errors.cardHolder ? "border-red-500" : "border-gray-300"
+                          }`}
+                        />
+                        {errors.cardHolder && (
+                          <p className="text-red-500 text-sm mb-2">{errors.cardHolder}</p>
+                        )}
+
+                        {/* Expiration Date */}
+                        <label className="block text-sm font-medium mb-1">Expiration Date (MM/YY)</label>
+                        <input
+                          type="text"
+                          placeholder="MM/YY"
+                          value={card.expirationDate ?? ""}
+                          onChange={(e) =>
+                            handleCardChange(index, "expirationDate", e.target.value)
+                          }
+                          className={`w-full border rounded-lg px-3 py-2 mb-1 ${
+                            errors.expirationDate ? "border-red-500" : "border-gray-300"
+                          }`}
+                          maxLength={5}
+                        />
+                        {errors.expirationDate && (
+                          <p className="text-red-500 text-sm mb-2">{errors.expirationDate}</p>
+                        )}
+
+                        {/* CVV */}
+                        <label className="block text-sm font-medium mb-1">CVV</label>
+                        <input
+                          type="text"
+                          placeholder="3 digits"
+                          value={card.cvv ?? ""}
+                          onChange={(e) => handleCardChange(index, "cvv", e.target.value)}
+                          className={`w-full border rounded-lg px-3 py-2 mb-1 ${
+                            errors.cvv ? "border-red-500" : "border-gray-300"
+                          }`}
+                          maxLength={4}
+                        />
+                        {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
+                      </div>
+                    );
+                  })}
+
+                  <div className="flex justify-end space-x-3 mt-4">
+                    <button
+                      onClick={() => setShowCardEditor(false)}
+                      className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveCards}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                      Save Cards
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+
 
           <div>
             <label className="block font-medium mb-1">Billing Address</label>
