@@ -82,9 +82,6 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
             <Trailer trailerUrl={movie.trailer_url} />
           </div>
         </div>
-        <div className={styles.showtimesContainer}>
-          {movie.now_showing && <ShowtimePanel movie={movie} />}
-        </div>
       </div>
     </Card>
   );

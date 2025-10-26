@@ -2,34 +2,27 @@
 
 import React from "react";
 import styles from "./Card.module.css";
-
-// interface Showtime {
-//   id: number;
-//   movieId: number;
-//   theatreNum: number;
-//   startTime: Date;
-// }
-
-// export interface MovieProps {
-//   movie: {
-//     id: string;
-//     title: string;
-//     genre: string;
-//     mpaa_rating: string;
-//     rating: number; //a star rating between 0 and 5
-//     director: string; //list all directors in a single string
-//     producer: string; //list all producers in a single string
-//     cast: string; //list all major cast members in a single string
-//     synopsis: string;
-//     poster_url: string;
-//     trailer_url: string;
-//     now_showing: boolean;
-//     coming_soon: boolean;
-//     showtimes: Showtime[];
-//   };
-// }
+import { useUser } from "@/hooks/useUser";
+import Link from "next/link";
+import Navbar from "./Navbar";
 
 const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
+  const { user } = useUser();
+
+  if (!user || user.role !== "admin") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Navbar />
+        <p className="mb-6 text-lg">Access denied.</p>
+        <Link href="/">
+          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium">
+            Go back home
+          </p>
+        </Link>
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
