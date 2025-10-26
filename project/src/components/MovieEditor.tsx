@@ -1,39 +1,63 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
 import styles from "./Card.module.css";
 
-interface Showtime {
-  id: number;
-  movieId: number;
-  theatreNum: number;
-  startTime: Date;
-}
+// interface Showtime {
+//   id: number;
+//   movieId: number;
+//   theatreNum: number;
+//   startTime: Date;
+// }
 
-export interface MovieProps {
-  movie: {
-    id: string;
-    title: string;
-    genre: string;
-    mpaa_rating: string;
-    rating: number; //a star rating between 0 and 5
-    director: string; //list all directors in a single string
-    producer: string; //list all producers in a single string
-    cast: string; //list all major cast members in a single string
-    synopsis: string;
-    poster_url: string;
-    trailer_url: string;
-    now_showing: boolean;
-    coming_soon: boolean;
-    showtimes: Showtime[];
-  };
-}
+// export interface MovieProps {
+//   movie: {
+//     id: string;
+//     title: string;
+//     genre: string;
+//     mpaa_rating: string;
+//     rating: number; //a star rating between 0 and 5
+//     director: string; //list all directors in a single string
+//     producer: string; //list all producers in a single string
+//     cast: string; //list all major cast members in a single string
+//     synopsis: string;
+//     poster_url: string;
+//     trailer_url: string;
+//     now_showing: boolean;
+//     coming_soon: boolean;
+//     showtimes: Showtime[];
+//   };
+// }
 
 const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const movieData = Object.fromEntries(formData.entries());
+
+    movieData.now_showing = movieData.status === "now_showing";
+    movieData.coming_soon = movieData.status === "coming_soon";
+    delete movieData.status;
+
+    try {
+      const res = await fetch("http://localhost:8080/api/movies", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(movieData),
+      });
+
+      if (!res.ok) throw new Error("Failed to save movie");
+      alert("Movie saved successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Error saving movie!");
+    }
+  };
+
   return (
     <div className={styles.movieForm}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title">Title: </label>
           <input
