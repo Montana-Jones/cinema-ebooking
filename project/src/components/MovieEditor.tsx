@@ -41,7 +41,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
     delete movieData.status;
 
     try {
-      const res = await fetch("http://localhost:8080/api/movies", {
+      const res = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(movieData),
@@ -61,7 +61,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
         <div>
           <label htmlFor="title">Title: </label>
           <input
-            class="w-80 m-2 mr-8 border border-white-600 rounded-lg p-1"
+            className="w-80 m-2 mr-8 border border-white-600 rounded-lg p-1"
             type="text"
             id="title"
             name="title"
@@ -70,7 +70,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           ></input>
           <label htmlFor="genre">Genre: </label>
           <input
-            class="w-60 m-2 mr-8 border border-white-600 rounded-lg p-1"
+            className="w-60 m-2 mr-8 border border-white-600 rounded-lg p-1"
             type="text"
             id="genre"
             name="genre"
@@ -79,7 +79,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           ></input>
           <label htmlFor="mpaa_rating">Rating: </label>
           <input
-            class="w-20 m-2 mr-8 border border-white-600 rounded-lg p-1"
+            className="w-20 m-2 mr-8 border border-white-600 rounded-lg p-1"
             type="text"
             id="mpaa_rating"
             name="mpaa_rating"
@@ -88,7 +88,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           ></input>
           <label htmlFor="rating">Star Rating: </label>
           <input
-            class="w-15 m-2 border border-white-600 rounded-lg p-1"
+            className="w-15 m-2 border border-white-600 rounded-lg p-1"
             type="number"
             min="0"
             max="5"
@@ -102,7 +102,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
         <div>
           <label htmlFor="director">Director: </label>
           <input
-            class="w-100 m-2 mr-8 border border-white-600 rounded-lg p-1"
+            className="w-100 m-2 mr-8 border border-white-600 rounded-lg p-1"
             type="text"
             id="director"
             name="director"
@@ -111,7 +111,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           ></input>
           <label htmlFor="producer">Producer: </label>
           <input
-            class="w-120 m-2 border border-white-600 rounded-lg p-1"
+            className="w-120 m-2 border border-white-600 rounded-lg p-1"
             type="text"
             id="producer"
             name="producer"
@@ -121,17 +121,17 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
         </div>
         <label htmlFor="cast">Cast: </label>
         <input
-          class="w-250 m-2 border border-white-600 rounded-lg p-1"
+          className="w-250 m-2 border border-white-600 rounded-lg p-1"
           type="text"
           id="cast"
           name="cast"
           defaultValue={movie.cast}
           required
         ></input>
-        <div class="flex items-center">
+        <div className="flex items-center">
           <label htmlFor="synopsis">Synopsis: </label>
           <textarea
-            class="w-250 m-2 border border-white-600 rounded-lg p-1"
+            className="w-250 m-2 border border-white-600 rounded-lg p-1"
             type="text"
             id="synopsis"
             name="synopsis"
@@ -142,7 +142,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
         <div>
           <label htmlFor="trailer_url">Trailer URL: </label>
           <input
-            class="w-200 m-2 border border-white-600 rounded-lg p-1"
+            className="w-200 m-2 border border-white-600 rounded-lg p-1"
             type="url"
             id="trailer_url"
             name="trailer_url"
@@ -153,7 +153,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
         <div>
           <label htmlFor="poster_url">Poster URL: </label>
           <input
-            class="w-250 m-2 border border-white-600 rounded-lg p-1"
+            className="w-250 m-2 border border-white-600 rounded-lg p-1"
             type="url"
             id="poster_url"
             name="poster_url"
@@ -161,11 +161,11 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
             required
           ></input>
         </div>
-        <div class="flex">
-          <p class="mr-3">Status: </p>
-          <label class="mr-10">
+        <div className="flex">
+          <p className="mr-3">Status: </p>
+          <label className="mr-10">
             <input
-              class="m-1"
+              className="m-1"
               type="radio"
               name="status"
               value="now_showing"
@@ -176,7 +176,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           </label>
           <label>
             <input
-              class="m-1"
+              className="m-1"
               type="radio"
               name="status"
               value="coming_soon"
@@ -187,7 +187,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
           </label>
         </div>
         <button
-          class="flex mt-3 m-auto text-2xl bg-[#4c3b4d] border-2 border-[#675068] rounded-full p-3 pr-5 pl-5 cursor-pointer"
+          className="flex mt-3 m-auto text-2xl bg-[#4c3b4d] border-2 border-[#675068] rounded-full p-3 pr-5 pl-5 cursor-pointer"
           type="submit"
         >
           Save Changes

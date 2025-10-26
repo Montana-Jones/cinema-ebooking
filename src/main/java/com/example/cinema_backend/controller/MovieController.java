@@ -1,64 +1,131 @@
 package com.example.cinema_backend.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.cinema_backend.model.Movie;
-import com.example.cinema_backend.service.MovieService;
+import com.example.cinema_backend.repository.MovieRepository;
 
 @RestController
 @RequestMapping("/api/movies")
-@CrossOrigin(origins = "http://localhost:3000")
 public class MovieController {
 
-    private final MovieService movieService;
-
     @Autowired
-    public MovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
+    private MovieRepository movieRepository;
 
-    // GET /api/movies
+    // -------------------------------
+    // GET all movies
+    // -------------------------------
     @GetMapping
-    public ResponseEntity<List<Movie>> getAllMovies() {
-        return ResponseEntity.ok(movieService.getAllMovies());
+    public List<Movie> getAllMovies() {
+        return movieRepository.findAll();
     }
 
-    // GET /api/movies/{id}
+    // -------------------------------
+    // GET movie by ID
+    // -------------------------------
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable String id) {
-        return ResponseEntity.ok(movieService.getMovieById(id));
+    public Optional<Movie> getMovieById(@PathVariable String id) {
+        return movieRepository.findById(id);
     }
 
-    // GET /api/movies/now-showing
-    @GetMapping("/now-showing")
-    public ResponseEntity<List<Movie>> getNowShowingMovies() {
-        return ResponseEntity.ok(movieService.getNowShowingMovies());
+    // -------------------------------
+    // CREATE a new movie
+    // -------------------------------
+    @PostMapping
+    public Movie addMovie(@RequestBody Movie newMovie) {
+        newMovie.setId(null);
+        return movieRepository.save(newMovie);
     }
 
-    // GET /api/movies/coming-soon
-    @GetMapping("/coming-soon")
-    public ResponseEntity<List<Movie>> getComingSoonMovies() {
-        return ResponseEntity.ok(movieService.getComingSoonMovies());
+    // -------------------------------
+    // UPDATE movie by ID
+    // -------------------------------
+    @PutMapping("/{id}")
+    public Movie updateMovie(@PathVariable String id, @RequestBody Movie updatedMovie) {
+        Optional<Movie> opt = movieRepository.findById(id);
+        if (opt.isEmpty()) {
+            throw new RuntimeException("Movie not found with id: " + id);
+        }
+
+        Movie movie = opt.get();
+        boolean hasChanges = false;
+
+        if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().equals(movie.getTitle())) {
+            movie.setTitle(updatedMovie.getTitle());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getGenre() != null && !updatedMovie.getGenre().equals(movie.getGenre())) {
+            movie.setGenre(updatedMovie.getGenre());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getMpaaRating() != null && !updatedMovie.getMpaaRating().equals(movie.getMpaaRating())) {
+            movie.setMpaaRating(updatedMovie.getMpaaRating());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getDirector() != null && !updatedMovie.getDirector().equals(movie.getDirector())) {
+            movie.setDirector(updatedMovie.getDirector());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getProducer() != null && !updatedMovie.getProducer().equals(movie.getProducer())) {
+            movie.setProducer(updatedMovie.getProducer());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getCast() != null && !updatedMovie.getCast().equals(movie.getCast())) {
+            movie.setCast(updatedMovie.getCast());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getSynopsis() != null && !updatedMovie.getSynopsis().equals(movie.getSynopsis())) {
+            movie.setSynopsis(updatedMovie.getSynopsis());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getPosterUrl() != null && !updatedMovie.getPosterUrl().equals(movie.getPosterUrl())) {
+            movie.setPosterUrl(updatedMovie.getPosterUrl());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getTrailerUrl() != null && !updatedMovie.getTrailerUrl().equals(movie.getTrailerUrl())) {
+            movie.setTrailerUrl(updatedMovie.getTrailerUrl());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.isNowShowing() != movie.isNowShowing()) {
+            movie.setNowShowing(updatedMovie.isNowShowing());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.isComingSoon() != movie.isComingSoon()) {
+            movie.setComingSoon(updatedMovie.isComingSoon());
+            hasChanges = true;
+        }
+
+        if (updatedMovie.getRating() != movie.getRating()) {
+            movie.setRating(updatedMovie.getRating());
+            hasChanges = true;
+        }
+
+        if (!hasChanges) {
+            return movie; // No updates → return current movie
+        }
+
+        return movieRepository.save(movie);
     }
 
-    // GET /api/movies/search?title=some_title
-    @GetMapping("/search")
-    public ResponseEntity<List<Movie>> searchMoviesByTitle(@RequestParam String title) {
-        return ResponseEntity.ok(movieService.searchMoviesByTitle(title));
-    }
-
-    // GET /api/movies/filter?genre=some_genre
-    @GetMapping("/filter")
-    public ResponseEntity<List<Movie>> filterMoviesByGenre(@RequestParam String genre) {
-        return ResponseEntity.ok(movieService.filterMoviesByGenre(genre));
+    // -------------------------------
+    // DELETE movie by ID
+    // -------------------------------
+    @DeleteMapping("/{id}")
+    public void deleteMovie(@PathVariable String id) {
+        movieRepository.deleteById(id);
     }
 }

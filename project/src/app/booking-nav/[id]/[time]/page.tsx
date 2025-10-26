@@ -92,7 +92,7 @@ export default function MoviePage({
         minHeight: "100vh",
       }}
     >
-      <TopBar />
+      <Navbar />
 
       <div
         style={{
@@ -120,7 +120,7 @@ export default function MoviePage({
       >
         {/* Poster */}
         <div style={{ flex: "0 0 auto" }}>
-          <div className={styles.moviePreview}>
+          <div className="ml-3">
             <Link
               href={`/movie-details/${movie.id}`}
               style={{ textDecoration: "none", color: "inherit" }}
@@ -145,16 +145,23 @@ export default function MoviePage({
         <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
           <div>
             {/* Screen */}
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <div
+              style={{ flex: "1", display: "flex", justifyContent: "center" }}
+            >
               <Image
                 src={TheatreScreen}
                 alt="screen"
-                style={{ width: "58%", height: "auto", margin: "1rem 0", paddingRight: "4rem" }}
+                style={{
+                  width: "58%",
+                  height: "auto",
+                  margin: "1rem 0",
+                  paddingRight: "4rem",
+                }}
               />
             </div>
 
             {/* Seats */}
-            <div style={{ display: "inline-block", paddingLeft: "10.5rem" }}>
+            <div style={{ display: "inline-block", paddingLeft: "9.5rem" }}>
               {seats.map((row, rowIndex) => (
                 <div
                   key={rowIndex}

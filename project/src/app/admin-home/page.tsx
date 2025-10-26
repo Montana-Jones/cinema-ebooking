@@ -5,11 +5,13 @@ import styles from "@/components/Card.module.css";
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
+import AddMovie from "@/components/AddMovie";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
 import Link from "next/link";
 import Image from "next/image";
 import pencil from "@/assets/pencil.png";
+import add from "@/assets/add.png";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
@@ -56,7 +58,6 @@ export default function Home() {
       <Navbar />
       <ToggleSwitch checked={showNowShowing} onChange={setShowNowShowing} />
       <div className={styles.moviePreviews}>
-        {/* <div> */}
         {filteredMovies.map((movie) => (
           <div key={movie.id}>
             <div className={styles.editButton}>
@@ -71,7 +72,11 @@ export default function Home() {
             {movie.now_showing && <ShowtimePanel movie={movie} />}
           </div>
         ))}
-        {/* </div> */}
+      </div>
+      <div className="fixed mb-3 mr-3 bottom-0 right-0 z-1000">
+        <Link href={`/add-movie`}>
+          <Image src={add} alt="add movie" width={50} height={50} />
+        </Link>
       </div>
     </main>
   );
