@@ -8,7 +8,6 @@ import Link from "next/link";
 import styles from "@/components/Card.module.css";
 import search from "@/assets/search.png";
 
-
 export default function Navbar() {
   return (
     <nav className={styles.navbarContainer}>
@@ -17,14 +16,13 @@ export default function Navbar() {
           <Image src={theatre} alt="logo" priority />
         </Link>
       </div>
-        
-        <div>
-          <strong style={{ color: "#000000", fontSize: "1.25rem" }}>Edit Profile</strong>
-      
-        </div>
 
-        
-      
+      <div>
+        <strong style={{ color: "#ffffffff", fontSize: "1.25rem" }}>
+          Edit Profile
+        </strong>
+      </div>
+
       <div className={styles.navbarRight}>
         <a
           href="/"

@@ -148,7 +148,7 @@ const App = () => {
 
             <button
               onClick={() => handleSearch(searchTerm, genre)}
-              className="px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out w-full sm:w-auto mt-4 sm:mt-0"
+              className="px-8 py-3 text-lg font-semibold text-white bg-[#4c3b4d] rounded-full shadow-md hover:bg-[#675068] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out w-full sm:w-auto mt-4 sm:mt-0"
             >
               Search
             </button>
