@@ -7,13 +7,15 @@ import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
+import Link from "next/link";
+import Image from "next/image";
+import pencil from "@/assets/pencil.png";
 
 export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const [isAdmin, setIsAdmin] = useState(false);
+
   // Fetch movies from backend
   useEffect(() => {
     fetch("http://localhost:8080/api/movies") // backend endpoint
@@ -57,6 +59,14 @@ export default function Home() {
         {/* <div> */}
         {filteredMovies.map((movie) => (
           <div key={movie.id}>
+            <div className={styles.editButton}>
+              <Link
+                href={`movie-editor/${movie.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                <Image src={pencil} alt="edit" width={30} height={30} />
+              </Link>
+            </div>
             <MoviePreview movie={movie} />
             {movie.now_showing && <ShowtimePanel movie={movie} />}
           </div>

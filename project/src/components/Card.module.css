@@ -29,14 +29,33 @@
     gap: 20px;
 }
 
+.editButton {
+  display: flex;
+  justify-content: end;
+}
+
+.movieForm {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 1rem;
+  font-size: 20px;
+}
+
+.textInput {
+  border: 1px solid #afafaf;
+  border-radius: 16rem;
+  padding: 4px;
+  margin: 0.25rem;
+}
+
+
 .searchBar {
   display: flex;
  
   align-items: center;
   /*gap: .5rem;  added the gap */
   background-color: whitesmoke;
-  border-color: #675068;
-  border-width: 2px;
+  border: #675068 solid 2px;
   border-radius: 16px;
   padding: 0.5rem 0.5rem;
   width: 400px;
@@ -83,13 +102,12 @@
 .showtimeContainer {
     width: 266px;
     height: fit-content;
-    margin: 1rem auto;
+    margin: 0 auto;
 }
 
 .showtimeContainer h1 {
     display: flex;
     justify-content: center;
-    margin-bottom: 1rem;
     font-size: 28px;
     font-weight: 500;
 }
