@@ -26,7 +26,6 @@ export default function Navbar() {
     }
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -37,12 +36,11 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("user"); // remove user from storage
-    setUser(null); // reset state
-    setMenuOpen(false); // close menu
-    window.location.href = "/"; // redirect to home
+    localStorage.removeItem("user");
+    setUser(null);
+    setMenuOpen(false);
+    window.location.href = "/";
   };
 
   return (
@@ -58,47 +56,58 @@ export default function Navbar() {
           <Image src={search} alt="search" priority />
         </Link>
 
-        {/* Profile section */}
         <div ref={menuRef} className="relative ml-4 flex items-center">
           {user ? (
             <div className="flex items-center space-x-2">
-              {user && (
-                <span>
-                  Hello {user.email} {user.role === "ADMIN" ? "(Admin)" : ""}
-                </span>
-              )}
-              <button
-                onClick={() => setMenuOpen((prev) => !prev)}
-                className="focus:outline-none"
-              >
-                <Image
-                  src={avatar}
-                  alt="profile"
-                  priority
-                  className="cursor-pointer w-9 h-9"
-                />
-              </button>
+              <span>
+                Hello {user.email} {user.role === "ADMIN" ? "(Admin)" : ""}
+              </span>
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg border z-50">
-                  <Link
-                    href={`/edit-profile/${user.email}`}
-                    className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
+              {user.role === "ADMIN" ? (
+                <Link href="/manage-movies">
+                  <Image
+                    src={gear}
+                    alt="manage movies"
+                    className="cursor-pointer w-9 h-9"
+                    priority
+                  />
+                </Link>
+              ) : (
+                <div className="relative">
                   <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    className="focus:outline-none"
                   >
-                    Logout
+                    <Image
+                      src={avatar}
+                      alt="profile"
+                      priority
+                      className="cursor-pointer w-9 h-9"
+                    />
                   </button>
+
+                  {menuOpen && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg border z-50">
+                      <Link
+                        href={`/edit-profile/${user.email}`}
+                        className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           ) : (
-            <>
+            <div className="relative">
               <button
                 onClick={() => setMenuOpen((prev) => !prev)}
                 className="focus:outline-none"
@@ -129,7 +138,7 @@ export default function Navbar() {
                   </Link>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>

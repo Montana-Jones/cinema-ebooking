@@ -2,8 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useUser } from "@/hooks/useUser";
 import Navbar from "./Navbar";
+
+interface User {
+  email: string;
+  role: string;
+}
 
 interface Movie {
   id: string;
@@ -13,25 +17,22 @@ interface Movie {
 }
 
 export default function ManageMovies() {
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
 
-  if (!user || user.role !== "admin") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-        <Navbar />
-        <p className="mb-6 text-lg">Access denied.</p>
-        <Link href="/">
-          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]">
-            Go back home
-          </p>
-        </Link>
-      </div>
-    );
-  }
-
+  // Load logged-in user from localStorage
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // Fetch movies once user is confirmed to be admin
+  useEffect(() => {
+    if (!user || user.role !== "ADMIN") return;
+
     fetch("http://localhost:8080/api/movies")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch movies");
@@ -45,7 +46,21 @@ export default function ManageMovies() {
         console.error("Error fetching movies:", err);
         setLoading(false);
       });
-  }, []);
+  }, [user]);
+
+  if (!user || user.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Navbar />
+        <p className="mb-6 text-lg">Access denied.</p>
+        <Link href="/">
+          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]">
+            Go back home
+          </p>
+        </Link>
+      </div>
+    );
+  }
 
   const handleDelete = async (id: string, title: string) => {
     const confirmed = window.confirm(
@@ -82,7 +97,6 @@ export default function ManageMovies() {
           key={movie.id}
           className="flex flex-col justify-between bg-[#1f1f1f] rounded-2xl shadow-lg border border-gray-700 p-6 h-[250px]"
         >
-          {/* Movie Info */}
           <div>
             <h2 className="text-xl font-bold mb-2">
               <Link
@@ -102,7 +116,6 @@ export default function ManageMovies() {
             </div>
           </div>
 
-          {/* Buttons pinned to bottom */}
           <div className="flex justify-around mt-4">
             <Link
               href={`/movie-editor/${movie.id}`}

@@ -25,13 +25,19 @@ export default function LoginPage() {
 
       if (!res.ok) throw new Error("Login failed");
 
-      const user = await res.json();
+      const loginResponse = await res.json();
 
-      // Store user object in context
+      // Fetch full user info after login
+      const userRes = await fetch(
+        `http://localhost:8080/api/customers/email/${loginResponse.email}`
+      );
+      if (!userRes.ok) throw new Error("Failed to fetch user");
+      const user = await userRes.json();
+
+      localStorage.setItem("user", JSON.stringify(user)); // store full user
       setUser(user);
 
-      // Persist user object to localStorage for page refresh
-      localStorage.setItem("user", JSON.stringify(user));
+      console.log("Logged in user:", user); // debug
 
       window.location.href = "/";
     } catch (err) {
