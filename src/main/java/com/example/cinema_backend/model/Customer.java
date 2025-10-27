@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+
+
+
+
 
 import lombok.Data;
 
@@ -18,11 +21,16 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String email;
+    private String password;
     private Status status;
+    private Promotion promotion;
+    private String phoneNumber;
+    private String homeAddress;
+    private String billingAddress;
+
     
-    @DBRef
     private List<Booking> bookings;
     
-    @DBRef
+    
     private List<PaymentInfo> paymentInfo;
 }
