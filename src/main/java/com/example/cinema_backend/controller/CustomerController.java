@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.cinema_backend.model.Customer;
@@ -11,8 +14,12 @@ import com.example.cinema_backend.repository.CustomerRepository;
 import com.example.cinema_backend.service.EmailService;
 import com.example.cinema_backend.util.JwtUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/customers")
+// @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class CustomerController {
 
     @Autowired
@@ -73,6 +80,41 @@ public class CustomerController {
         customer.setVerified(true);
         customer.setVerificationCode(null); // clear code after verification
         return customerRepository.save(customer);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyCustomer(HttpServletRequest request) {
+        // Get the token from the cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No cookies found");
+        }
+
+        String token = null;
+        for (Cookie cookie : cookies) {
+            if ("token".equals(cookie.getName())) {
+                token = cookie.getValue();
+                break;
+            }
+        }
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token found");
+        }
+
+        try {
+            // Validate token and extract email
+            String email = jwtUtil.extractEmail(token);
+            Customer customer = customerRepository.findByEmail(email);
+            if (customer == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            }
+
+            customer.setPassword(null); // never send password
+            return ResponseEntity.ok(customer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
     }
 
     // -------------------------------
@@ -139,6 +181,17 @@ public class CustomerController {
         return customerRepository.save(customer);
     }
 
+    // GET customer by email
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
+        Customer customer = customerRepository.findByEmail(email);
+        if (customer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        customer.setPassword(null); // never return password
+        return ResponseEntity.ok(customer);
+    }
+
     // -------------------------------
     // DELETE customer by ID
     // -------------------------------
@@ -151,25 +204,30 @@ public class CustomerController {
     // LOGIN endpoint
     // -------------------------------
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        Optional<Customer> opt = customerRepository.findByEmail(request.getEmail());
-        if (opt.isEmpty()) {
-            throw new RuntimeException("Invalid email or password");
+    public ResponseEntity<?> loginCustomer(@RequestBody Customer loginRequest, HttpServletResponse response) {
+        Customer customer = customerRepository.findByEmail(loginRequest.getEmail());
+
+        if (customer == null || !customer.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
-        Customer customer = opt.get();
+        // Generate token using JwtUtil
+        String token = jwtUtil.generateToken(customer.getEmail());
 
-        // For now, password is stored in plain text
-        if (!customer.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
+        // Add HTTP-only cookie
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(false) // change to true if using HTTPS
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(24 * 60 * 60)
+                .build();
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(
-                String.valueOf(customer.getId()),
-                customer.getEmail());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return new LoginResponse(token, customer);
+        // Send customer info (without password)
+        customer.setPassword(null);
+        return ResponseEntity.ok(customer);
     }
 
     // -------------------------------

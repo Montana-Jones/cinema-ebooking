@@ -22,15 +22,10 @@ export default function Home() {
 
   // Fetch movies from backend
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    fetch("http://localhost:8080/api/movies", {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
+    setLoading(true);
+    fetch("http://localhost:8080/api/movies")
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch movies");
-        }
+        if (!res.ok) throw new Error("Failed to fetch movies");
         return res.json();
       })
       .then((data) => {

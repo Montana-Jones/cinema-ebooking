@@ -58,8 +58,9 @@ export default function EditProfile({
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
+        console.log("http://localhost:8080/api/customers/email/${email}");
         const res = await fetch(
-          `http://localhost:8080/api/customers/email/${email}`
+          `http://localhost:8080/api/customers/email/montana.jones1002@gmail.com`
         );
         if (!res.ok) throw new Error("Failed to fetch customer");
         const data = await res.json();
