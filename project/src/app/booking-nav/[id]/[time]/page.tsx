@@ -128,7 +128,7 @@ export default function MoviePage({
               <Image
                 src={movie.poster_url}
                 alt={movie.title}
-                width={233}
+                width={300}
                 height={350}
                 className={styles.posterPreview}
               />
@@ -149,12 +149,12 @@ export default function MoviePage({
               <Image
                 src={TheatreScreen}
                 alt="screen"
-                style={{ width: "144%", height: "auto", margin: "1rem 0" }}
+                style={{ width: "58%", height: "auto", margin: "1rem 0", paddingRight: "4rem" }}
               />
             </div>
 
             {/* Seats */}
-            <div style={{ display: "inline-block" }}>
+            <div style={{ display: "inline-block", paddingLeft: "10.5rem" }}>
               {seats.map((row, rowIndex) => (
                 <div
                   key={rowIndex}

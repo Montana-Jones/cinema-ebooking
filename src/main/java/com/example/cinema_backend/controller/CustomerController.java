@@ -4,15 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.cinema_backend.model.Customer;
 import com.example.cinema_backend.repository.CustomerRepository;
@@ -87,19 +79,22 @@ public class CustomerController {
             hasChanges = true;
         }
 
-        if (updatedCustomer.getPhoneNumber() != null && !updatedCustomer.getPhoneNumber().equals(customer.getPhoneNumber())) {
+        if (updatedCustomer.getPhoneNumber() != null
+                && !updatedCustomer.getPhoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
             changeSummary.append("- Phone number updated\n");
             hasChanges = true;
         }
 
-        if (updatedCustomer.getHomeAddress() != null && !updatedCustomer.getHomeAddress().equals(customer.getHomeAddress())) {
+        if (updatedCustomer.getHomeAddress() != null
+                && !updatedCustomer.getHomeAddress().equals(customer.getHomeAddress())) {
             customer.setHomeAddress(updatedCustomer.getHomeAddress());
             changeSummary.append("- Home address updated\n");
             hasChanges = true;
         }
 
-        if (updatedCustomer.getBillingAddress() != null && !updatedCustomer.getBillingAddress().equals(customer.getBillingAddress())) {
+        if (updatedCustomer.getBillingAddress() != null
+                && !updatedCustomer.getBillingAddress().equals(customer.getBillingAddress())) {
             customer.setBillingAddress(updatedCustomer.getBillingAddress());
             changeSummary.append("- Billing address updated\n");
             hasChanges = true;
@@ -111,7 +106,8 @@ public class CustomerController {
             hasChanges = true;
         }
 
-        if (updatedCustomer.getPaymentInfo() != null && !updatedCustomer.getPaymentInfo().equals(customer.getPaymentInfo())) {
+        if (updatedCustomer.getPaymentInfo() != null
+                && !updatedCustomer.getPaymentInfo().equals(customer.getPaymentInfo())) {
             customer.setPaymentInfo(updatedCustomer.getPaymentInfo());
             changeSummary.append("- Payment methods updated\n");
             hasChanges = true;
@@ -128,10 +124,9 @@ public class CustomerController {
             changeSummary.append("\nIf you didn’t make these changes, please contact support immediately.\n\n");
             changeSummary.append("Best regards,\nCinema Team");
             emailService.sendEmail(
-                customer.getEmail(),
-                "Account Update Notification",
-                changeSummary.toString()
-            );
+                    customer.getEmail(),
+                    "Account Update Notification",
+                    changeSummary.toString());
         } catch (Exception e) {
             System.err.println("Failed to send email notification: " + e.getMessage());
         }
@@ -145,13 +140,5 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public void deleteCustomer(@PathVariable String id) {
         customerRepository.deleteById(id);
-    }
-
-    // -------------------------------
-    // CREATE new customer
-    // -------------------------------
-    @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
     }
 }
