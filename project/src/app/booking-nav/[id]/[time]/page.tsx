@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 import styles from "@/components/Card.module.css";
-import TopBar from "@/app/booking-nav/parts/topBar";
 import MoviePreview from "@/components/MoviePreview";
 import Image from "next/image";
 import Link from "next/link";
@@ -92,7 +91,7 @@ export default function MoviePage({
         minHeight: "100vh",
       }}
     >
-      <TopBar />
+      <Navbar />
 
       <div
         style={{
@@ -149,7 +148,12 @@ export default function MoviePage({
               <Image
                 src={TheatreScreen}
                 alt="screen"
-                style={{ width: "58%", height: "auto", margin: "1rem 0", paddingRight: "4rem" }}
+                style={{
+                  width: "58%",
+                  height: "auto",
+                  margin: "1rem 0",
+                  paddingRight: "4rem",
+                }}
               />
             </div>
 

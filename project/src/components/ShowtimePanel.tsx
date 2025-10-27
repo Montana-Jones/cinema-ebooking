@@ -1,5 +1,4 @@
 "use client";
-//src/components/ShowtimePanel.tsx
 import Image from "next/image";
 import React from "react";
 import styles from "./Card.module.css";
@@ -18,7 +17,7 @@ interface MovieProps {
     title: string;
     genre: string;
     mpaa_rating: string;
-    rating: number; // star rating between 0 and 5
+    rating: number;
     director: string;
     producer: string;
     cast: string;
@@ -35,20 +34,24 @@ const hardcodedShowtimes = ["11:00am", "2:00pm", "5:00pm", "8:00pm", "11:00pm"];
 
 const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
   return (
-    <div className={styles.showtimeContainer}>
-      <h1>Showtimes</h1>
-      <div className={styles.showtimes}>
-        {hardcodedShowtimes.map((time) => (
-          <Link
-            key={time}
-            className={styles.showtimeButton}
-            href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
-          >
-            <p>{time}</p>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <>
+      {movie.now_showing && (
+        <div className={styles.showtimeContainer}>
+          <h1>Showtimes</h1>
+          <div className={styles.showtimes}>
+            {hardcodedShowtimes.map((time) => (
+              <Link
+                key={time}
+                className={styles.showtimeButton}
+                href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
+              >
+                <p>{time}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

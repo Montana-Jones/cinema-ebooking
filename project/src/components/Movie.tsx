@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "./Card";
 import styles from "./Card.module.css";
 import Trailer from "./Trailer";
 import ShowtimePanel from "./ShowtimePanel";
+import Link from "next/link";
 
 interface Showtime {
   id: number;
@@ -20,10 +21,10 @@ export interface MovieProps {
     title: string;
     genre: string;
     mpaa_rating: string;
-    rating: number; //a star rating between 0 and 5
-    director: string; //list all directors in a single string
-    producer: string; //list all producers in a single string
-    cast: string; //list all major cast members in a single string
+    rating: number; // a star rating between 0 and 5
+    director: string;
+    producer: string;
+    cast: string;
     synopsis: string;
     poster_url: string;
     trailer_url: string;
@@ -34,59 +35,90 @@ export interface MovieProps {
 }
 
 const Movie: React.FC<MovieProps> = ({ movie }) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Get the user object from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        console.log("Logged-in user:", user);
+        if (user.role === "ADMIN") {
+          setIsAdmin(true);
+        }
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+      }
+    }
+  }, []);
+
   return (
-    <Card>
-      <div className={styles.movieCard}>
-        {/* Poster */}
-        <div className={styles.posterWrapper}>
-          <Image
-            src={movie.poster_url}
-            alt={movie.title}
-            width={350}
-            height={525}
-            className={styles.poster}
-          />
+    <div>
+      {/* Only show Edit button if user is admin */}
+      {isAdmin && (
+        <div className="flex justify-around mt-4">
+          <Link
+            href={`/movie-editor/${movie.id}`}
+            className="w-fit text-lg bg-[#675068] text-white border-2 border-[#4c3b4d] rounded-full px-4 py-2 cursor-pointer hover:bg-[#4c3b4d] transition"
+          >
+            Edit Movie
+          </Link>
         </div>
-        {/* Movie Info */}
-        <div className={styles.movieInfo}>
-          <h2 className={styles.title}>{movie.title}</h2>
-          <div className={styles.movieType}>
-            <p>
-              <strong>Genre:</strong> {movie.genre}
-            </p>
-            <p>
-              <strong>Rating:</strong> {movie.mpaa_rating}
-            </p>
-            <p>
-              <strong>Stars:</strong> {movie.rating} ⭐
-            </p>
+      )}
+
+      <Card>
+        <div className={styles.movieCard}>
+          {/* Poster */}
+          <div className={styles.posterWrapper}>
+            <Image
+              src={movie.poster_url}
+              alt={movie.title}
+              width={350}
+              height={525}
+              className={styles.poster}
+            />
           </div>
 
-          <div className={styles.crew}>
-            <p>
-              <strong>Director:</strong> {movie.director}
-            </p>
-            <p>
-              <strong>Producer:</strong> {movie.producer}
-            </p>
-          </div>
-          <p>
-            <strong>Cast:</strong> {movie.cast}
-          </p>
-          <p className={styles.synopsis}>
-            <strong>Synopsis:</strong> {movie.synopsis}
-          </p>
+          {/* Movie Info */}
+          <div className={styles.movieInfo}>
+            <h2 className={styles.title}>{movie.title}</h2>
+            <div className={styles.movieType}>
+              <p>
+                <strong>Genre:</strong> {movie.genre}
+              </p>
+              <p>
+                <strong>Rating:</strong> {movie.mpaa_rating}
+              </p>
+              <p>
+                <strong>Stars:</strong> {movie.rating} ⭐
+              </p>
+            </div>
 
-          {/* Trailer Link */}
-          <div className={styles.trailerWrapper}>
-            <Trailer trailerUrl={movie.trailer_url} />
+            <div className={styles.crew}>
+              <p>
+                <strong>Director:</strong> {movie.director}
+              </p>
+              <p>
+                <strong>Producer:</strong> {movie.producer}
+              </p>
+            </div>
+
+            <p>
+              <strong>Cast:</strong> {movie.cast}
+            </p>
+            <p className={styles.synopsis}>
+              <strong>Synopsis:</strong> {movie.synopsis}
+            </p>
+
+            {/* Trailer Link */}
+            <div className={styles.trailerWrapper}>
+              <Trailer trailerUrl={movie.trailer_url} />
+            </div>
           </div>
         </div>
-        <div className={styles.showtimesContainer}>
-          {movie.now_showing && <ShowtimePanel movie={movie} />}
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

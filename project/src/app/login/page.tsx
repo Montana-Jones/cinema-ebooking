@@ -34,6 +34,12 @@ export default function LoginPage() {
       if (!userRes.ok) throw new Error("Failed to fetch user");
       const user = await userRes.json();
 
+      if (!user.verified) {
+        alert("Please verify your account via the link sent to your email.");
+        setLoading(false);
+        return;
+      }
+
       localStorage.setItem("user", JSON.stringify(user)); // store full user
       setUser(user);
 

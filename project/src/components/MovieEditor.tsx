@@ -41,7 +41,7 @@ const MovieEditor: React.FC<MovieProps> = ({ movie }) => {
     delete movieData.status;
 
     try {
-      const res = await fetch("http://localhost:8080/api/movies", {
+      const res = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(movieData),

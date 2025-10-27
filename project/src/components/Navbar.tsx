@@ -7,6 +7,7 @@ import styles from "@/components/Card.module.css";
 import search from "@/assets/search.png";
 import gear from "@/assets/gear.png";
 import avatar from "@/assets/avatar.png";
+import logout from "@/assets/logout.png";
 import theatre from "@/assets/theatre.png";
 
 interface User {
@@ -39,108 +40,101 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-    setMenuOpen(false);
     window.location.href = "/";
   };
 
   return (
     <nav className={styles.navbarContainer}>
+      {/* Left side: logo */}
       <div className={styles.navbarLeft}>
         <Link href="/">
           <Image src={theatre} alt="logo" priority />
         </Link>
       </div>
 
+      {/* Right side: icons */}
       <div className={styles.navbarRight}>
+        {/* Search icon */}
         <Link href="/search">
           <Image src={search} alt="search" priority />
         </Link>
 
-        <div ref={menuRef} className="relative ml-4 flex items-center">
-          {user ? (
-            <div className="flex items-center space-x-2">
-              <span>
-                Hello {user.email} {user.role === "ADMIN" ? "(Admin)" : ""}
-              </span>
+        {/* Logged-in user section */}
+        {user ? (
+          <div className="flex items-center space-x-4 ml-4">
+            <span>
+              Hello {user.email} {user.role === "ADMIN" ? "(Admin)" : ""}
+            </span>
 
-              {user.role === "ADMIN" ? (
-                <Link href="/manage-movies">
-                  <Image
-                    src={gear}
-                    alt="manage movies"
-                    className="cursor-pointer w-9 h-9"
-                    priority
-                  />
-                </Link>
-              ) : (
-                <div className="relative">
-                  <button
-                    onClick={() => setMenuOpen((prev) => !prev)}
-                    className="focus:outline-none"
-                  >
-                    <Image
-                      src={avatar}
-                      alt="profile"
-                      priority
-                      className="cursor-pointer w-9 h-9"
-                    />
-                  </button>
+            {/* Admin-only manage movies icon */}
+            {user.role === "ADMIN" && (
+              <Link href="/manage-movies">
+                <Image
+                  src={gear}
+                  alt="manage movies"
+                  className="cursor-pointer w-9 h-9"
+                  priority
+                />
+              </Link>
+            )}
 
-                  {menuOpen && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg border z-50">
-                      <Link
-                        href={`/edit-profile/${user.email}`}
-                        className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen((prev) => !prev)}
-                className="focus:outline-none"
-              >
+            {/* Non-admin users can edit profile */}
+            {user.role !== "ADMIN" && (
+              <Link href={`/edit-profile/${user.email}`}>
                 <Image
                   src={avatar}
                   alt="profile"
                   priority
                   className="cursor-pointer w-9 h-9"
                 />
-              </button>
+              </Link>
+            )}
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg border z-50">
-                  <Link
-                    href="/login"
-                    className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            {/* Logout icon for all logged-in users */}
+            <button onClick={handleLogout} className="focus:outline-none">
+              <Image
+                src={logout}
+                alt="logout"
+                priority
+                className="cursor-pointer w-9 h-9"
+              />
+            </button>
+          </div>
+        ) : (
+          // Logged-out users: avatar with dropdown
+          <div ref={menuRef} className="relative ml-4 flex items-center">
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="focus:outline-none"
+            >
+              <Image
+                src={avatar}
+                alt="profile"
+                priority
+                className="cursor-pointer w-9 h-9"
+              />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute top-9 right-0 mt-2 w-32 bg-white shadow-lg rounded-lg border z-50">
+                <Link
+                  href="/login"
+                  className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="block px-4 py-2 text-md font-bold text-[#675068] hover:text-[#75D1A6]"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );

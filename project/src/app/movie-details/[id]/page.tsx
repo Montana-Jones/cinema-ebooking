@@ -1,5 +1,6 @@
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
+import ShowtimePanel from "@/components/ShowtimePanel";
 
 interface MoviePageProps {
   params: { id: string };
@@ -25,14 +26,14 @@ export default async function MoviePage({ params }: MoviePageProps) {
   return (
     <main
       style={{
-        display: "flex",
+        display: "grid",
         justifyContent: "center",
-        flexDirection: "column",
         minHeight: "100vh",
       }}
     >
       <Navbar />
       <Movie movie={movie} />
+      <ShowtimePanel movie={movie} />
     </main>
   );
 }
