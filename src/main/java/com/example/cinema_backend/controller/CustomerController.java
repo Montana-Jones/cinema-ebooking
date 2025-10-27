@@ -20,7 +20,7 @@ import com.example.cinema_backend.service.EmailService;
 
 @RestController
 @RequestMapping("/api/customers")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class CustomerController {
 
     @Autowired

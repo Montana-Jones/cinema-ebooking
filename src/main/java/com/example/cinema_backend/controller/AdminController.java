@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admins")
-@CrossOrigin(origins = "*") // allow frontend access (adjust for security later)
+//@CrossOrigin(origins = "*") // allow frontend access (adjust for security later)
 public class AdminController {
 
     @Autowired
