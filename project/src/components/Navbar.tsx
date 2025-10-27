@@ -1,29 +1,29 @@
 "use client";
 
-<<<<<<< Updated upstream
-import React from "react";
-=======
 import React, { useState } from "react";
->>>>>>> Stashed changes
 import Image from "next/image";
+import Link from "next/link";
 import avatar from "@/assets/avatar.png";
 import theatre from "@/assets/theatre.png";
-import Link from "next/link";
-import styles from "@/components/Card.module.css";
 import search from "@/assets/search.png";
 import gear from "@/assets/gear.png";
+import styles from "@/components/Card.module.css";
 import { useUser } from "@/hooks/useUser";
 
 export default function Navbar() {
-<<<<<<< Updated upstream
-=======
-  const { user } = useUser(); // get user from context
+  const { user, setUser } = useUser(); // assume setUser can update context
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isLoggedIn = !!user;
   const isAdmin = user?.role === "admin";
 
->>>>>>> Stashed changes
+  const handleLogout = () => {
+    // Clear user from context or localStorage
+    setUser(null);
+    // Redirect to home
+    window.location.href = "/";
+  };
+
   return (
     <nav className={styles.navbarContainer}>
       <div className={styles.navbarLeft}>
@@ -34,11 +34,8 @@ export default function Navbar() {
 
       <div className={styles.navbarRight}>
         <Link href="/search">
-          <Image src={search} alt="logo" priority />
+          <Image src={search} alt="search" priority />
         </Link>
-<<<<<<< Updated upstream
-        <Image src={avatar} alt="profile" priority />
-=======
 
         {/* Admin-only link */}
         {isAdmin && (
@@ -55,7 +52,7 @@ export default function Navbar() {
           </Link>
         )}
 
-        {/* Profile button only for non-admin logged-in users */}
+        {/* Profile button for non-admin logged-in users */}
         {isLoggedIn && !isAdmin && (
           <Link href={`/edit-profile/${user.email}`} className="ml-4">
             <Image
@@ -102,7 +99,16 @@ export default function Navbar() {
             )}
           </div>
         )}
->>>>>>> Stashed changes
+
+        {/* Logout button for any logged-in user */}
+        {isLoggedIn && (
+          <button
+            onClick={handleLogout}
+            className="ml-4 text-[#675068] font-bold hover:text-[#75D1A6]"
+          >
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );
