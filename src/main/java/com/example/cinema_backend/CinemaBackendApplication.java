@@ -19,7 +19,7 @@ public class CinemaBackendApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**") // all endpoints
+				registry.addMapping("/api/**") // all endpoints
 						.allowedOrigins("http://localhost:3000") // your frontend
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 						.allowedHeaders("*")
