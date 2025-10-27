@@ -19,7 +19,7 @@ import com.example.cinema_backend.security.AESUtil;
 @RestController
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "*")
-public class CustomerController {
+public class CustomerControllerr {
 
     @Autowired
     private CustomerRepository customerRepository;
