@@ -3,26 +3,17 @@ package com.example.cinema_backend.controller;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
-import java.util.HashMap;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< HEAD
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-=======
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
->>>>>>> 69de934 (done with hashing password)
 
 import com.example.cinema_backend.model.Customer;
+import com.example.cinema_backend.model.Status;
 import com.example.cinema_backend.repository.CustomerRepository;
 import com.example.cinema_backend.service.EmailService;
 
@@ -37,7 +28,8 @@ public class CustomerController {
     @Autowired
     private EmailService emailService;
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     //  Verify password endpoint
     @PostMapping("/verify-password/{email}")
@@ -158,6 +150,63 @@ public class CustomerController {
 
         return saved;
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+        String email = loginData.get("email");
+        String password = loginData.get("password");
+
+        Optional<Customer> existingCustomer = customerRepository.findByEmail(email);
+
+        if (existingCustomer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Customer not found");
+        }
+
+        Customer customer = existingCustomer.get();
+
+        // Compare plain password with hashed one
+        if (!passwordEncoder.matches(password, customer.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid password");
+        }
+
+        // If successful, return the customer (without password)
+        customer.setPassword(null); // hide password from response
+        return ResponseEntity.ok(customer);
+    }
+
+    
+    @PostMapping("/add")
+    public ResponseEntity<?> addCustomer(@RequestBody Customer newCustomer) {
+        try {
+            // Check if email already exists
+            Optional<Customer> existing = customerRepository.findByEmail(newCustomer.getEmail());
+            if (existing.isPresent()) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body("Email already exists");
+            }
+
+            // Hash the password before saving
+            String encodedPassword = passwordEncoder.encode(newCustomer.getPassword());
+            newCustomer.setPassword(encodedPassword);
+            // Set default status or fields if needed
+            if (newCustomer.getStatus() == null) {
+                newCustomer.setStatus(Status.ACTIVE);
+            }
+            
+
+            Customer savedCustomer = customerRepository.save(newCustomer);
+            return ResponseEntity.ok(savedCustomer);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating customer: " + e.getMessage());
+        }
+    }
+        
+    
 
     // -------------------------------
     // DELETE customer by ID
