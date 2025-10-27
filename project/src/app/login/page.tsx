@@ -3,11 +3,13 @@
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setUser, setToken } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +23,12 @@ export default function LoginPage() {
       });
 
       if (!res.ok) throw new Error("Login failed");
+
+      const data = await res.json();
+
+      // Store token and user info in localStorage
+      setToken(data.token);
+      setUser(data.customer);
 
       // Redirect to home or user dashboard
       window.location.href = "/";
@@ -36,7 +44,6 @@ export default function LoginPage() {
     <div>
       <Navbar />
       <div className="min-h-screen flex items-center justify-center bg-[#131313]">
-        <Navbar />
         <div className="w-full max-w-md bg-[#675068] p-8 rounded-2xl shadow-lg">
           <h1 className="text-2xl font-bold text-white mb-6 text-center">
             Login

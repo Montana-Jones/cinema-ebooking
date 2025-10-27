@@ -12,7 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 import pencil from "@/assets/pencil.png";
 import add from "@/assets/add.png";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/context/UserContext";
 
 export default function Home() {
   const { user } = useUser(); // get logged-in user
@@ -22,7 +22,11 @@ export default function Home() {
 
   // Fetch movies from backend
   useEffect(() => {
-    fetch("http://localhost:8080/api/movies") // backend endpoint
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8080/api/movies", {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch movies");

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.cinema_backend.model.Customer;
 import com.example.cinema_backend.repository.CustomerRepository;
 import com.example.cinema_backend.service.EmailService;
+import com.example.cinema_backend.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -19,6 +20,9 @@ public class CustomerController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // -------------------------------
     // GET all customers
@@ -48,9 +52,6 @@ public class CustomerController {
         String code = emailService.sendVerificationEmail(newCustomer.getEmail());
         newCustomer.setVerificationCode(code);
 
-        // Temporarily disable password hashing
-        // newCustomer.setPassword(passwordEncoder.encode(newCustomer.getPassword()));
-
         return customerRepository.save(newCustomer);
     }
 
@@ -72,50 +73,6 @@ public class CustomerController {
         customer.setVerified(true);
         customer.setVerificationCode(null); // clear code after verification
         return customerRepository.save(customer);
-    }
-
-    // -------------------------------
-    // LOGIN endpoint
-    // -------------------------------
-    @PostMapping("/login")
-    public Customer login(@RequestBody LoginRequest request) {
-        Optional<Customer> optionalCustomer = customerRepository.findByEmail(request.getEmail());
-
-        // Check if customer exists
-        Customer customer = optionalCustomer.orElseThrow(() -> new RuntimeException("Invalid email or password"));
-
-        // Compare password (no hashing)
-        if (!customer.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
-        if (!customer.isVerified()) {
-            throw new RuntimeException("Email not verified");
-        }
-
-        return customer;
-    }
-
-    // DTO for login
-    public static class LoginRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
     }
 
     // -------------------------------
@@ -191,7 +148,32 @@ public class CustomerController {
     }
 
     // -------------------------------
-    // DTO for verification request
+    // LOGIN endpoint
+    // -------------------------------
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        Optional<Customer> opt = customerRepository.findByEmail(request.getEmail());
+        if (opt.isEmpty()) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        Customer customer = opt.get();
+
+        // For now, password is stored in plain text
+        if (!customer.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        // Generate JWT token
+        String token = jwtUtil.generateToken(
+                String.valueOf(customer.getId()),
+                customer.getEmail());
+
+        return new LoginResponse(token, customer);
+    }
+
+    // -------------------------------
+    // DTOs
     // -------------------------------
     public static class VerificationRequest {
         private String code;
@@ -205,4 +187,42 @@ public class CustomerController {
         }
     }
 
+    public static class LoginRequest {
+        private String email;
+        private String password;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
+
+    public static class LoginResponse {
+        private String token;
+        private Customer customer;
+
+        public LoginResponse(String token, Customer customer) {
+            this.token = token;
+            this.customer = customer;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public Customer getCustomer() {
+            return customer;
+        }
+    }
 }
