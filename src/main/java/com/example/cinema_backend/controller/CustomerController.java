@@ -2,9 +2,13 @@ package com.example.cinema_backend.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.cinema_backend.model.Customer;
 import com.example.cinema_backend.repository.CustomerRepository;
@@ -20,6 +24,19 @@ public class CustomerController {
 
     @Autowired
     private EmailService emailService;
+
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    //  Verify password endpoint
+    @PostMapping("/verify-password/{email}")
+    public boolean verifyPassword(@PathVariable String email, @RequestBody Map<String, String> body) {
+        String oldPassword = body.get("oldPassword");
+        Optional<Customer> opt = customerRepository.findByEmail(email);
+        if (opt.isEmpty()) return false;
+
+        Customer customer = opt.get();
+        return passwordEncoder.matches(oldPassword, customer.getPassword());
+    }
 
     // -------------------------------
     // GET all customers
@@ -73,8 +90,11 @@ public class CustomerController {
             hasChanges = true;
         }
 
-        if (updatedCustomer.getPassword() != null && !updatedCustomer.getPassword().equals(customer.getPassword())) {
-            customer.setPassword(updatedCustomer.getPassword());
+        // Password: check and hash if changed
+        if (updatedCustomer.getPassword() != null 
+                && !passwordEncoder.matches(updatedCustomer.getPassword(), customer.getPassword())) {
+            String hashedPassword = passwordEncoder.encode(updatedCustomer.getPassword());
+            customer.setPassword(hashedPassword);
             changeSummary.append("- Password changed\n");
             hasChanges = true;
         }
@@ -110,7 +130,7 @@ public class CustomerController {
         }
 
         if (!hasChanges) {
-            return customer; // No updates → no email sent
+            return customer; // no update → no email
         }
 
         Customer saved = customerRepository.save(customer);
@@ -119,11 +139,7 @@ public class CustomerController {
         try {
             changeSummary.append("\nIf you didn’t make these changes, please contact support immediately.\n\n");
             changeSummary.append("Best regards,\nCinema Team");
-            emailService.sendEmail(
-                customer.getEmail(),
-                "Account Update Notification",
-                changeSummary.toString()
-            );
+            emailService.sendEmail(customer.getEmail(), "Account Update Notification", changeSummary.toString());
         } catch (Exception e) {
             System.err.println("Failed to send email notification: " + e.getMessage());
         }
