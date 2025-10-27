@@ -4,18 +4,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.cinema_backend.model.Customer;
 import com.example.cinema_backend.model.Status;
 import com.example.cinema_backend.repository.CustomerRepository;
 import com.example.cinema_backend.service.EmailService;
+import com.example.cinema_backend.security.AESUtil;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -31,7 +30,9 @@ public class CustomerController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    //  Verify password endpoint
+    // -------------------------------
+    // Verify password
+    // -------------------------------
     @PostMapping("/verify-password/{email}")
     public boolean verifyPassword(@PathVariable String email, @RequestBody Map<String, String> body) {
         String oldPassword = body.get("oldPassword");
@@ -47,7 +48,9 @@ public class CustomerController {
     // -------------------------------
     @GetMapping
     public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+        List<Customer> customers = customerRepository.findAll();
+        customers.forEach(this::decryptAndMaskPaymentInfo);
+        return customers;
     }
 
     // -------------------------------
@@ -55,7 +58,9 @@ public class CustomerController {
     // -------------------------------
     @GetMapping("/{id}")
     public Optional<Customer> getCustomerById(@PathVariable String id) {
-        return customerRepository.findById(id);
+        Optional<Customer> customer = customerRepository.findById(id);
+        customer.ifPresent(this::decryptAndMaskPaymentInfo);
+        return customer;
     }
 
     // -------------------------------
@@ -63,7 +68,9 @@ public class CustomerController {
     // -------------------------------
     @GetMapping("/email/{email}")
     public Optional<Customer> getCustomerByEmail(@PathVariable String email) {
-        return customerRepository.findByEmail(email);
+        Optional<Customer> customer = customerRepository.findByEmail(email);
+        customer.ifPresent(this::decryptAndMaskPaymentInfo);
+        return customer;
     }
 
     // -------------------------------
@@ -72,12 +79,9 @@ public class CustomerController {
     @PutMapping("/email/{email}")
     public Customer updateCustomerByEmail(@PathVariable String email, @RequestBody Customer updatedCustomer) {
         Optional<Customer> opt = customerRepository.findByEmail(email);
-        if (opt.isEmpty()) {
-            throw new RuntimeException("Customer not found with email: " + email);
-        }
+        if (opt.isEmpty()) throw new RuntimeException("Customer not found with email: " + email);
 
         Customer customer = opt.get();
-
         boolean hasChanges = false;
         StringBuilder changeSummary = new StringBuilder("Hello " + customer.getFirstName() + ",\n\n");
         changeSummary.append("The following changes were made to your account:\n");
@@ -87,59 +91,56 @@ public class CustomerController {
             changeSummary.append("- First name updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getLastName() != null && !updatedCustomer.getLastName().equals(customer.getLastName())) {
             customer.setLastName(updatedCustomer.getLastName());
             changeSummary.append("- Last name updated\n");
             hasChanges = true;
         }
-
-        // Password: check and hash if changed
         if (updatedCustomer.getPassword() != null 
                 && !passwordEncoder.matches(updatedCustomer.getPassword(), customer.getPassword())) {
-            String hashedPassword = passwordEncoder.encode(updatedCustomer.getPassword());
-            customer.setPassword(hashedPassword);
+            customer.setPassword(passwordEncoder.encode(updatedCustomer.getPassword()));
             changeSummary.append("- Password changed\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPhoneNumber() != null && !updatedCustomer.getPhoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
             changeSummary.append("- Phone number updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getHomeAddress() != null && !updatedCustomer.getHomeAddress().equals(customer.getHomeAddress())) {
             customer.setHomeAddress(updatedCustomer.getHomeAddress());
             changeSummary.append("- Home address updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getBillingAddress() != null && !updatedCustomer.getBillingAddress().equals(customer.getBillingAddress())) {
             customer.setBillingAddress(updatedCustomer.getBillingAddress());
             changeSummary.append("- Billing address updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPromotion() != null && !updatedCustomer.getPromotion().equals(customer.getPromotion())) {
             customer.setPromotion(updatedCustomer.getPromotion());
             changeSummary.append("- Promotion preference updated\n");
             hasChanges = true;
         }
 
-        if (updatedCustomer.getPaymentInfo() != null && !updatedCustomer.getPaymentInfo().equals(customer.getPaymentInfo())) {
+        // Encrypt payment info before saving
+        if (updatedCustomer.getPaymentInfo() != null) {
+            updatedCustomer.getPaymentInfo().forEach(p -> {
+                if (p.getCardNumber() != null && !p.getCardNumber().isEmpty())
+                    p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
+                if (p.getCvv() != null && !p.getCvv().isEmpty())
+                    p.setCvv(AESUtil.encrypt(p.getCvv()));
+            });
             customer.setPaymentInfo(updatedCustomer.getPaymentInfo());
             changeSummary.append("- Payment methods updated\n");
             hasChanges = true;
         }
 
-        if (!hasChanges) {
-            return customer; // no update → no email
-        }
+        if (!hasChanges) return customer;
 
         Customer saved = customerRepository.save(customer);
 
-        // Send summary email
+        // Email notification
         try {
             changeSummary.append("\nIf you didn’t make these changes, please contact support immediately.\n\n");
             changeSummary.append("Best regards,\nCinema Team");
@@ -151,51 +152,54 @@ public class CustomerController {
         return saved;
     }
 
+    // -------------------------------
+    // LOGIN endpoint
+    // -------------------------------
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String email = loginData.get("email");
         String password = loginData.get("password");
 
         Optional<Customer> existingCustomer = customerRepository.findByEmail(email);
-
         if (existingCustomer.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Customer not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found");
         }
 
         Customer customer = existingCustomer.get();
 
-        // Compare plain password with hashed one
         if (!passwordEncoder.matches(password, customer.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        // If successful, return the customer (without password)
-        customer.setPassword(null); // hide password from response
+        decryptAndMaskPaymentInfo(customer);
+        customer.setPassword(null); // hide password
         return ResponseEntity.ok(customer);
     }
 
-    
+    // -------------------------------
+    // ADD new customer
+    // -------------------------------
     @PostMapping("/add")
     public ResponseEntity<?> addCustomer(@RequestBody Customer newCustomer) {
         try {
-            // Check if email already exists
             Optional<Customer> existing = customerRepository.findByEmail(newCustomer.getEmail());
             if (existing.isPresent()) {
-                return ResponseEntity
-                        .status(HttpStatus.CONFLICT)
-                        .body("Email already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
             }
 
-            // Hash the password before saving
-            String encodedPassword = passwordEncoder.encode(newCustomer.getPassword());
-            newCustomer.setPassword(encodedPassword);
-            // Set default status or fields if needed
-            if (newCustomer.getStatus() == null) {
-                newCustomer.setStatus(Status.ACTIVE);
+            newCustomer.setPassword(passwordEncoder.encode(newCustomer.getPassword()));
+
+            // Encrypt payment info
+            if (newCustomer.getPaymentInfo() != null) {
+                newCustomer.getPaymentInfo().forEach(p -> {
+                    if (p.getCardNumber() != null && !p.getCardNumber().isEmpty())
+                        p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
+                    if (p.getCvv() != null && !p.getCvv().isEmpty())
+                        p.setCvv(AESUtil.encrypt(p.getCvv()));
+                });
             }
-            
+
+            if (newCustomer.getStatus() == null) newCustomer.setStatus(Status.ACTIVE);
 
             Customer savedCustomer = customerRepository.save(newCustomer);
             return ResponseEntity.ok(savedCustomer);
@@ -205,14 +209,38 @@ public class CustomerController {
                     .body("Error creating customer: " + e.getMessage());
         }
     }
-        
-    
 
     // -------------------------------
-    // DELETE customer by ID
+    // DELETE customer
     // -------------------------------
     @DeleteMapping("/{id}")
     public void deleteCustomer(@PathVariable String id) {
         customerRepository.deleteById(id);
+    }
+
+    // -------------------------------
+    // Helper: Decrypt and mask payment info
+    // -------------------------------
+    private void decryptAndMaskPaymentInfo(Customer customer) {
+        if (customer.getPaymentInfo() != null) {
+            customer.getPaymentInfo().forEach(p -> {
+                try {
+                    if (p.getCardNumber() != null)
+                        p.setCardNumber(AESUtil.decrypt(p.getCardNumber()));
+                    if (p.getCvv() != null)
+                        p.setCvv(AESUtil.decrypt(p.getCvv()));
+
+                    // Mask before sending
+                    if (p.getCardNumber() != null && p.getCardNumber().length() > 4) {
+                        String last4 = p.getCardNumber().substring(p.getCardNumber().length() - 4);
+                        p.setCardNumber("**** **** **** " + last4);
+                    }
+                    if (p.getCvv() != null) p.setCvv("***");
+
+                } catch (Exception e) {
+                    // skip
+                }
+            });
+        }
     }
 }
