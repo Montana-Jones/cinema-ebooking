@@ -19,5 +19,10 @@ public class EmailService {
         message.setText(text);
         mailSender.send(message);
     }
+
+    public void sendPasswordReset(String email, String resetLink) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'sendPasswordReset'");
+    }
 }
 
