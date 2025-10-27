@@ -213,15 +213,12 @@ public class CustomerController {
         }
 
         Customer customer = opt.get();
-
         if (!customer.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // Generate JWT token
         String token = jwtUtil.generateToken(customer.getEmail());
-
-        return new LoginResponse(token, customer);
+        return new LoginResponse(token, customer.getEmail(), customer.isAdmin());
     }
 
     // -------------------------------
@@ -262,19 +259,25 @@ public class CustomerController {
 
     public static class LoginResponse {
         private String token;
-        private Customer customer;
+        private String email;
+        private boolean isAdmin;
 
-        public LoginResponse(String token, Customer customer) {
+        public LoginResponse(String token, String email, boolean isAdmin) {
             this.token = token;
-            this.customer = customer;
+            this.email = email;
+            this.isAdmin = isAdmin;
         }
 
         public String getToken() {
             return token;
         }
 
-        public Customer getCustomer() {
-            return customer;
+        public String getEmail() {
+            return email;
+        }
+
+        public boolean isAdmin() {
+            return isAdmin;
         }
     }
 }

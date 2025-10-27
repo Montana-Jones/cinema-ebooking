@@ -26,7 +26,12 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Login failed");
 
       const user = await res.json();
+
+      // Store user object in context
       setUser(user);
+
+      // Persist user object to localStorage for page refresh
+      localStorage.setItem("user", JSON.stringify(user));
 
       window.location.href = "/";
     } catch (err) {
