@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import TopBar from "@/app/edit-profile/parts/topBar";
+import Navbar from "@/components/Navbar";
 
 type PaymentCard = {
   cardHolder: string;
@@ -157,7 +157,7 @@ export default function Signup() {
   if (step === "verify") {
     return (
       <div className="flex flex-col items-center mb-10">
-        <TopBar />
+        <Navbar />
         <div className="max-w-md w-full pt-20">
           <form
             onSubmit={handleVerify}
@@ -166,6 +166,7 @@ export default function Signup() {
             <h2 className="text-2xl font-semibold text-center text-[#675068] mb-4">
               Email Verification
             </h2>
+
             {errors.length > 0 && (
               <ul className="text-red-500 text-sm mb-2 list-disc list-inside">
                 {errors.map((err, idx) => (
@@ -173,11 +174,13 @@ export default function Signup() {
                 ))}
               </ul>
             )}
+
             {success && (
               <p className="text-green-600 text-center">
                 Your account is verified! You can now log in.
               </p>
             )}
+
             <input
               type="text"
               placeholder="Enter verification code"
@@ -185,6 +188,7 @@ export default function Signup() {
               onChange={(e) => setVerificationCode(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
+
             <button
               type="submit"
               disabled={submitting || success}
@@ -200,7 +204,7 @@ export default function Signup() {
 
   return (
     <div className="flex flex-col items-center mb-10">
-      <TopBar />
+      <Navbar />
       <div className="max-w-md w-full pt-20">
         <form
           onSubmit={handleSignup}
@@ -209,6 +213,7 @@ export default function Signup() {
           <h2 className="text-2xl font-semibold text-center text-[#675068] mb-4">
             Sign Up
           </h2>
+
           {errors.length > 0 && (
             <ul className="text-red-500 text-sm mb-2 list-disc list-inside">
               {errors.map((err, idx) => (
