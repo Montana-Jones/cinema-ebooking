@@ -92,7 +92,7 @@ export default function Signup() {
     setSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/customers", {
+      const res = await fetch("http://localhost:8080/api/customers/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -119,7 +119,7 @@ export default function Signup() {
       if (!res.ok) throw new Error("Failed to register");
 
       const data = await res.json();
-      setUserId(data.userId);
+      setUserId(data.id);
       setStep("verify");
       setErrors([]);
     } catch (err) {
@@ -134,6 +134,7 @@ export default function Signup() {
     e.preventDefault();
     if (!userId) return;
 
+    setSubmitting(true);
     try {
       const res = await fetch(
         `http://localhost:8080/api/customers/verify/${userId}`,
@@ -151,6 +152,8 @@ export default function Signup() {
     } catch (err) {
       console.error(err);
       setErrors(["Invalid verification code"]);
+    } finally {
+      setSubmitting(false);
     }
   };
 

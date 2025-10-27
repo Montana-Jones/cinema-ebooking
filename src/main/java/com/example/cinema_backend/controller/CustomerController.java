@@ -2,14 +2,13 @@ package com.example.cinema_backend.controller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.cinema_backend.model.Customer;
-import com.example.cinema_backend.model.PaymentInfo;
 import com.example.cinema_backend.repository.CustomerRepository;
+import com.example.cinema_backend.service.EmailService;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -17,6 +16,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     // -------------------------------
     // GET all customers
@@ -37,15 +39,18 @@ public class CustomerController {
     // -------------------------------
     // CREATE a new customer (signup)
     // -------------------------------
-    @PostMapping
+    @PostMapping("/signup")
     public Customer addCustomer(@RequestBody Customer newCustomer) {
         newCustomer.setId(null);
-
-        // Generate a simple verification code
-        newCustomer.setVerificationCode(UUID.randomUUID().toString().substring(0, 6));
         newCustomer.setVerified(false);
 
-        // Save customer
+        // Generate and send verification code
+        String code = emailService.sendVerificationEmail(newCustomer.getEmail());
+        newCustomer.setVerificationCode(code);
+
+        // Temporarily disable password hashing
+        // newCustomer.setPassword(passwordEncoder.encode(newCustomer.getPassword()));
+
         return customerRepository.save(newCustomer);
     }
 
@@ -67,6 +72,50 @@ public class CustomerController {
         customer.setVerified(true);
         customer.setVerificationCode(null); // clear code after verification
         return customerRepository.save(customer);
+    }
+
+    // -------------------------------
+    // LOGIN endpoint
+    // -------------------------------
+    @PostMapping("/login")
+    public Customer login(@RequestBody LoginRequest request) {
+        Optional<Customer> optionalCustomer = customerRepository.findByEmail(request.getEmail());
+
+        // Check if customer exists
+        Customer customer = optionalCustomer.orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        // Compare password (no hashing)
+        if (!customer.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        if (!customer.isVerified()) {
+            throw new RuntimeException("Email not verified");
+        }
+
+        return customer;
+    }
+
+    // DTO for login
+    public static class LoginRequest {
+        private String email;
+        private String password;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 
     // -------------------------------
@@ -155,4 +204,5 @@ public class CustomerController {
             this.code = code;
         }
     }
+
 }
