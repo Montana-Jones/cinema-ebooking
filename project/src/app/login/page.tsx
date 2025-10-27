@@ -20,17 +20,14 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       if (!res.ok) throw new Error("Login failed");
 
-      const data = await res.json();
+      const user = await res.json();
+      setUser(user);
 
-      // Store token and user info in localStorage
-      setToken(data.token);
-      setUser(data.customer);
-
-      // Redirect to home or user dashboard
       window.location.href = "/";
     } catch (err) {
       alert("Invalid email or password");

@@ -5,6 +5,10 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+
+
+
+
 import lombok.Data;
 
 @Document(collection = "customer")
@@ -24,11 +28,9 @@ public class Customer {
     private String homeAddress;
     private String billingAddress;
 
-    // --- Verification fields ---
-    private String verificationCode;
-    private boolean verified;
-
+    
     private List<Booking> bookings;
-
+    
+    
     private List<PaymentInfo> paymentInfo;
 }
