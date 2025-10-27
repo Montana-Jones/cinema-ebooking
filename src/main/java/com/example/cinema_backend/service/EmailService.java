@@ -43,4 +43,21 @@ public class EmailService {
         int code = 100000 + random.nextInt(900000); // 6-digit code
         return String.valueOf(code);
     }
+
+    public void sendPasswordReset(String toEmail, String resetLink) {
+        String subject = "Cinema Booking Password Reset";
+        String text = "You requested a password reset.\n\n"
+                + "Click the link below to reset your password:\n"
+                + resetLink + "\n\n"
+                + "If you did not request this, please ignore this email.";
+
+        try {
+            sendEmail(toEmail, subject, text);
+            System.out.println("Sent password reset link to " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send password reset email to " + toEmail + ": " + e.getMessage());
+            throw new RuntimeException("Failed to send reset email");
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.cinema_backend.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -30,6 +31,9 @@ public class Customer {
 
     private String verificationCode;
     private boolean verified;
+
+    private String resetToken;
+    private LocalDateTime tokenExpiration;
 
     public boolean isAdmin() {
         return "ADMIN".equalsIgnoreCase(role);

@@ -9,7 +9,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { setUser, setToken } = useUser();
+  const [resetMessage, setResetMessage] = useState(""); // for forgot password feedback
+  const { setUser } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ export default function LoginPage() {
 
       const loginResponse = await res.json();
 
-      // Fetch full user info after login
+      // Fetch full user info
       const userRes = await fetch(
         `http://localhost:8080/api/customers/email/${loginResponse.email}`
       );
@@ -40,10 +41,8 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify(user)); // store full user
+      localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
-
-      console.log("Logged in user:", user); // debug
 
       window.location.href = "/";
     } catch (err) {
@@ -51,6 +50,34 @@ export default function LoginPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle forgot password
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setResetMessage("Please enter your email to reset password.");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/customers/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to send reset email");
+
+      setResetMessage(
+        "If your email is registered, a password reset link has been sent."
+      );
+    } catch (err) {
+      console.error(err);
+      setResetMessage("Error sending password reset email.");
     }
   };
 
@@ -98,6 +125,19 @@ export default function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
+
+          {/* Forgot Password */}
+          <div className="text-center mt-4">
+            <button
+              onClick={handleForgotPassword}
+              className="text-sm text-white font-bold hover:text-[#75D1A6] transition"
+            >
+              Forgot Password?
+            </button>
+            {resetMessage && (
+              <p className="text-green-400 mt-2 text-sm">{resetMessage}</p>
+            )}
+          </div>
 
           <p className="text-center text-sm text-white mt-4">
             Don’t have an account?{" "}

@@ -1,9 +1,13 @@
 package com.example.cinema_backend.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.cinema_backend.model.Customer;
@@ -13,8 +17,7 @@ import com.example.cinema_backend.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/customers")
-@CrossOrigin(origins = "http://localhost:3000", // your frontend
-        allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*")
 public class CustomerController {
 
     @Autowired
@@ -69,20 +72,82 @@ public class CustomerController {
     // VERIFY a customer
     // -------------------------------
     @PostMapping("/verify/{id}")
-    public Customer verifyCustomer(@PathVariable String id, @RequestBody VerificationRequest request) {
+    public ResponseEntity<?> verifyCustomer(@PathVariable String id, @RequestBody VerificationRequest request) {
         Optional<Customer> opt = customerRepository.findById(id);
         if (opt.isEmpty()) {
-            throw new RuntimeException("Customer not found with id: " + id);
+            return ResponseEntity.badRequest().body("Customer not found with id: " + id);
         }
 
         Customer customer = opt.get();
         if (!customer.getVerificationCode().equals(request.getCode())) {
-            throw new RuntimeException("Invalid verification code");
+            return ResponseEntity.badRequest().body("Invalid verification code");
         }
 
         customer.setVerified(true);
         customer.setVerificationCode(null); // clear code after verification
-        return customerRepository.save(customer);
+        customerRepository.save(customer);
+
+        return ResponseEntity.ok("Account verified successfully");
+    }
+
+    // -------------------------------
+    // FORGOT PASSWORD
+    // -------------------------------
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            Optional<Customer> opt = customerRepository.findByEmail(email);
+            if (opt.isEmpty()) {
+                return ResponseEntity.ok().build(); // Don't reveal if email exists
+            }
+
+            Customer user = opt.get();
+            String token = UUID.randomUUID().toString();
+            user.setResetToken(token);
+            user.setTokenExpiration(LocalDateTime.now().plusHours(2));
+            customerRepository.save(user);
+
+            // Send email with reset link
+            String resetLink = "http://localhost:3000/reset-password?token=" + token;
+            emailService.sendPasswordReset(email, resetLink);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to send reset email");
+        }
+    }
+
+    // -------------------------------
+    // RESET PASSWORD
+    // -------------------------------
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            String newPassword = body.get("password");
+
+            if (token == null || newPassword == null) {
+                return ResponseEntity.badRequest().body("Missing token or password");
+            }
+
+            Optional<Customer> opt = customerRepository.findByResetToken(token);
+            if (opt.isEmpty() || opt.get().getTokenExpiration().isBefore(LocalDateTime.now())) {
+                return ResponseEntity.badRequest().body("Invalid or expired token");
+            }
+
+            Customer user = opt.get();
+            user.setPassword(newPassword); // save plain text
+            user.setResetToken(null);
+            user.setTokenExpiration(null);
+            customerRepository.save(user);
+
+            return ResponseEntity.ok("Password successfully updated");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Internal server error");
+        }
     }
 
     // -------------------------------
@@ -106,52 +171,44 @@ public class CustomerController {
             changeSummary.append("- First name updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getLastName() != null && !updatedCustomer.getLastName().equals(customer.getLastName())) {
             customer.setLastName(updatedCustomer.getLastName());
             changeSummary.append("- Last name updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getEmail() != null && !updatedCustomer.getEmail().equals(customer.getEmail())) {
             customer.setEmail(updatedCustomer.getEmail());
             changeSummary.append("- Email updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPassword() != null && !updatedCustomer.getPassword().equals(customer.getPassword())) {
             customer.setPassword(updatedCustomer.getPassword());
             changeSummary.append("- Password changed\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPhoneNumber() != null
                 && !updatedCustomer.getPhoneNumber().equals(customer.getPhoneNumber())) {
             customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
             changeSummary.append("- Phone number updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getHomeAddress() != null
                 && !updatedCustomer.getHomeAddress().equals(customer.getHomeAddress())) {
             customer.setHomeAddress(updatedCustomer.getHomeAddress());
             changeSummary.append("- Home address updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getBillingAddress() != null
                 && !updatedCustomer.getBillingAddress().equals(customer.getBillingAddress())) {
             customer.setBillingAddress(updatedCustomer.getBillingAddress());
             changeSummary.append("- Billing address updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPromotion() != null && !updatedCustomer.getPromotion().equals(customer.getPromotion())) {
             customer.setPromotion(updatedCustomer.getPromotion());
             changeSummary.append("- Promotion preference updated\n");
             hasChanges = true;
         }
-
         if (updatedCustomer.getPaymentInfo() != null
                 && !updatedCustomer.getPaymentInfo().equals(customer.getPaymentInfo())) {
             customer.setPaymentInfo(updatedCustomer.getPaymentInfo());
@@ -160,7 +217,7 @@ public class CustomerController {
         }
 
         if (!hasChanges) {
-            return customer; // No updates → no email sent
+            return customer;
         }
 
         Customer saved = customerRepository.save(customer);
@@ -169,10 +226,7 @@ public class CustomerController {
         try {
             changeSummary.append("\nIf you didn’t make these changes, please contact support immediately.\n\n");
             changeSummary.append("Best regards,\nCinema Team");
-            emailService.sendEmail(
-                    customer.getEmail(),
-                    "Account Update Notification",
-                    changeSummary.toString());
+            emailService.sendEmail(customer.getEmail(), "Account Update Notification", changeSummary.toString());
         } catch (Exception e) {
             System.err.println("Failed to send email notification: " + e.getMessage());
         }
@@ -190,7 +244,6 @@ public class CustomerController {
             throw new RuntimeException("Customer not found with email: " + email);
         }
         Customer customer = opt.get();
-        // Delegate to ID-based update to reuse logic
         return updateCustomer(customer.getId(), updatedCustomer);
     }
 
@@ -206,19 +259,23 @@ public class CustomerController {
     // LOGIN endpoint
     // -------------------------------
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Optional<Customer> opt = customerRepository.findByEmail(request.getEmail());
         if (opt.isEmpty()) {
-            throw new RuntimeException("Invalid email or password");
+            return ResponseEntity.badRequest().body("Invalid email or password");
         }
 
         Customer customer = opt.get();
         if (!customer.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            return ResponseEntity.badRequest().body("Invalid email or password");
+        }
+
+        if (!customer.isVerified()) {
+            return ResponseEntity.badRequest().body("Account not verified");
         }
 
         String token = jwtUtil.generateToken(customer.getEmail());
-        return new LoginResponse(token, customer.getEmail(), customer.isAdmin());
+        return ResponseEntity.ok(new LoginResponse(token, customer.getEmail(), customer.isAdmin()));
     }
 
     // -------------------------------

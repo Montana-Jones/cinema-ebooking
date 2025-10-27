@@ -13,6 +13,7 @@ import theatre from "@/assets/theatre.png";
 interface User {
   email: string;
   role: string;
+  verified: boolean;
 }
 
 export default function Navbar() {
