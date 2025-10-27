@@ -11,4 +11,6 @@ public class Admin {
 
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
+    private String username;
+    private String password;
 }

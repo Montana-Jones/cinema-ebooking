@@ -27,10 +27,10 @@ public class AdminController {
         return adminRepository.findById(id);
     }
 
-    // Get admin by email (optional)
-    @GetMapping("/email/{email}")
-    public Optional<Admin> getAdminByEmail(@PathVariable String email) {
-        return adminRepository.findByEmail(email);
+    // Get admin by username
+    @GetMapping("/username/{username}")
+    public Optional<Admin> getAdminByUsername(@PathVariable String username) {
+        return adminRepository.findByUsername(username);
     }
 
     // Create a new admin
@@ -44,8 +44,12 @@ public class AdminController {
     public Admin updateAdmin(@PathVariable String id, @RequestBody Admin updatedAdmin) {
         return adminRepository.findById(id)
                 .map(admin -> {
-                    admin.setEmail(updatedAdmin.getEmail());
-                    admin.setPassword(updatedAdmin.getPassword());
+                    if (updatedAdmin.getUsername() != null) {
+                        admin.setUsername(updatedAdmin.getUsername());
+                    }
+                    if (updatedAdmin.getPassword() != null) {
+                        admin.setPassword(updatedAdmin.getPassword());
+                    }
                     return adminRepository.save(admin);
                 })
                 .orElseThrow(() -> new RuntimeException("Admin not found with id " + id));

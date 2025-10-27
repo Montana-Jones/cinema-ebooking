@@ -13,6 +13,8 @@ import com.example.cinema_backend.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/customers")
+@CrossOrigin(origins = "http://localhost:3000", // your frontend
+        allowCredentials = "true")
 public class CustomerController {
 
     @Autowired
@@ -217,9 +219,7 @@ public class CustomerController {
         }
 
         // Generate JWT token
-        String token = jwtUtil.generateToken(
-                String.valueOf(customer.getId()),
-                customer.getEmail());
+        String token = jwtUtil.generateToken(customer.getEmail());
 
         return new LoginResponse(token, customer);
     }
