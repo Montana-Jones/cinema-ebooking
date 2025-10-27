@@ -256,7 +256,7 @@ const hasDuplicateCard = (index: number): boolean => {
       setSuccess(false);
 
       try {
-        const payload = {
+        const basePayload = {
           id: customer.id,
           first_name: customer.firstName,
           last_name: customer.lastName,
@@ -264,10 +264,11 @@ const hasDuplicateCard = (index: number): boolean => {
           home_address: customer.homeAddress,
           billing_address: customer.billingAddress,
           phone_number: customer.phoneNumber,
-          ...(verifiedOldPassword && newPassword
-            ? { password: newPassword }
-            : {password: customer.password}), // only update password if verified
         };
+
+        const payload = verifiedOldPassword && newPassword
+          ? { ...basePayload, password: newPassword }
+          : basePayload;
 
         const res = await fetch(
           `http://localhost:8080/api/customers/email/${customer.email}`,
@@ -295,23 +296,37 @@ const hasDuplicateCard = (index: number): boolean => {
       }
     };
 
-  const handleOldPasswordSubmit = () => {
+  const handleOldPasswordSubmit = async () => {
     if (!customer) return;
 
-    if (oldPasswordInput === customer.password) {
-      setVerifiedOldPassword(true);
-      setShowOldPasswordPrompt(false);
-    } else {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      if (newAttempts >= 3) {
-        alert("Too many failed attempts. Returning to profile page.");
-        window.location.href = `/edit-profile/${customer.email}`;
+    try {
+      const res = await fetch(`http://localhost:8080/api/customers/verify-password/${customer.email}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldPassword: oldPasswordInput }),
+      });
+
+      const isValid = await res.json();
+
+      if (isValid ) {
+        setVerifiedOldPassword(true);
+        setShowOldPasswordPrompt(false);
       } else {
-        alert(`Incorrect password. Attempt ${newAttempts} of 3.`);
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        if (newAttempts >= 3) {
+          alert("Too many failed attempts. Returning to profile page.");
+          window.location.href = `/edit-profile/${customer.email}`;
+        } else {
+          alert(`Incorrect password. Attempt ${newAttempts} of 3.`);
+        }
       }
+    } catch (err) {
+      console.error(err);
+      alert("Error verifying password.");
     }
   };
+
 
   useEffect(() => {
     setPasswordMismatch(
