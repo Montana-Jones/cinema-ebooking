@@ -152,16 +152,16 @@ export default function MoviePage({
                 src={TheatreScreen}
                 alt="screen"
                 style={{
-                  width: "58%",
+                  width: "60%",
                   height: "auto",
                   margin: "1rem 0",
-                  paddingRight: "4rem",
+                  paddingRight: "5rem",
                 }}
               />
             </div>
 
             {/* Seats */}
-            <div style={{ display: "inline-block", paddingLeft: "9.5rem" }}>
+            <div style={{ display: "inline-block", paddingLeft: "10.5rem" }}>
               {seats.map((row, rowIndex) => (
                 <div
                   key={rowIndex}
