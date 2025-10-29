@@ -5,7 +5,7 @@ import styles from "@/components/Card.module.css";
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
-import AddMovie from "@/components/AddMovie";
+import AddMovie from "@/components/ManageMovies";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
 import Link from "next/link";

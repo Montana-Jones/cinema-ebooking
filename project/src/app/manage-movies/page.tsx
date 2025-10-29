@@ -1,7 +1,7 @@
-import AddMovie from "@/components/ManageMovies";
+import ManageMovies from "@/components/ManageMovies";
 import Navbar from "@/components/Navbar";
 
-export default function AddMoviePage() {
+export default function ManageMoviesPage() {
   return (
     <main
       style={{
@@ -12,7 +12,7 @@ export default function AddMoviePage() {
       }}
     >
       <Navbar />
-      <AddMovie />
+      <ManageMovies />
     </main>
   );
 }
