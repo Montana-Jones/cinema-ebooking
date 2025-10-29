@@ -11,6 +11,8 @@ import com.example.cinema_backend.repository.MovieRepository;
 
 @RestController
 @RequestMapping("/api/movies")
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class MovieController {
 
     @Autowired

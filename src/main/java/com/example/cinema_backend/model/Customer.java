@@ -1,10 +1,10 @@
 package com.example.cinema_backend.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 
 
 
@@ -22,15 +22,25 @@ public class Customer {
     private String lastName;
     private String email;
     private String password;
+    private String role; // "CUSTOMER" or "ADMIN"
+
     private Status status;
     private Promotion promotion;
     private String phoneNumber;
     private String homeAddress;
     private String billingAddress;
 
-    
     private List<Booking> bookings;
-    
-    
     private List<PaymentInfo> paymentInfo;
+
+    private String verificationCode;
+    private boolean verified;
+
+    private String resetToken;
+    private LocalDateTime tokenExpiration;
+
+    public boolean isAdmin() {
+            return "ADMIN".equalsIgnoreCase(role);
+    }
+    
 }
