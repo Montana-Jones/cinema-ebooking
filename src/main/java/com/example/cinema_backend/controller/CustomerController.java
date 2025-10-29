@@ -24,6 +24,7 @@ import com.example.cinema_backend.util.JwtUtil;
 @RestController
 @RequestMapping("/api/customers")
 //@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*")
 public class CustomerController {
 
     @Autowired
@@ -161,6 +162,38 @@ public class CustomerController {
     }
 
     // -------------------------------
+    // RESET PASSWORD
+    // -------------------------------
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            String newPassword = body.get("password");
+
+            if (token == null || newPassword == null) {
+                return ResponseEntity.badRequest().body("Missing token or password");
+            }
+
+            Optional<Customer> opt = customerRepository.findByResetToken(token);
+            if (opt.isEmpty() || opt.get().getTokenExpiration().isBefore(LocalDateTime.now())) {
+                return ResponseEntity.badRequest().body("Invalid or expired token");
+            }
+
+            Customer user = opt.get();
+            user.setPassword(passwordEncoder.encode(newPassword)); 
+            user.setResetToken(null);
+            user.setTokenExpiration(null);
+            customerRepository.save(user);
+
+            return ResponseEntity.ok("Password successfully updated");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Internal server error");
+        }
+    }
+
+
+    // -------------------------------
     // LOGIN endpoint
     // -------------------------------
     @PostMapping("/login")
@@ -206,8 +239,14 @@ public class CustomerController {
                         p.setCvv(AESUtil.encrypt(p.getCvv()));
                 });
             }
+            newCustomer.setId(null);
+            newCustomer.setStatus(Status.UNVERIFIED);
+            newCustomer.setVerified(false);
 
-            if (newCustomer.getStatus() == null) newCustomer.setStatus(Status.ACTIVE);
+            // Generate and send verification code
+            String code = emailService.sendVerificationEmail(newCustomer.getEmail());
+            newCustomer.setVerificationCode(code);
+            //
 
             Customer savedCustomer = customerRepository.save(newCustomer);
             return ResponseEntity.ok(savedCustomer);
@@ -239,7 +278,8 @@ public class CustomerController {
         }
 
         customer.setVerified(true);
-        customer.setVerificationCode(null); // clear code after verification
+        customer.setStatus(Status.ACTIVE);
+        customer.setVerificationCode(null);// clear code after verification
         customerRepository.save(customer);
 
         return ResponseEntity.ok("Account verified successfully");
