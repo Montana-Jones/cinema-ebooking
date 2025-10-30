@@ -214,7 +214,8 @@ public class CustomerController {
 
         decryptAndMaskPaymentInfo(customer);
         customer.setPassword(null); // hide password
-        return ResponseEntity.ok(customer);
+        String token = jwtUtil.generateToken(customer.getEmail());
+        return ResponseEntity.ok(new LoginResponse(token, customer.getEmail(), customer.isAdmin()));
     }
 
     // -------------------------------

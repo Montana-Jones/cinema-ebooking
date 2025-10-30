@@ -1,4 +1,4 @@
-import ManageMovies from "@/components/ManageMovies";
+import ManageMovies from "../../components/ManageMovies";
 import Navbar from "@/components/Navbar";
 
 export default function ManageMoviesPage() {
