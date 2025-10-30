@@ -5,12 +5,16 @@ import com.example.cinema_backend.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admins")
-//@CrossOrigin(origins = "*") // allow frontend access (adjust for security later)
+@CrossOrigin(origins = "*") // allow frontend access (adjust for security later)
 public class AdminController {
 
     @Autowired
@@ -37,8 +41,24 @@ public class AdminController {
     //  Create a new admin
     @PostMapping
     public Admin createAdmin(@RequestBody Admin admin) {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        admin.setPassword(encoder.encode(admin.getPassword()));
         return adminRepository.save(admin);
     }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Admin loginRequest) {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        Admin admin = adminRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        if (encoder.matches(loginRequest.getPassword(), admin.getPassword())) {
+            return "Login successful";
+        } else {
+            return "Invalid password";
+        }
+    }
+
 
     //  Update an admin
     @PutMapping("/{id}")
