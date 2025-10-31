@@ -1,6 +1,0 @@
-com/example/cinema_backend/exception/MovieNotFoundException.class
-com/example/cinema_backend/service/MovieService.class
-com/example/cinema_backend/repository/MovieRepository.class
-com/example/cinema_backend/model/Movie.class
-com/example/cinema_backend/controller/MovieController.class
-com/example/cinema_backend/CinemaBackendApplication.class

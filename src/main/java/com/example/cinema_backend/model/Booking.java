@@ -27,7 +27,7 @@ public class Booking {
     private List<Ticket> tickets;
 
     @DBRef
-    private Customer customer;
+    private User user;
 
    
 }
