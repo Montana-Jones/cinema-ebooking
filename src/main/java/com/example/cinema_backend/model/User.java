@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
-@Document(collection = "users")
+@Document(collection = "user")
 @Data
 public class User {
 
