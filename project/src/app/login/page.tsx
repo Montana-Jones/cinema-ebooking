@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/customers/login", {
+      const res = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       // Fetch full user info
       const userRes = await fetch(
-        `http://localhost:8080/api/customers/email/${loginResponse.email}`
+        `http://localhost:8080/api/users/email/${loginResponse.email}`
       );
       if (!userRes.ok) throw new Error("Failed to fetch user");
       const user = await userRes.json();
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/customers/forgot-password`,
+        `http://localhost:8080/api/users/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

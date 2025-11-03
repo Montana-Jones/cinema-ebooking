@@ -54,7 +54,7 @@ export default function EditProfile({
     const fetchCustomer = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/customers/email/${email}`
+          `http://localhost:8080/api/users/email/${email}`
         );
         if (!res.ok) throw new Error("Failed to fetch customer");
         const data = await res.json();
@@ -217,7 +217,7 @@ const hasDuplicateCard = (index: number): boolean => {
 
       try {
         const res = await fetch(
-          `http://localhost:8080/api/customers/email/${customer.email}`,
+          `http://localhost:8080/api/users/email/${customer.email}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -271,7 +271,7 @@ const hasDuplicateCard = (index: number): boolean => {
           : basePayload;
 
         const res = await fetch(
-          `http://localhost:8080/api/customers/email/${customer.email}`,
+          `http://localhost:8080/api/users/email/${customer.email}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -300,7 +300,7 @@ const hasDuplicateCard = (index: number): boolean => {
     if (!customer) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/customers/verify-password/${customer.email}`, {
+      const res = await fetch(`http://localhost:8080/api/users/verify-password/${customer.email}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPassword: oldPasswordInput }),
