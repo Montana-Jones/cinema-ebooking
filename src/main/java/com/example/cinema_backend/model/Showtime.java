@@ -21,8 +21,8 @@ public class Showtime {
     private String endTime;   // e.g., "4:00 PM"
     private String date;
     private String duration;
+    private String roomName;
 
-    @DBRef
     private Movie movie;
     
     @DBRef

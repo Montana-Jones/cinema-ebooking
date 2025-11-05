@@ -24,6 +24,12 @@ public class ShowroomController {
         return showroomRepository.findAll();
     }
 
+    @GetMapping("/{name}")
+    public Optional<Showroom> getShowroomByName(@PathVariable String name) {
+        return showroomRepository.findByName(name);
+    }
+    
+
     @GetMapping("/{id}")
     public Optional<Showroom> getShowroomById(@PathVariable String id) {
         return showroomRepository.findById(id);

@@ -1,5 +1,6 @@
 package com.example.cinema_backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -14,12 +15,11 @@ public class Showroom {
 
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
-
-    private int numSeats;
-
-    @DBRef
-    private List<Showtime> showtimes;
+    private String name;
+    private int numRows;
+    private int numCols;
 
     @DBRef
-    private Theatre theatre;
+    private List<Showtime> showtimes = new ArrayList<>();
+
 }
