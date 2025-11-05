@@ -22,7 +22,7 @@ public class Showtime {
     private String date;
     private String duration;
     private String roomName;
-
+    @DBRef
     private Movie movie;
     
     @DBRef

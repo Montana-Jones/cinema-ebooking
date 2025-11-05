@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import com.example.cinema_backend.repository.ShowroomRepository;
 import com.example.cinema_backend.model.Showroom;
+import com.example.cinema_backend.model.Movie;
+import com.example.cinema_backend.repository.MovieRepository;
 
 
 
@@ -31,6 +33,8 @@ public class ShowtimeController {
     private ShowtimeRepository showtimeRepository;
     @Autowired
     private ShowroomRepository showroomRepository;
+    @Autowired
+    private MovieRepository movieRepository;
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> editShowtime(@PathVariable String id, @RequestBody Showtime updatedShowtime) {
@@ -63,12 +67,22 @@ public class ShowtimeController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addShowtime(@RequestBody Showtime newShowtime) {
+        //get showroom by name
         Showroom showroom = showroomRepository.findByName(newShowtime.getRoomName())
                 .orElseThrow(() -> new RuntimeException("Showroom not found: " + newShowtime.getRoomName()));
         newShowtime.setShowroom(showroom);
+        //get movie by id
+        Movie movie = movieRepository.findById(newShowtime.getMovie().getId())
+                .orElseThrow(() -> new RuntimeException("Movie not found: " + newShowtime.getMovie().getId()));
+        newShowtime.setMovie(movie);
+        //save showtime
         Showtime savedShowtime = showtimeRepository.save(newShowtime);
+        //update movie and showroom
+        movie.getShowtimes().add(savedShowtime);
+        movieRepository.save(movie);
         showroom.getShowtimes().add(savedShowtime);
         showroomRepository.save(showroom);
+
         return ResponseEntity.ok(savedShowtime);
     }
     

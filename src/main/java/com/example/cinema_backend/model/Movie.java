@@ -1,5 +1,6 @@
 package com.example.cinema_backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -29,5 +30,5 @@ public class Movie {
     private double rating;
 
     @DBRef
-    private List<Showtime> showtimes; // Added to match the frontend data structure
+    private List<Showtime> showtimes = new ArrayList<>(); 
 }
