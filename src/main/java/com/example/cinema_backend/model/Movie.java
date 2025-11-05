@@ -30,5 +30,5 @@ public class Movie {
     private double rating;
 
     @DBRef
-    private List<Showtime> showtimes = new ArrayList<>(); 
+    private List<Showtime> showtime = new ArrayList<>(); 
 }

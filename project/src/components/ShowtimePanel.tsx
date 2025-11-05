@@ -5,12 +5,12 @@ import React from "react";
 import styles from "./Card.module.css";
 import Link from "next/link";
 
-interface Showtime {
-  id: number;
-  movieId: number;
-  theatreNum: number;
-  startTime: Date;
-}
+// interface Showtime {
+//   id: number;
+//   movieId: number;
+//   theatreNum: number;
+//   startTime: Date;
+// }
 
 interface MovieProps {
   movie: {
@@ -27,24 +27,53 @@ interface MovieProps {
     trailer_url: string;
     now_showing: boolean;
     coming_soon: boolean;
-    showtimes: Showtime[];
+    showtime: {
+      start_time: String;
+      end_time: String;
+
+    }[] ;
   };
 }
 
-const hardcodedShowtimes = ["11:00am", "2:00pm", "5:00pm", "8:00pm", "11:00pm"];
+// const hardcodedShowtimes = ["11:00am", "2:00pm", "5:00pm", "8:00pm", "11:00pm"];
+
+// const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
+//   return (
+//     <div className={styles.showtimeContainer}>
+//       <h1>Showtimes</h1>
+//       <div className={styles.showtimes}>
+//         {hardcodedShowtimes.map((time) => (
+//           <Link
+//             key={time}
+//             className={styles.showtimeButton}
+//             href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
+//           >
+//             <p>{time}</p>
+//           </Link>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ShowtimePanel;
 
 const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
+  console.log("Showtimes:", JSON.stringify(movie.showtime, null, 2));
+
+
   return (
+    
     <div className={styles.showtimeContainer}>
       <h1>Showtimes</h1>
       <div className={styles.showtimes}>
-        {hardcodedShowtimes.map((time) => (
+        {movie.showtime.map((time, index) => (
           <Link
-            key={time}
+            key={index}
             className={styles.showtimeButton}
-            href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
+            href={`/booking-nav/${movie.id}/${time.start_time}`}
           >
-            <p>{time}</p>
+            <p>{time.start_time}</p>
           </Link>
         ))}
       </div>

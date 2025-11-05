@@ -78,7 +78,7 @@ public class ShowtimeController {
         //save showtime
         Showtime savedShowtime = showtimeRepository.save(newShowtime);
         //update movie and showroom
-        movie.getShowtimes().add(savedShowtime);
+        movie.getShowtime().add(savedShowtime);
         movieRepository.save(movie);
         showroom.getShowtimes().add(savedShowtime);
         showroomRepository.save(showroom);

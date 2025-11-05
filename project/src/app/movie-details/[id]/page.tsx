@@ -6,7 +6,8 @@ interface MoviePageProps {
 }
 
 export default async function MoviePage({ params }: MoviePageProps) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   const res = await fetch(`http://localhost:8080/api/movies/${id}`, {
     cache: "no-store", // ensures fresh data each time
