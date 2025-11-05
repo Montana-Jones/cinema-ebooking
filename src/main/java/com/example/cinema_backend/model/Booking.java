@@ -19,7 +19,7 @@ public class Booking {
     private String bookingNum;
     private int numTickets;
     private String showTime;
-    // uy added here
+
     private String movieTitle;
 
 

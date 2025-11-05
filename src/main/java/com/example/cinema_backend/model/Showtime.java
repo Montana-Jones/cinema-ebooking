@@ -17,7 +17,8 @@ public class Showtime {
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
 
-    private String time; // e.g., "2:00 PM"
+    private String startTime; // e.g., "2:00 PM"
+    private String endTime;   // e.g., "4:00 PM"
     private String date;
     private String duration;
 
@@ -26,4 +27,6 @@ public class Showtime {
     
     @DBRef
     private Showroom showroom;
+
+    
 }

@@ -1,0 +1,16 @@
+package com.example.cinema_backend.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+
+@Document(collection = "promotion_code")
+@Data
+public class PromotionCode {
+    @Id
+    private String id;
+    private String code;
+    private double discountPercentage;
+
+    
+}

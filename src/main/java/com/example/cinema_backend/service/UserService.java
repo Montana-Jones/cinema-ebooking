@@ -85,6 +85,7 @@ public class UserService {
         }
 
         if (updated.getPaymentInfo() != null) {
+            paymentRepository.deleteAll(user.getPaymentInfo());
             updated.getPaymentInfo().forEach(p -> {
                 if (p.getCardNumber() != null) p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
                 if (p.getCvv() != null) p.setCvv(AESUtil.encrypt(p.getCvv()));
