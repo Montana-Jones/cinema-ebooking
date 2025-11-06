@@ -36,6 +36,16 @@ public class ShowtimeController {
     @Autowired
     private MovieRepository movieRepository;
 
+    @GetMapping
+    public List<Showtime> getAllShowtimes() {
+        return showtimeRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Showtime> getShowtimeById(@PathVariable String id) {
+        return showtimeRepository.findById(id);
+    }
+    
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> editShowtime(@PathVariable String id, @RequestBody Showtime updatedShowtime) {
        
@@ -60,10 +70,7 @@ public class ShowtimeController {
 
     }
 
-    @GetMapping("/{roomName}")
-    public List<Showtime> getShowtimeByRoomName(@PathVariable String roomName) {
-        return showtimeRepository.findByRoomName(roomName);
-    }
+
 
     @PostMapping("/add")
     public ResponseEntity<?> addShowtime(@RequestBody Showtime newShowtime) {

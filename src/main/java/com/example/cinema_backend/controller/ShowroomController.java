@@ -24,7 +24,7 @@ public class ShowroomController {
         return showroomRepository.findAll();
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/roomname/{name}")
     public Optional<Showroom> getShowroomByName(@PathVariable String name) {
         return showroomRepository.findByName(name);
     }

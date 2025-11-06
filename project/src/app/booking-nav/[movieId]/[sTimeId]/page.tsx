@@ -1,6 +1,7 @@
 "use client";
+//src/app/booking-nav/[movieId]/[sTimeId]/page.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 import styles from "@/components/Card.module.css";
@@ -9,10 +10,9 @@ import MoviePreview from "@/components/MoviePreview";
 import Image from "next/image";
 import Link from "next/link";
 import TheatreScreen from "@/assets/TheaterScreen.png";
+import { set } from "mongoose";
 
-interface MoviePageProps {
-  params: { id: string; time: string };
-}
+
 
 interface MovieP {
   id: string;
@@ -25,52 +25,109 @@ interface MovieP {
   genre: string;
   mpaa_rating: string;
 }
+interface Showroom {
+  id: string;
+  name: string;
+  num_rows: number;
+  num_cols: number;
+}
+
+interface Showtime {
+  id: string;
+  start_time: String;
+  end_time: String;
+  // movie?: MovieP;
+  room_name: string;
+  
+}
 
 type Seat = {
   id: string;
   occupied: boolean;
 };
 
-const rows = 10;
-const cols = 12;
+// const rows = 10;
+// const cols = 12;
 
-// Generate dummy seats
-const generateSeats = (): Seat[][] => {
-  return Array.from({ length: rows }, (_, rowIndex) =>
-    Array.from({ length: cols }, (_, colIndex) => ({
-      id: `${rowIndex}-${colIndex}`,
-      occupied: Math.random() < 0.2, // 20% seats occupied
-    }))
-  );
-};
+
 
 export default function MoviePage({
   params,
 }: {
-  params: Promise<{ id: string; time: string }>;
+  params: Promise<{ movieId: string; sTimeId: string }>;
 }) {
   const [movie, setMovie] = useState<MovieP | null>(null);
   const [seats, setSeats] = useState<Seat[][]>([]);
+  const [showtime, setShowtime] = useState<Showtime | null>(null);
+  const [showroom, setShowroom] = useState<Showroom | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const { id, time } = React.use(params); // ✅ unwrap the Promise
+  const { movieId, sTimeId } = use(params); 
+  const [rows, setRows] = useState<number>(5);
+  const [cols, setCols] = useState<number>(12);
   const now = new Date(); // current date & time
-  const t = decodeURIComponent(time);
+  // const t = decodeURIComponent(time);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/movies/${id}`)
+    console.log("movieId from params:", movieId);
+
+    if (!movieId) return;
+    fetch(`http://localhost:8080/api/movies/${movieId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Movie fetched:", data); // debug
         setMovie(data);
       })
       .catch((err) => console.error(err));
-  }, [id, time]);
+  }, [movieId, sTimeId]);
+
+  
+
+  useEffect(() => {
+    if (!sTimeId) return;
+    fetch(`http://localhost:8080/api/showtimes/${sTimeId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Showtime fetched:", data); 
+        setShowtime(data);
+        
+      })
+      .catch((err) => console.error(err));
+  }, [sTimeId]);
+
+
+  useEffect(() => {
+    console.log("Showtime room_name:", showtime?.room_name);
+    if (!showtime?.room_name) return;
+    fetch(`http://localhost:8080/api/showrooms/roomname/${showtime?.room_name }`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Showroom fetched:", data); // debug
+        setShowroom(data);
+        console.log("Showroom rows and cols:", data.num_rows, data.num_cols);
+        setRows(data.num_rows);
+        setCols(data.num_cols);
+      })
+      .catch((err) => console.error(err));
+  }, [showtime?.room_name]);
+  
+ 
+
+  const generateSeats = (): Seat[][] => {
+    return Array.from({ length: rows }, (_, rowIndex) =>
+      Array.from({ length: cols }, (_, colIndex) => ({
+        id: `${rowIndex}-${colIndex}`,
+        occupied: Math.random() < 0.2, // 20% seats occupied
+      }))
+    );
+  };
+
+
 
   useEffect(() => {
     // Generate seats only on client
     const newSeats = generateSeats();
     setSeats(newSeats);
-  }, []);
+  }, [rows, cols]);
   const toggleSeat = (seatId: string) => {
     setSelectedSeats((prev) =>
       prev.includes(seatId)
@@ -106,7 +163,7 @@ export default function MoviePage({
         }}
       >
         <p>
-          Time: {now.toLocaleDateString()} at {t}
+          Time: {now.toLocaleDateString()} at {showtime ? showtime.start_time : ""}
         </p>
       </div>
 

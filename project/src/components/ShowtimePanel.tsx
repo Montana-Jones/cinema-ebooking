@@ -28,6 +28,7 @@ interface MovieProps {
     now_showing: boolean;
     coming_soon: boolean;
     showtime: {
+      id: string;
       start_time: String;
       end_time: String;
 
@@ -67,13 +68,13 @@ const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
     <div className={styles.showtimeContainer}>
       <h1>Showtimes</h1>
       <div className={styles.showtimes}>
-        {movie.showtime.map((time, index) => (
+        {movie.showtime.map((sTime, index) => (
           <Link
             key={index}
             className={styles.showtimeButton}
-            href={`/booking-nav/${movie.id}/${time.start_time}`}
+            href={`/booking-nav/${movie.id}/${sTime.id}`}
           >
-            <p>{time.start_time}</p>
+            <p>{sTime.start_time}</p>
           </Link>
         ))}
       </div>
