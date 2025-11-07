@@ -36,7 +36,7 @@ interface Showtime {
   id: string;
   start_time: String;
   end_time: String;
-  movieId: String;
+  movie_id: String;
   room_name: string;
   
 }
@@ -63,10 +63,12 @@ export default function MoviePage({
   
   const [rows, setRows] = useState<number>(5);
   const [cols, setCols] = useState<number>(12);
-  const now = new Date(); // current date & time
+  const now = new Date(date); // current date & time
   // const t = decodeURIComponent(time);
 
-  
+console.log("Params:", params);
+console.log("date:", date, "sTimeId:", sTimeId);
+
 
   
 
@@ -82,7 +84,7 @@ export default function MoviePage({
       .catch((err) => console.error(err));
   }, [sTimeId]);
 
-  const movieId = showtime?.movieId;
+  const movieId = showtime?.movie_id;
 
   useEffect(() => {
     console.log("movieId from params:", movieId);
