@@ -45,6 +45,9 @@ export default function Home() {
       })
       .then((data) => {
         setDates(data);
+        if (data.length > 0) {
+          setSelectedDate(new Date(data[0].date));
+      }
       })
       .catch((err) => {
         console.error("Error fetching dates:", err);
@@ -53,7 +56,9 @@ export default function Home() {
 
   // Filter movies based on toggle
   const filteredMovies = movies.filter((movie) =>
-    showNowShowing ? movie.now_showing : movie.coming_soon
+  
+    ((showNowShowing ? movie.now_showing : movie.coming_soon)
+  && ((selectedDate && showNowShowing)? movie.showtime.some((sTime: any) => sTime.date === selectedDate.toISOString().split("T")[0]) : true ))
   );
 
   if (loading) {
@@ -78,6 +83,7 @@ export default function Home() {
           <span className={styles.selectDayLabel}>Select Date:</span>
           {dates.map((d, i) => {
             const date = new Date(d.date);
+            
             const isSelected =
               selectedDate.toDateString() === date.toDateString();
 
