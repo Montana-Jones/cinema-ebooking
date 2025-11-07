@@ -11,6 +11,32 @@
   z-index: 100;
 }
 
+.daySelector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.dayButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.dayButton:hover {
+  background-color: #e2e2e2;
+}
+
+.selectedDay {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+
 .navbarLeft {
     float: left;
     display: flex;

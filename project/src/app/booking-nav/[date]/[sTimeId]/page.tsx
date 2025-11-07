@@ -1,5 +1,5 @@
 "use client";
-//src/app/booking-nav/[movieId]/[sTimeId]/page.tsx
+//src/app/booking-nav/[date]/[sTimeId]/page.tsx
 
 import React, { use, useEffect, useState } from "react";
 import Movie from "@/components/Movie";
@@ -36,7 +36,7 @@ interface Showtime {
   id: string;
   start_time: String;
   end_time: String;
-  // movie?: MovieP;
+  movieId: String;
   room_name: string;
   
 }
@@ -46,39 +46,27 @@ type Seat = {
   occupied: boolean;
 };
 
-// const rows = 10;
-// const cols = 12;
 
 
 
 export default function MoviePage({
   params,
 }: {
-  params: Promise<{ movieId: string; sTimeId: string }>;
+  params: Promise<{ date: string; sTimeId: string }>;
 }) {
+  const { date, sTimeId } = use(params); 
   const [movie, setMovie] = useState<MovieP | null>(null);
   const [seats, setSeats] = useState<Seat[][]>([]);
   const [showtime, setShowtime] = useState<Showtime | null>(null);
   const [showroom, setShowroom] = useState<Showroom | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const { movieId, sTimeId } = use(params); 
+  
   const [rows, setRows] = useState<number>(5);
   const [cols, setCols] = useState<number>(12);
   const now = new Date(); // current date & time
   // const t = decodeURIComponent(time);
 
-  useEffect(() => {
-    console.log("movieId from params:", movieId);
-
-    if (!movieId) return;
-    fetch(`http://localhost:8080/api/movies/${movieId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Movie fetched:", data); // debug
-        setMovie(data);
-      })
-      .catch((err) => console.error(err));
-  }, [movieId, sTimeId]);
+  
 
   
 
@@ -94,6 +82,20 @@ export default function MoviePage({
       .catch((err) => console.error(err));
   }, [sTimeId]);
 
+  const movieId = showtime?.movieId;
+
+  useEffect(() => {
+    console.log("movieId from params:", movieId);
+
+    if (!movieId) return;
+    fetch(`http://localhost:8080/api/movies/${movieId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Movie fetched:", data); // debug
+        setMovie(data);
+      })
+      .catch((err) => console.error(err));
+  }, [movieId, sTimeId]);
 
   useEffect(() => {
     console.log("Showtime room_name:", showtime?.room_name);

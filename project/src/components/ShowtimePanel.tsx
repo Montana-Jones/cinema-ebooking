@@ -34,32 +34,11 @@ interface MovieProps {
 
     }[] ;
   };
+  selectedDate?: Date;
 }
 
-// const hardcodedShowtimes = ["11:00am", "2:00pm", "5:00pm", "8:00pm", "11:00pm"];
 
-// const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
-//   return (
-//     <div className={styles.showtimeContainer}>
-//       <h1>Showtimes</h1>
-//       <div className={styles.showtimes}>
-//         {hardcodedShowtimes.map((time) => (
-//           <Link
-//             key={time}
-//             className={styles.showtimeButton}
-//             href={`/booking-nav/${movie.id}/${encodeURIComponent(time)}`}
-//           >
-//             <p>{time}</p>
-//           </Link>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ShowtimePanel;
-
-const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
+const ShowtimePanel: React.FC<MovieProps> = ({ movie, selectedDate }) => {
   console.log("Showtimes:", JSON.stringify(movie.showtime, null, 2));
 
 
@@ -72,7 +51,7 @@ const ShowtimePanel: React.FC<MovieProps> = ({ movie }) => {
           <Link
             key={index}
             className={styles.showtimeButton}
-            href={`/booking-nav/${movie.id}/${sTime.id}`}
+            href={`/booking-nav/${selectedDate?.toISOString().split("T")[0]}/${sTime.id}`}
           >
             <p>{sTime.start_time}</p>
           </Link>
