@@ -23,6 +23,7 @@ public class Showtime {
     private String duration;
     private String movieId;
     private String roomName;
+    private String seatBinary;
     @DBRef
     private Movie movie;
     

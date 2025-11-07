@@ -45,7 +45,19 @@ public class ShowtimeController {
     public Optional<Showtime> getShowtimeById(@PathVariable String id) {
         return showtimeRepository.findById(id);
     }
-    
+
+    @PutMapping("/saveSeats/{id}")
+    public ResponseEntity<?> updateSeats(@PathVariable String id, @RequestBody String seatBinary) {
+        Optional<Showtime> opt = showtimeRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(404).body("Showtime not found: " + id);
+        }
+        Showtime showtime = opt.get();
+        showtime.setSeatBinary(seatBinary);
+        showtimeRepository.save(showtime);
+        return ResponseEntity.ok(showtime);
+    }
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> editShowtime(@PathVariable String id, @RequestBody Showtime updatedShowtime) {
        

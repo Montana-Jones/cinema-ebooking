@@ -30,6 +30,7 @@ interface Showroom {
   name: string;
   num_rows: number;
   num_cols: number;
+  seat_binary: string;
 }
 
 interface Showtime {
@@ -38,6 +39,7 @@ interface Showtime {
   end_time: String;
   movie_id: String;
   room_name: string;
+  seat_binary: string;
   
 }
 
@@ -63,11 +65,8 @@ export default function MoviePage({
   
   const [rows, setRows] = useState<number>(5);
   const [cols, setCols] = useState<number>(12);
-  const now = new Date(date); // current date & time
-  // const t = decodeURIComponent(time);
+  const now = new Date(date); 
 
-console.log("Params:", params);
-console.log("date:", date, "sTimeId:", sTimeId);
 
 
   
@@ -114,24 +113,27 @@ console.log("date:", date, "sTimeId:", sTimeId);
       .catch((err) => console.error(err));
   }, [showtime?.room_name]);
   
- 
+    useEffect(() => {
+    if (!showtime) return; // wait for data
 
-  const generateSeats = (): Seat[][] => {
-    return Array.from({ length: rows }, (_, rowIndex) =>
+    // if seat_binary doesn’t exist, initialize it
+    const seatBinary = showtime.seat_binary || 
+      Array.from({ length: rows * cols }, () => "0").join("");
+
+    // Split into array of bits
+    const seatB = seatBinary.split("");
+
+    // Convert to seat grid
+    const generatedSeats = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => ({
         id: `${rowIndex}-${colIndex}`,
-        occupied: Math.random() < 0.2, // 20% seats occupied
+        occupied: seatB[rowIndex * cols + colIndex] === "1", // FIXED index
       }))
     );
-  };
 
+    setSeats(generatedSeats);
+  }, [showtime, rows, cols]);
 
-
-  useEffect(() => {
-    // Generate seats only on client
-    const newSeats = generateSeats();
-    setSeats(newSeats);
-  }, [rows, cols]);
   const toggleSeat = (seatId: string) => {
     setSelectedSeats((prev) =>
       prev.includes(seatId)
