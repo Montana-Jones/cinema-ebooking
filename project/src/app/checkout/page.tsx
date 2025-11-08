@@ -16,8 +16,13 @@ interface Ticket {
 }
 
 interface Config {
-  booking_fee: number; // corresponds to Double in Java
-  tax_rate: number; // corresponds to Double in Java
+  booking_fee: number;
+  tax_rate: number;
+}
+
+interface PromoCode {
+  code: string;
+  discount_percentage: number; // e.g., 10 means 10%
 }
 
 export default function CheckoutPage() {
@@ -31,7 +36,13 @@ export default function CheckoutPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [config, setConfig] = useState<Config[]>([]);
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Promo input
+  const [enteredCode, setEnteredCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [promoMessage, setPromoMessage] = useState("");
 
   // Parse selected seats from query params
   useEffect(() => {
@@ -45,22 +56,25 @@ export default function CheckoutPage() {
     }
   }, [searchParams]);
 
-  // Fetch tickets and config (booking_fee, tax_rate) from backend
+  // Fetch tickets, config, and promo codes
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [ticketRes, configRes] = await Promise.all([
+        const [ticketRes, configRes, promoRes] = await Promise.all([
           fetch("http://localhost:8080/api/tickets"),
           fetch("http://localhost:8080/api/fees-and-taxes"),
+          fetch("http://localhost:8080/api/promotion-codes"),
         ]);
 
-        const [ticketData, configData] = await Promise.all([
+        const [ticketData, configData, promoData] = await Promise.all([
           ticketRes.json(),
           configRes.json(),
+          promoRes.json(),
         ]);
 
         setTickets(ticketData);
         setConfig(configData);
+        setPromoCodes(promoData);
       } catch (e) {
         console.error("Failed to fetch data:", e);
       } finally {
@@ -72,7 +86,7 @@ export default function CheckoutPage() {
 
   if (loading)
     return <p style={{ color: "white" }}>Loading checkout information...</p>;
-  if (!config)
+  if (!config.length)
     return <p style={{ color: "white" }}>Failed to load pricing configuration.</p>;
 
   // --- Calculations ---
@@ -87,11 +101,33 @@ export default function CheckoutPage() {
   const subtotal = calculateSubtotal();
   const bookingTotal = (config[0].booking_fee ?? 0) * seats.length;
   const tax = (subtotal + bookingTotal) * (config[0].tax_rate ?? 0);
-  const total = subtotal + bookingTotal + tax;
+  const preDiscountTotal = subtotal + bookingTotal + tax;
+
+  // Apply discount if promo applied
+  const discount =
+    appliedPromo && appliedPromo.discount_percentage
+      ? (preDiscountTotal * appliedPromo.discount_percentage)
+      : 0;
+
+  const total = preDiscountTotal - discount;
+
+  // --- Handlers ---
+  const handleApplyPromo = () => {
+    const found = promoCodes.find(
+      (p) => p.code.toUpperCase() === enteredCode.trim().toUpperCase()
+    );
+
+    if (found) {
+      setAppliedPromo(found);
+      setPromoMessage(`Promo applied! ${found.discount_percentage * 100}% off`);
+    } else {
+      setAppliedPromo(null);
+      setPromoMessage("Invalid promo code.");
+    }
+  };
 
   const handleConfirm = async () => {
     try {
-      // Example booking payload
       const bookingData = {
         movieTitle,
         showtimeId,
@@ -99,10 +135,11 @@ export default function CheckoutPage() {
         subtotal,
         bookingFee: config[0].booking_fee,
         taxRate: config[0].tax_rate,
+        promoCode: appliedPromo ? appliedPromo.code : null,
+        discountPercentage: appliedPromo ? appliedPromo.discount_percentage : 0,
         total,
       };
 
-      // Send to backend (optional)
       await fetch("http://localhost:8080/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -181,7 +218,61 @@ export default function CheckoutPage() {
           <p>
             Tax ({(config[0].tax_rate * 100).toFixed(2)}%): ${tax.toFixed(2)}
           </p>
+
+          {appliedPromo && (
+            <p style={{ color: "#00ff99" }}>
+              Promo Discount ({appliedPromo.discount_percentage * 100}%): -$
+              {discount.toFixed(2)}
+            </p>
+          )}
+
           <h2>Total: ${total.toFixed(2)}</h2>
+        </div>
+
+        {/* --- Promo Code Input --- */}
+        <div style={{ marginTop: "1.5rem" }}>
+          <label htmlFor="promo" style={{ fontWeight: "bold" }}>
+            Have a promo code?
+          </label>
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+            <input
+              id="promo"
+              type="text"
+              value={enteredCode}
+              onChange={(e) => setEnteredCode(e.target.value)}
+              placeholder="Enter promo code"
+              style={{
+                flex: 1,
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "none",
+              }}
+            />
+            <button
+              onClick={handleApplyPromo}
+              style={{
+                backgroundColor: "#0070f3",
+                border: "none",
+                borderRadius: "6px",
+                color: "white",
+                fontWeight: "bold",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+              }}
+            >
+              Apply
+            </button>
+          </div>
+          {promoMessage && (
+            <p
+              style={{
+                color: appliedPromo ? "#00ff99" : "#ff5555",
+                marginTop: "0.5rem",
+              }}
+            >
+              {promoMessage}
+            </p>
+          )}
         </div>
 
         <button
@@ -190,7 +281,7 @@ export default function CheckoutPage() {
             marginTop: "1.5rem",
             width: "100%",
             padding: "1rem",
-            backgroundColor: "#0070f3",
+            backgroundColor: "#00b14f",
             border: "none",
             borderRadius: "6px",
             color: "white",
