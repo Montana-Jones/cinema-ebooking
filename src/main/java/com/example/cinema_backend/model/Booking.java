@@ -20,6 +20,7 @@ public class Booking {
     private int numTickets;
     private String showTimeId;
     private String email;
+    private String roomName;
 
     private String movieId;
 
@@ -27,8 +28,7 @@ public class Booking {
     @DBRef
     private List<Ticket> tickets;
 
-    @DBRef
-    private User user;
+
 
    
 }

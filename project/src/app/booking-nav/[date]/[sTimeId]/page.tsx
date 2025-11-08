@@ -1,6 +1,4 @@
 "use client";
-//src/app/booking-nav/[date]/[sTimeId]/page.tsx
-
 import React, { use, useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
@@ -9,10 +7,9 @@ import TopBar from "@/app/booking-nav/parts/topBar";
 import MoviePreview from "@/components/MoviePreview";
 import Image from "next/image";
 import Link from "next/link";
+
 import TheatreScreen from "@/assets/TheaterScreen.png";
-import { set } from "mongoose";
-
-
+import { useRouter } from "next/navigation";
 
 interface MovieP {
   id: string;
@@ -25,6 +22,7 @@ interface MovieP {
   genre: string;
   mpaa_rating: string;
 }
+
 interface Showroom {
   id: string;
   name: string;
@@ -40,7 +38,6 @@ interface Showtime {
   movie_id: String;
   room_name: string;
   seat_binary: string;
-  
 }
 
 type Seat = {
@@ -48,37 +45,34 @@ type Seat = {
   occupied: boolean;
 };
 
-
-
-
 export default function MoviePage({
   params,
 }: {
   params: Promise<{ date: string; sTimeId: string }>;
 }) {
-  const { date, sTimeId } = use(params); 
+  const { date, sTimeId } = use(params);
+  const router = useRouter();
   const [movie, setMovie] = useState<MovieP | null>(null);
   const [seats, setSeats] = useState<Seat[][]>([]);
   const [showtime, setShowtime] = useState<Showtime | null>(null);
   const [showroom, setShowroom] = useState<Showroom | null>(null);
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  
+
+  // 🆕 stores seat id and seat type
+  const [selectedSeats, setSelectedSeats] = useState<
+    { id: string; type: string }[]
+  >([]);
+  const [showSeatType, setShowSeatType] = useState<string | null>(null);
+
   const [rows, setRows] = useState<number>(5);
   const [cols, setCols] = useState<number>(12);
-  const now = new Date(date); 
-
-
-
-  
+  const now = new Date(date);
 
   useEffect(() => {
     if (!sTimeId) return;
     fetch(`http://localhost:8080/api/showtimes/${sTimeId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Showtime fetched:", data); 
         setShowtime(data);
-        
       })
       .catch((err) => console.error(err));
   }, [sTimeId]);
@@ -86,61 +80,94 @@ export default function MoviePage({
   const movieId = showtime?.movie_id;
 
   useEffect(() => {
-    console.log("movieId from params:", movieId);
-
     if (!movieId) return;
     fetch(`http://localhost:8080/api/movies/${movieId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Movie fetched:", data); // debug
         setMovie(data);
       })
       .catch((err) => console.error(err));
   }, [movieId, sTimeId]);
 
   useEffect(() => {
-    console.log("Showtime room_name:", showtime?.room_name);
     if (!showtime?.room_name) return;
-    fetch(`http://localhost:8080/api/showrooms/roomname/${showtime?.room_name }`)
+    fetch(`http://localhost:8080/api/showrooms/roomname/${showtime.room_name}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Showroom fetched:", data); // debug
         setShowroom(data);
-        console.log("Showroom rows and cols:", data.num_rows, data.num_cols);
         setRows(data.num_rows);
         setCols(data.num_cols);
       })
       .catch((err) => console.error(err));
   }, [showtime?.room_name]);
-  
-    useEffect(() => {
-    if (!showtime) return; // wait for data
 
-    // if seat_binary doesn’t exist, initialize it
-    const seatBinary = showtime.seat_binary || 
+  useEffect(() => {
+    if (!showtime) return;
+    const seatBinary =
+      showtime.seat_binary ||
       Array.from({ length: rows * cols }, () => "0").join("");
 
-    // Split into array of bits
     const seatB = seatBinary.split("");
 
-    // Convert to seat grid
     const generatedSeats = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => ({
         id: `${rowIndex}-${colIndex}`,
-        occupied: seatB[rowIndex * cols + colIndex] === "1", 
+        occupied: seatB[rowIndex * cols + colIndex] === "1",
       }))
     );
 
     setSeats(generatedSeats);
   }, [showtime, rows, cols]);
 
-  const toggleSeat = (seatId: string) => {
-    setSelectedSeats((prev) =>
-      prev.includes(seatId)
-        ? prev.filter((id) => id !== seatId)
-        : [...prev, seatId]
+  // upgraded toggle: open seat-type selector for adding, or remove if already selected
+  const toggleSeat = (seatId: string | Seat) => {
+    const id = typeof seatId === "string" ? seatId : seatId.id;
+    const alreadySelected = selectedSeats.some((s) => s.id === id);
+    if (alreadySelected) {
+      // deselect
+      setSelectedSeats((prev) => prev.filter((s) => s.id !== id));
+      setShowSeatType(null);
+    } else {
+      // open seat type popup so user chooses type before adding
+      setShowSeatType(id);
+    }
+  };
+
+  const handleSeatTypeSelect = (seatId: string, type: string) => {
+    setSelectedSeats((prev) => [...prev, { id: seatId, type }]);
+    setShowSeatType(null);
+  };
+
+  const getSeatColor = (seat: Seat) => {
+    if (seat.occupied) return "#555";
+    const seatInfo = selectedSeats.find((s) => s.id === seat.id);
+    if (!seatInfo) return "#0af";
+
+    switch (seatInfo.type) {
+      case "ADULT":
+        return "#f00";
+      case "CHILD":
+        return "#f00";
+      case "SENIOR":
+        return "#f00";
+      default:
+        return "#0af";
+    }
+  };
+  const handleContinue = () => {
+    if (selectedSeats.length === 0) return;
+
+    // Encode seat objects as a URI-safe string
+    const seatsParam = encodeURIComponent(JSON.stringify(selectedSeats));
+
+    router.push(
+      `/checkout?movieTitle=${encodeURIComponent(movie?.title || "")}` +
+      `&showtimeId=${encodeURIComponent(showtime?.id || "")}` +
+      `&startTime=${encodeURIComponent(showtime?.start_time?.toString() || "")}` +
+      `&seats=${seatsParam}`
     );
   };
+
 
   if (!movie) {
     return <p>Movie not found.</p>;
@@ -156,7 +183,6 @@ export default function MoviePage({
       }}
     >
       <Navbar />
-
       <div
         style={{
           padding: "1rem",
@@ -169,16 +195,17 @@ export default function MoviePage({
         }}
       >
         <p>
-          Time: {now.toLocaleDateString()} at {showtime ? showtime.start_time : ""}
+          Time: {now.toLocaleDateString()} at{" "}
+          {showtime ? showtime.start_time : ""}
         </p>
       </div>
 
       <div
         style={{
           display: "flex",
-          justifyContent: "center", // keeps things centered
-          alignItems: "center", // vertical alignment
-          gap: "2rem", // spacing between poster, seats, summary
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "2rem",
         }}
       >
         {/* Poster */}
@@ -204,10 +231,9 @@ export default function MoviePage({
           </div>
         </div>
 
-        {/* Seat grid block */}
+        {/* Seat Grid */}
         <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
           <div>
-            {/* Screen */}
             <div
               style={{ flex: "1", display: "flex", justifyContent: "center" }}
             >
@@ -223,7 +249,6 @@ export default function MoviePage({
               />
             </div>
 
-            {/* Seats */}
             <div style={{ display: "inline-block", paddingLeft: "10.5rem" }}>
               {seats.map((row, rowIndex) => (
                 <div
@@ -235,27 +260,65 @@ export default function MoviePage({
                   }}
                 >
                   {row.map((seat) => {
-                    const isSelected = selectedSeats.includes(seat.id);
                     return (
-                      <div
-                        key={seat.id}
-                        onClick={() => !seat.occupied && toggleSeat(seat.id)}
-                        style={{
-                          width: "25px",
-                          height: "25px",
-                          margin: "3px",
-                          backgroundColor: seat.occupied
-                            ? "#555"
-                            : isSelected
-                            ? "#f00"
-                            : "#0af",
-                          cursor: seat.occupied ? "not-allowed" : "pointer",
-                          borderRadius: "4px",
-                          fontSize: ".7rem",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {seat.id}
+                      <div key={seat.id} style={{ position: "relative" }}>
+                        <div
+                          onClick={() =>
+                            !seat.occupied && toggleSeat(seat.id)
+                          }
+                          style={{
+                            width: "25px",
+                            height: "25px",
+                            margin: "3px",
+                            backgroundColor: getSeatColor(seat),
+                            cursor: seat.occupied
+                              ? "not-allowed"
+                              : "pointer",
+                            borderRadius: "4px",
+                            fontSize: ".7rem",
+                            fontWeight: "bold",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {seat.id}
+                        </div>
+
+                        {/* 🆕 Seat Type Popup */}
+                        {showSeatType === seat.id && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-80px",
+                              left: "-30px",
+                              background: "#0b0000ff",
+                              border: "1px solid #ccc",
+                              borderRadius: "6px",
+                              padding: "5px",
+                              display: "flex",
+                              flexDirection: "column",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              zIndex: 10,
+                            }}
+                          >
+                            {["ADULT", "CHILD", "SENIOR"].map((type) => (
+                              <button
+                                key={type}
+                                onClick={() =>
+                                  handleSeatTypeSelect(seat.id, type)
+                                }
+                                style={{
+                                  margin: "2px",
+                                  cursor: "pointer",
+                                  fontSize: "0.8rem",
+                                }}
+                              >
+                                {type}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -265,7 +328,7 @@ export default function MoviePage({
           </div>
         </div>
 
-        {/* Selected seats + button */}
+        {/* Right panel */}
         <div
           style={{
             flex: "0 0 auto",
@@ -273,92 +336,27 @@ export default function MoviePage({
             borderRadius: "8px",
             padding: "1rem",
             width: "247px",
-            minHeight: "400",
-            position: "relative",
-            overflow: "visible",
-            zIndex: 1,
-            display: "flex", // <-- make the block flex
-            flexDirection: "column", // <-- stack items vertically
-            alignItems: "center", // <-- center horizontally
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          {/* Legend */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <div
-                style={{
-                  width: "25px",
-                  height: "25px",
-                  margin: "3px",
-                  backgroundColor: "#555",
-                  borderRadius: "4px",
-                }}
-              />
-              <span style={{ marginLeft: "8px" }}>Occupied</span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <div
-                style={{
-                  width: "25px",
-                  height: "25px",
-                  margin: "3px",
-                  backgroundColor: "#0af",
-                  borderRadius: "4px",
-                }}
-              />
-              <span style={{ marginLeft: "8px" }}>Available</span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <div
-                style={{
-                  width: "25px",
-                  height: "25px",
-                  margin: "3px",
-                  backgroundColor: "#f00",
-                  borderRadius: "4px",
-                }}
-              />
-              <span style={{ marginLeft: "8px" }}>Selected</span>
-            </div>
-          </div>
-          <span>--------------</span>
-          <h3
-            style={{
-              marginBottom: "0.5rem",
-              fontSize: "1.1rem",
-              fontWeight: 1000,
-            }}
-          >
-            Selected Seats:
-          </h3>
-          <p>{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</p>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#555", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Occupied</span> </div> <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#0af", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Available</span> </div><div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#f00", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Selected</span> </div>  <span>--------------</span>
+          <h3>Selected Seats:</h3>
+          {selectedSeats.length > 0 ? (
+            <ul>
+              {selectedSeats.map((s) => (
+                <li key={s.id}>
+                  {s.id} – {s.type}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>None</p>
+          )}
           <button
             disabled={selectedSeats.length === 0}
+            onClick={handleContinue}
             style={{
               marginTop: "1rem",
               padding: "0.75rem 1.5rem",
@@ -369,10 +367,10 @@ export default function MoviePage({
               borderRadius: "6px",
               cursor: selectedSeats.length === 0 ? "not-allowed" : "pointer",
             }}
-            onClick={() => alert(`Seats booked: ${selectedSeats.join(", ")}`)}
           >
             Continue
           </button>
+
         </div>
       </div>
     </main>

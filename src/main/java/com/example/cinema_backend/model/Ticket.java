@@ -16,6 +16,5 @@ public class Ticket {
     private double ticketPrice;
     private TicketType ticketType;
 
-    @DBRef
-    private Booking booking;
+
 }
