@@ -127,7 +127,7 @@ export default function MoviePage({
     const generatedSeats = Array.from({ length: rows }, (_, rowIndex) =>
       Array.from({ length: cols }, (_, colIndex) => ({
         id: `${rowIndex}-${colIndex}`,
-        occupied: seatB[rowIndex * cols + colIndex] === "1", // FIXED index
+        occupied: seatB[rowIndex * cols + colIndex] === "1", 
       }))
     );
 

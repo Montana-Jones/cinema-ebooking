@@ -10,8 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.cinema_backend.model.User;
+
 import com.example.cinema_backend.model.Status;
 import com.example.cinema_backend.repository.UserRepository;
+
 import com.example.cinema_backend.security.AESUtil;
 import com.example.cinema_backend.util.JwtUtil;
 import com.example.cinema_backend.repository.PaymentInfoRepository;
@@ -28,6 +30,7 @@ public class UserService {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
     @Autowired private PaymentInfoRepository paymentRepository;
+
 
     
     public boolean verifyPassword(@PathVariable String email, @RequestBody Map<String, String> body) {
