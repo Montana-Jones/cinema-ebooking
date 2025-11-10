@@ -4,8 +4,13 @@ import styles from "@/components/Card.module.css";
 import React, { useState, useEffect } from "react";
 import MoviePreview from "@/components/MoviePreview";
 import Navbar from "@/components/Navbar";
+import AddMovieButton from "@/components/AddMovieButton";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
+
+interface User {
+  role: string;
+}
 
 interface Date {
   id: string;
@@ -17,6 +22,7 @@ export default function Home() {
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dates, setDates] = useState<Date[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Fetch movies
@@ -47,7 +53,7 @@ export default function Home() {
         setDates(data);
         if (data.length > 0) {
           setSelectedDate(new Date(data[0].date));
-      }
+        }
       })
       .catch((err) => {
         console.error("Error fetching dates:", err);
@@ -55,10 +61,15 @@ export default function Home() {
   }, []);
 
   // Filter movies based on toggle
-  const filteredMovies = movies.filter((movie) =>
-  
-    ((showNowShowing ? movie.now_showing : movie.coming_soon)
-  && ((selectedDate && showNowShowing)? movie.showtime.some((sTime: any) => sTime.date === selectedDate.toISOString().split("T")[0]) : true ))
+  const filteredMovies = movies.filter(
+    (movie) =>
+      (showNowShowing ? movie.now_showing : movie.coming_soon) &&
+      (selectedDate && showNowShowing
+        ? movie.showtime.some(
+            (sTime: any) =>
+              sTime.date === selectedDate.toISOString().split("T")[0]
+          )
+        : true)
   );
 
   if (loading) {
@@ -83,7 +94,7 @@ export default function Home() {
           <span className={styles.selectDayLabel}>Select Date:</span>
           {dates.map((d, i) => {
             const date = new Date(d.date);
-            
+
             const isSelected =
               selectedDate.toDateString() === date.toDateString();
 
@@ -116,6 +127,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      <AddMovieButton />
     </main>
   );
 }
