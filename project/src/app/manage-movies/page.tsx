@@ -1,5 +1,6 @@
 import ManageMovies from "../../components/ManageMovies";
 import Navbar from "@/components/Navbar";
+import AddMovieButton from "@/components/AddMovieButton";
 
 export default function ManageMoviesPage() {
   return (
@@ -13,6 +14,7 @@ export default function ManageMoviesPage() {
     >
       <Navbar />
       <ManageMovies />
+      <AddMovieButton />
     </main>
   );
 }

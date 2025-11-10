@@ -18,15 +18,18 @@ const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
         href={`/movie-details/${movie.id}`}
         style={{ textDecoration: "none", color: "inherit" }}
       >
-        <Card style={{ cursor: "pointer" }}>
+        <Card style={{ cursor: "pointer", border: "solid white 1px" }}>
           <div className={styles.moviePreview}>
-            <Image
-              src={movie.poster_url}
-              alt={movie.title}
-              width={266}
-              height={400}
-              className={styles.posterPreview}
-            />
+            <div className={styles.imageWrapper}>
+              <Image
+                src={movie.poster_url}
+                alt={movie.title}
+                fill
+                className={styles.posterPreview}
+                sizes="(max-width: 600px) 100vw, 300px"
+              />
+            </div>
+
             <h2 className={styles.previewTitle}>{movie.title}</h2>
             <div className={styles.previewDetails}>
               <p>{movie.mpaa_rating}</p>
