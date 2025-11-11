@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import TopBar from "@/app/checkout/parts/topBar"
 
 // --- Interfaces ---
 interface Seat {
@@ -166,7 +166,7 @@ export default function CheckoutPage() {
         color: "white",
       }}
     >
-      <Navbar />
+      <TopBar/>
 
       <div
         style={{

@@ -182,7 +182,7 @@ export default function MoviePage({
         minHeight: "100vh",
       }}
     >
-      <Navbar />
+      <TopBar/>
       <div
         style={{
           padding: "1rem",
