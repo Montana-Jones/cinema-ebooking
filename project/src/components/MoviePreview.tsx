@@ -9,13 +9,14 @@ import { MovieProps } from "./Movie";
 
 interface MoviePreviewProps {
   movie: MovieProps["movie"];
+  href?: string; // optional override for link
 }
 
-const MoviePreview: React.FC<MoviePreviewProps> = ({ movie }) => {
+const MoviePreview: React.FC<MoviePreviewProps> = ({ movie, href }) => {
   return (
     <div className={styles.previewContainer}>
       <Link
-        href={`/movie-details/${movie.id}`}
+        href={href || `/movie-details/${movie.id}`}
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <Card style={{ cursor: "pointer", border: "solid white 1px" }}>
