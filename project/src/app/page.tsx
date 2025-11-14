@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import AddMovieButton from "@/components/AddMovieButton";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
-
+import { useRouter } from "next/navigation";
 interface User {
   role: string;
 }
@@ -18,13 +18,24 @@ interface Date {
 }
 
 export default function Home() {
+    const router = useRouter(); 
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dates, setDates] = useState<Date[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
 
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+
+      if (user.role === "admin") {
+        router.push("/admin-dash");
+      }
+    }
+  }, []);
   // Fetch movies
   useEffect(() => {
     fetch("http://localhost:8080/api/movies")

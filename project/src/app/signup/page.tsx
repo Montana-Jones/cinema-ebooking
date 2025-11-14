@@ -21,6 +21,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [paymentInfo, setPaymentInfo] = useState<PaymentCard[]>([]);
+  const [promotionsOptIn, setPromotionsOptIn] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
@@ -28,8 +29,7 @@ export default function Signup() {
   const [userId, setUserId] = useState<string | null>(null);
 
   const validateAddress = (address: string) => {
-    const pattern = /^[\w\s.]+,\s*[\w\s.]+,\s*[A-Z]{2}\s*\d{5}$/i;
-    return pattern.test(address.trim());
+    return /^[a-zA-Z0-9\s,.-]{5,}$/.test(address.trim());
   };
 
   const validateCard = (card: PaymentCard) => {
@@ -69,14 +69,8 @@ export default function Signup() {
       newErrors.push("Password must be at least 8 characters");
     if (password !== confirmPassword) newErrors.push("Passwords do not match");
 
-    // Only validate cards if the user entered any info
     paymentInfo.forEach((card, i) => {
-      if (
-        card.cardNumber ||
-        card.cardHolder ||
-        card.expirationDate ||
-        card.cvv
-      ) {
+      if (card.cardNumber || card.cardHolder || card.expirationDate || card.cvv) {
         const cardErrors = validateCard(card).map(
           (err) => `Card ${i + 1}: ${err}`
         );
@@ -96,18 +90,18 @@ export default function Signup() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
+          firstName,
+          lastName,
           email,
-          phone_number: phoneNumber,
-          home_address: homeAddress,
-          billing_address: billingAddress,
+          phoneNumber,
+          homeAddress,
+          billingAddress,
           password,
+           promotionsOptIn: promotionsOptIn,   // ✅ send boolean
+          subscribedToPromotions: promotionsOptIn, // ✅ optional, if backend tracks it separately
           payment_info: paymentInfo
-            .filter(
-              (c) => c.cardNumber || c.cardHolder || c.expirationDate || c.cvv
-            )
-            .map((c) => ({
+            .filter(c => c.cardNumber || c.cardHolder || c.expirationDate || c.cvv)
+            .map(c => ({
               card_holder: c.cardHolder,
               card_number: c.cardNumber,
               expiration_date: c.expirationDate,
@@ -116,15 +110,19 @@ export default function Signup() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to register");
+      // ✅ FIXED ERROR HANDLING (IMPORTANT)
+      if (!res.ok) {
+        const backendMessage = await res.text();
+        throw new Error(backendMessage || "Signup failed");
+      }
 
       const data = await res.json();
       setUserId(data.id);
       setStep("verify");
       setErrors([]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setErrors(["Server error: failed to register"]);
+      setErrors([err.message || "Server error: failed to register"]);
     } finally {
       setSubmitting(false);
     }
@@ -136,21 +134,17 @@ export default function Signup() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/users/verify/${userId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: verificationCode }),
-        }
-      );
+      const res = await fetch(`http://localhost:8080/api/users/verify/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: verificationCode }),
+      });
 
       if (!res.ok) throw new Error("Verification failed");
 
       setSuccess(true);
       setErrors([]);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setErrors(["Invalid verification code"]);
     } finally {
       setSubmitting(false);
@@ -225,72 +219,92 @@ export default function Signup() {
             </ul>
           )}
 
-          {/* Personal info */}
+          {/* Personal Fields */}
           <input
             type="text"
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="text"
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="text"
             placeholder="Phone Number (10 digits)"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
             maxLength={10}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="text"
-            placeholder="Home Address (Street, City, ST ZIP)"
+            placeholder="Home Address"
             value={homeAddress}
             onChange={(e) => setHomeAddress(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="text"
-            placeholder="Billing Address (Street, City, ST ZIP)"
+            placeholder="Billing Address"
             value={billingAddress}
             onChange={(e) => setBillingAddress(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="password"
-            placeholder="Password (min 8 characters)"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
+
           <input
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-3 py-2"
           />
 
-          {/* Optional payment cards */}
+          {/* Promotion Checkbox */}
+          <div className="flex items-center space-x-2 mt-2">
+            <input
+              type="checkbox"
+              checked={promotionsOptIn}
+              onChange={(e) => setPromotionsOptIn(e.target.checked)}
+              className="w-5 h-5 accent-[#75D1A6]"
+            />
+            <label className="text-white text-sm">Send me promotions</label>
+          </div>
+
+          {/* Payment Cards */}
           <h3 className="font-semibold text-[#675068] mt-4">
             Payment Cards (Optional)
           </h3>
+
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="border p-3 rounded-lg mb-2">
               <p className="font-medium mb-1">Card {i + 1}</p>
+
               <input
                 type="text"
                 placeholder="Card Number"
@@ -300,6 +314,7 @@ export default function Signup() {
                 }
                 className="w-full border rounded-lg px-3 py-2 mb-1"
               />
+
               <input
                 type="text"
                 placeholder="Card Holder Name"
@@ -309,6 +324,7 @@ export default function Signup() {
                 }
                 className="w-full border rounded-lg px-3 py-2 mb-1"
               />
+
               <input
                 type="text"
                 placeholder="Expiration (MM/YY)"
@@ -318,6 +334,7 @@ export default function Signup() {
                 }
                 className="w-full border rounded-lg px-3 py-2 mb-1"
               />
+
               <input
                 type="text"
                 placeholder="CVV"
