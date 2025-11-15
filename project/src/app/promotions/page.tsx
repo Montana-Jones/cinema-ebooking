@@ -1,111 +1,122 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import axios from "axios";
 
 interface Promotion {
-  id?: string;
+  id: string;
   name: string;
   amount: number;
   code: string;
   state: string;
 }
 
+interface NewPromotion {
+  name: string;
+  amount: string;
+  code: string;
+}
+
 const Promotions: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [newPromotion, setNewPromotion] = useState({
+  const [newPromotion, setNewPromotion] = useState<NewPromotion>({
     name: "",
     amount: "",
     code: "",
   });
-  const [selectedPromo, setSelectedPromo] = useState("");
+  const [selectedPromo, setSelectedPromo] = useState<string>("");
 
-  // Fetch promotions from backend when page loads
   useEffect(() => {
-    const fetchPromotions = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/api/promotions");
-        if (!res.ok) throw new Error("Failed to fetch promotions");
-        const data = await res.json();
-        setPromotions(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchPromotions();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewPromotion({ ...newPromotion, [e.target.name]: e.target.value });
-  };
-
-  // Save promotion to database
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newPromo: Promotion = {
-      name: newPromotion.name,
-      amount: Number(newPromotion.amount),
-      code: newPromotion.code,
-      state: "ACTIVE",
-    };
-
+  const fetchPromotions = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/promotions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPromo),
-      });
-
-      if (!res.ok) throw new Error("Failed to save promotion");
-
-      const savedPromo = await res.json();
-      setPromotions([...promotions, savedPromo]);
-      setNewPromotion({ name: "", amount: "", code: "" });
-
-      alert("Promotion added successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Error saving promotion");
+      const response = await axios.get("http://localhost:8080/api/promotions");
+      const data = response.data.map((p: any) => ({
+        id: p.id || p._id,
+        name: p.name,
+        amount: p.amount,
+        code: p.code,
+        state: p.state,
+      }));
+      setPromotions(data);
+    } catch (err) {
+      console.error("Error fetching promotions:", err);
+      alert("Failed to fetch promotions from backend!");
     }
   };
 
-  // Send promotion email
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewPromotion({ ...newPromotion, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newPromo = {
+      name: newPromotion.name,
+      amount: Number(newPromotion.amount),
+      code: newPromotion.code,
+      state: "Active",
+    };
+
+    try {
+      await axios.post("http://localhost:8080/api/promotions", newPromo);
+      setNewPromotion({ name: "", amount: "", code: "" });
+      fetchPromotions();
+      alert("Promotion added and sent to all registered users!");
+    } catch (err) {
+      console.error("Error saving promotion:", err);
+      alert("Failed to save promotion!");
+    }
+  };
+
   const handleSend = async () => {
     if (!selectedPromo) {
       alert("Please choose a promotion to send!");
       return;
     }
 
+    const promo = promotions.find((p) => p.id === selectedPromo);
+    if (!promo) {
+      alert("Promotion not found!");
+      return;
+    }
+
     try {
-      const res = await fetch(`http://localhost:8080/api/promotions/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ promoCode: selectedPromo }),
-      });
+      await axios.post(`http://localhost:8080/api/promotions/send/${promo.id}`);
+      alert(`Promotion "${promo.name}" sent successfully!`);
+    } catch (err) {
+      console.error("Error sending promotion:", err);
+      alert("Failed to send promotion!");
+    }
+  };
 
-      if (!res.ok) throw new Error("Failed to send promotion");
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this promotion?")) return;
 
-      alert(`Promotion "${selectedPromo}" sent to subscribed customers!`);
-    } catch (error) {
-      console.error(error);
-      alert("Error sending promotion");
+    try {
+      await axios.delete(`http://localhost:8080/api/promotions/${id}`);
+      setPromotions(promotions.filter((promo) => promo.id !== id));
+      alert("Promotion deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting promotion:", err);
+      alert("Failed to delete promotion!");
     }
   };
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
       <Navbar />
-
       <div className="max-w-5xl mx-auto p-6 sm:p-10">
         <h1 className="text-4xl font-bold text-center mb-10 text-[#75D1A6] drop-shadow-lg">
           Promotions Management
         </h1>
 
-        {/* Promotion Table */}
+        {/* Active Promotions Table */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
-            Active Promotions
-          </h2>
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Active Promotions</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -114,28 +125,34 @@ const Promotions: React.FC = () => {
                   <th className="border-b border-gray-700 p-3">Amount</th>
                   <th className="border-b border-gray-700 p-3">Code</th>
                   <th className="border-b border-gray-700 p-3">State</th>
+                  <th className="border-b border-gray-700 p-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {promotions.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="text-center text-gray-400 p-6 italic"
-                    >
+                    <td colSpan={5} className="text-center text-gray-400 p-6 italic">
                       No promotions added yet.
                     </td>
                   </tr>
                 ) : (
-                  promotions.map((promo, index) => (
+                  promotions.map((promo) => (
                     <tr
-                      key={index}
+                      key={promo.id}
                       className="hover:bg-[#252525] transition border-b border-gray-800"
                     >
                       <td className="p-3">{promo.name}</td>
                       <td className="p-3">{promo.amount}</td>
                       <td className="p-3 text-[#75D1A6]">{promo.code}</td>
                       <td className="p-3 text-green-400">{promo.state}</td>
+                      <td className="p-3 flex gap-2">
+                        <button
+                          onClick={() => handleDelete(promo.id)}
+                          className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -146,13 +163,8 @@ const Promotions: React.FC = () => {
 
         {/* Add New Promotion */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
-            Add New Promotion
-          </h2>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-5 text-gray-300"
-          >
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Add New Promotion</h2>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-gray-300">
             <div>
               <label className="block mb-1 text-gray-400">Name</label>
               <input
@@ -166,9 +178,7 @@ const Promotions: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-gray-400">
-                Promotional Amount
-              </label>
+              <label className="block mb-1 text-gray-400">Promotional Amount</label>
               <input
                 type="number"
                 name="amount"
@@ -202,9 +212,7 @@ const Promotions: React.FC = () => {
 
         {/* Send Promotion */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
-            Send Promotion
-          </h2>
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Send Promotion</h2>
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <select
               value={selectedPromo}
@@ -212,9 +220,9 @@ const Promotions: React.FC = () => {
               className="flex-1 bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"
             >
               <option value="">-- Select a Promotion --</option>
-              {promotions.map((promo, index) => (
-                <option key={index} value={promo.code}>
-                  {promo.name} ({promo.code})
+              {promotions.map((promo) => (
+                <option key={promo.id} value={promo.id}>
+                  {promo.name}
                 </option>
               ))}
             </select>

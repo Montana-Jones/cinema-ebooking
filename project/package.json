@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start:all": "concurrently \"npm run dev\" \"cd .. && mvn spring-boot:run\"", 
+    "start:all": "concurrently \"npm run dev\" \"cd .. && mvn spring-boot:run\"",
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "15.5.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "axiom": "^0.26.0",
+    "axios": "^1.13.2",
+    "next": "^16.0.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-horizontal-scrolling-menu": "^8.2.0",
     "react-youtube": "^10.1.0"
   },
