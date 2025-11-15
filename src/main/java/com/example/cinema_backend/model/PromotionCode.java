@@ -10,7 +10,8 @@ public class PromotionCode {
     @Id
     private String id;
     private String code;
-    private double discountPercentage;
+    private double amount;
+    private String name;
+    private String state;
 
-    
 }

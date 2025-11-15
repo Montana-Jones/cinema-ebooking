@@ -90,14 +90,15 @@ export default function Signup() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName,
+          first_name: firstName,
+          last_name: lastName,
           lastName,
           email,
-          phoneNumber,
-          homeAddress,
-          billingAddress,
+          phone_number: phoneNumber,
+          home_address: homeAddress,
+          billing_address: billingAddress,
           password,
-           promotionsOptIn: promotionsOptIn,   // ✅ send boolean
+           promotions: promotionsOptIn,   // ✅ send boolean
           subscribedToPromotions: promotionsOptIn, // ✅ optional, if backend tracks it separately
           payment_info: paymentInfo
             .filter(c => c.cardNumber || c.cardHolder || c.expirationDate || c.cvv)

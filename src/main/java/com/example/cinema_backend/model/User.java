@@ -28,6 +28,8 @@ public class User {
     private String homeAddress;
     private String billingAddress;
 
+    private boolean Promotions;
+
     @DBRef
     private List<Booking> bookings;
     @DBRef

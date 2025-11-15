@@ -23,7 +23,20 @@ export default function ManageUsers() {
         return res.json();
       })
       .then((data) => {
-        setUsers(data);
+        console.log("Users API response:", data);
+
+        const mappedUsers = data.map((u: any) => ({
+          id: u.id || u._id,
+          firstName: u.first_name || u.firstName || "",
+          lastName: u.last_name || u.lastName || "",
+          email: u.email || "",
+          subscribedToPromotions: !!u.promotions || u.promotion === "REGISTERED",
+          suspended: u.status === "SUSPENDED" || false,
+        }));
+
+        console.log("Mapped users:", mappedUsers);
+
+        setUsers(mappedUsers);
         setLoading(false);
       })
       .catch((err) => {
@@ -34,23 +47,21 @@ export default function ManageUsers() {
 
   const handleSuspend = async (userId: string) => {
     const confirmSuspend = window.confirm(
-      "Are you sure you want to suspend this user?"
+      "Are you sure you want to suspend this user? This will delete their account."
     );
     if (!confirmSuspend) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/users/${userId}/suspend`,
-        { method: "PUT" }
-      );
+      // Correct DELETE endpoint
+      const url = `http://localhost:8080/api/users/${userId}`;
+      console.log("Deleting user with URL:", url);
 
-      if (!res.ok) throw new Error("Failed to suspend user");
+      const res = await fetch(url, { method: "DELETE" });
+      console.log("Response:", res.status, res.statusText);
 
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === userId ? { ...u, suspended: true } : u
-        )
-      );
+      if (!res.ok) throw new Error(`Failed to suspend user: ${res.status}`);
+
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
       alert("User suspended successfully!");
     } catch (err) {
       console.error(err);
@@ -88,10 +99,7 @@ export default function ManageUsers() {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-[#2a2a2a] transition"
-                >
+                <tr key={user.id} className="hover:bg-[#2a2a2a] transition">
                   <td className="p-4 border border-gray-700">{user.firstName}</td>
                   <td className="p-4 border border-gray-700">{user.lastName}</td>
                   <td className="p-4 border border-gray-700">{user.email}</td>
@@ -99,16 +107,12 @@ export default function ManageUsers() {
                     {user.subscribedToPromotions ? "✅ Yes" : "❌ No"}
                   </td>
                   <td className="p-4 border border-gray-700 text-center">
-                    {user.suspended ? (
-                      <span className="text-red-500 font-semibold">Suspended</span>
-                    ) : (
-                      <button
-                        onClick={() => handleSuspend(user.id)}
-                        className="bg-[#b33a3a] hover:bg-[#c44] text-white px-4 py-2 rounded-full text-sm transition"
-                      >
-                        Suspend
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleSuspend(user.id)}
+                      className="bg-[#b33a3a] hover:bg-[#c44] text-white px-4 py-2 rounded-full text-sm transition"
+                    >
+                      Suspend
+                    </button>
                   </td>
                 </tr>
               ))}
