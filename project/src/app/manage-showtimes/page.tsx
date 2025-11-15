@@ -3,150 +3,259 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 
-interface Showroom {
+interface Showtime {
   id: string;
-  name: string;
-  capacity: number;
+  startTime: string;
+  endTime: string;
+  date: string;
+  movieId: string;
+  roomName: string;
+  seatBinary: string;
 }
 
 export default function ManageShowtimes() {
-  const [showrooms, setShowrooms] = useState<Showroom[]>([]);
+  const [showtimes, setShowtimes] = useState<Showtime[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Form state
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [sendPromotions, setSendPromotions] = useState(false);
-
-
-  const [startPeriod, setStartPeriod] = useState("AM");
-  const [endPeriod, setEndPeriod] = useState("AM");
-
-  const [showroom, setShowroom] = useState("");
-  const [notifyUsers, setNotifyUsers] = useState(false); // checkbox (future use)
+  const [startHour, setStartHour] = useState(10);
+  const [startMinute, setStartMinute] = useState(0);
+  const [startAmPm, setStartAmPm] = useState("AM");
+  const [endHour, setEndHour] = useState(12);
+  const [endMinute, setEndMinute] = useState(0);
+  const [endAmPm, setEndAmPm] = useState("PM");
+  const [movieId, setMovieId] = useState("");
+  const [roomName, setRoomName] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/showrooms")
+    fetch("http://localhost:8080/api/showtimes")
       .then((res) => res.json())
-      .then(setShowrooms)
-      .catch(console.error);
+      .then((data) => {
+        const mappedShowtimes = data.map((s: any) => ({
+          id: s._id,
+          startTime: s.startTime,
+          endTime: s.endTime,
+          date: s.date,
+          movieId: s.movieId,
+          roomName: s.roomName,
+          seatBinary: s.seatBinary,
+        }));
+        setShowtimes(mappedShowtimes);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching showtimes:", err);
+        setLoading(false);
+      });
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const convertTo24Hour = (hour: number, minute: number, ampm: string) => {
+    let hour24 = hour;
+    if (ampm === "PM" && hour < 12) hour24 += 12;
+    if (ampm === "AM" && hour === 12) hour24 = 0;
+    return `${hour24.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
-    const formattedStart = `${time} ${startPeriod}`;
-    const formattedEnd = `${endTime} ${endPeriod}`;
+  const handleAddShowtime = async () => {
+    const startTime = convertTo24Hour(startHour, startMinute, startAmPm);
+    const endTime = convertTo24Hour(endHour, endMinute, endAmPm);
 
-    const res = await fetch("http://localhost:8080/api/showtimes/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        showroomId: showroom,
-        date,
-        startTime: formattedStart,
-        endTime: formattedEnd,
-        notifyUsers,
-      }),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/api/showtimes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, startTime, endTime, movieId, roomName }),
+      });
 
-    if (res.status === 409) {
-      alert("⚠️ Scheduling conflict — this showroom is already booked!");
-    } else if (res.ok) {
-      alert("✅ Showtime added successfully!");
-    } else {
-      alert("❌ Failed to add showtime.");
+      if (!res.ok) throw new Error("Failed to add showtime");
+
+      const newShowtime = await res.json();
+      setShowtimes((prev) => [
+        ...prev,
+        {
+          id: newShowtime._id,
+          startTime: newShowtime.startTime,
+          endTime: newShowtime.endTime,
+          date: newShowtime.date,
+          movieId: newShowtime.movieId,
+          roomName: newShowtime.roomName,
+          seatBinary: newShowtime.seatBinary,
+        },
+      ]);
+
+      // Reset form
+      setDate("");
+      setStartHour(10);
+      setStartMinute(0);
+      setStartAmPm("AM");
+      setEndHour(12);
+      setEndMinute(0);
+      setEndAmPm("PM");
+      setMovieId("");
+      setRoomName("");
+    } catch (err) {
+      console.error(err);
+      alert("Error adding showtime");
     }
   };
+
+  if (loading) return <p>Loading showtimes...</p>;
+
+  const handleDelete = async (id: string) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this showtime?");
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/showtimes/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete showtime");
+
+    setShowtimes((prev) => prev.filter((s) => s.id !== id));
+
+    alert("Showtime deleted successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting showtime.");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-[#121212] text-white p-6">
       <Navbar />
-      <div className="max-w-md mx-auto bg-[#1f1f1f] p-8 rounded-2xl border border-gray-700 shadow-lg">
-        <h1 className="text-2xl font-bold mb-6 text-[#75D1A6]">
-          Assign Showtime
-        </h1>
+      <h1 className="text-3xl font-bold text-[#75D1A6] mb-6">Manage Showtimes</h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label>Date:</label>
+      {/* Add Showtime Form */}
+      <div className="bg-[#1f1f1f] p-6 rounded-2xl mb-8">
+        <h2 className="text-xl font-semibold mb-4">Add Showtime</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <input
             type="date"
-            className="p-2 bg-[#2a2a2a] rounded-md"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            required
+            className="border rounded px-3 py-2 text-black"
           />
 
-          {/* START TIME WITH AM/PM */}
-          <label>Start Time:</label>
-          <div className="flex gap-3">
+          {/* Start Time */}
+          <div className="flex items-center space-x-2">
             <input
-              type="time"
-              className="p-2 bg-[#2a2a2a] rounded-md flex-1"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              required
+              type="number"
+              min={1}
+              max={12}
+              value={startHour}
+              onChange={(e) => setStartHour(Number(e.target.value))}
+              className="border rounded px-2 py-1 w-16 text-black"
+            />
+            :
+            <input
+              type="number"
+              min={0}
+              max={59}
+              value={startMinute}
+              onChange={(e) => setStartMinute(Number(e.target.value))}
+              className="border rounded px-2 py-1 w-16 text-black"
             />
             <select
-              className="p-2 bg-[#2a2a2a] rounded-md"
-              value={startPeriod}
-              onChange={(e) => setStartPeriod(e.target.value)}
+              value={startAmPm}
+              onChange={(e) => setStartAmPm(e.target.value)}
+              className="border rounded px-2 py-1 text-black"
             >
               <option>AM</option>
               <option>PM</option>
             </select>
           </div>
 
-          {/* END TIME WITH AM/PM */}
-          <label>End Time:</label>
-          <div className="flex gap-3">
+          {/* End Time */}
+          <div className="flex items-center space-x-2">
             <input
-              type="time"
-              className="p-2 bg-[#2a2a2a] rounded-md flex-1"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required
+              type="number"
+              min={1}
+              max={12}
+              value={endHour}
+              onChange={(e) => setEndHour(Number(e.target.value))}
+              className="border rounded px-2 py-1 w-16 text-black"
+            />
+            :
+            <input
+              type="number"
+              min={0}
+              max={59}
+              value={endMinute}
+              onChange={(e) => setEndMinute(Number(e.target.value))}
+              className="border rounded px-2 py-1 w-16 text-black"
             />
             <select
-              className="p-2 bg-[#2a2a2a] rounded-md"
-              value={endPeriod}
-              onChange={(e) => setEndPeriod(e.target.value)}
+              value={endAmPm}
+              onChange={(e) => setEndAmPm(e.target.value)}
+              className="border rounded px-2 py-1 text-black"
             >
               <option>AM</option>
               <option>PM</option>
             </select>
           </div>
 
-          <label>Showroom:</label>
-          <select
-            className="p-2 bg-[#2a2a2a] rounded-md"
-            value={showroom}
-            onChange={(e) => setShowroom(e.target.value)}
-            required
-          >
-            <option value="">-- Select Showroom --</option>
-            {showrooms.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name} (Capacity: {r.capacity})
-              </option>
-            ))}
-          </select>
+          <input
+            type="text"
+            placeholder="Movie ID"
+            value={movieId}
+            onChange={(e) => setMovieId(e.target.value)}
+            className="border rounded px-3 py-2 text-black"
+          />
+          <input
+            type="text"
+            placeholder="Room Name"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            className="border rounded px-3 py-2 text-black"
+          />
 
           <button
-            type="submit"
-            className="bg-[#675068] hover:bg-[#4c3b4d] py-2 rounded-full text-white font-semibold transition"
+            onClick={handleAddShowtime}
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mt-2"
           >
             Add Showtime
           </button>
+        </div>
+      </div>
 
-          <div className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    checked={sendPromotions}
-    onChange={(e) => setSendPromotions(e.target.checked)}
-  />
-  <label>Send me promotional emails</label>
-</div>
+      {/* Showtimes Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse border border-gray-700">
+          <thead>
+            <tr className="bg-[#2a2a2a] text-[#75D1A6]">
+              <th className="p-4 border border-gray-700 text-left">Date</th>
+              <th className="p-4 border border-gray-700 text-left">Start Time</th>
+              <th className="p-4 border border-gray-700 text-left">End Time</th>
+              <th className="p-4 border border-gray-700 text-left">Movie ID</th>
+              <th className="p-4 border border-gray-700 text-left">Room</th>
+            </tr>
+          </thead>
+          <tbody>
+            {showtimes.map((s) => (
+              <tr key={s.id} className="hover:bg-[#2a2a2a] transition">
 
-        </form>
+                <td className="p-4 border border-gray-700">{s.date}</td>
+                <td className="p-4 border border-gray-700">{s.startTime}</td>
+                <td className="p-4 border border-gray-700">{s.endTime}</td>
+                <td className="p-4 border border-gray-700">{s.movieId}</td>
+                <td className="p-4 border border-gray-700">{s.roomName}</td>
+                 <td className="p-4 border border-gray-700 text-center">
+        <button
+          onClick={() => handleDelete(s.id)}
+          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
+        >
+          Delete
+        </button>
+      </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -85,33 +85,39 @@ export default function Signup() {
 
     setSubmitting(true);
 
+    // Build signupData object for logging and fetch
+    const signupData = {
+      firstname: firstName,
+      lastname: lastName,
+      email,
+      phonenumber: phoneNumber,
+      homeaddress: homeAddress,
+      billingaddress: billingAddress,
+      password,
+      promotion: promotionsOptIn ? "REGISTERED" : "UNREGISTERED",
+      payment_info: paymentInfo
+        .filter(c => c.cardNumber || c.cardHolder || c.expirationDate || c.cvv)
+        .map(c => ({
+          card_holder: c.cardHolder,
+          card_number: c.cardNumber,
+          expiration_date: c.expirationDate,
+          cvv: c.cvv,
+        })),
+    };
+
+    // ✅ Debug logging
+    console.log("=== SIGNUP DATA ===");
+    console.log("promotionsOptIn checkbox value:", promotionsOptIn);
+    console.log("promotion field being sent:", signupData.promotion);
+    console.log("Full signup data:", JSON.stringify(signupData, null, 2));
+
     try {
       const res = await fetch("http://localhost:8080/api/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          lastName,
-          email,
-          phone_number: phoneNumber,
-          home_address: homeAddress,
-          billing_address: billingAddress,
-          password,
-           promotions: promotionsOptIn,   // ✅ send boolean
-          subscribedToPromotions: promotionsOptIn, // ✅ optional, if backend tracks it separately
-          payment_info: paymentInfo
-            .filter(c => c.cardNumber || c.cardHolder || c.expirationDate || c.cvv)
-            .map(c => ({
-              card_holder: c.cardHolder,
-              card_number: c.cardNumber,
-              expiration_date: c.expirationDate,
-              cvv: c.cvv,
-            })),
-        }),
+        body: JSON.stringify(signupData),
       });
 
-      // ✅ FIXED ERROR HANDLING (IMPORTANT)
       if (!res.ok) {
         const backendMessage = await res.text();
         throw new Error(backendMessage || "Signup failed");

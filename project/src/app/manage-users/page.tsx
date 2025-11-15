@@ -27,10 +27,10 @@ export default function ManageUsers() {
 
         const mappedUsers = data.map((u: any) => ({
           id: u.id || u._id,
-          firstName: u.first_name || u.firstName || "",
-          lastName: u.last_name || u.lastName || "",
+          firstName: u.firstName || u.firstname || u.first_name || "",
+          lastName: u.lastName || u.lastname || u.last_name || "",
           email: u.email || "",
-          subscribedToPromotions: !!u.promotions || u.promotion === "REGISTERED",
+          subscribedToPromotions: u.promotion === "REGISTERED",
           suspended: u.status === "SUSPENDED" || false,
         }));
 
@@ -52,7 +52,6 @@ export default function ManageUsers() {
     if (!confirmSuspend) return;
 
     try {
-      // Correct DELETE endpoint
       const url = `http://localhost:8080/api/users/${userId}`;
       console.log("Deleting user with URL:", url);
 
