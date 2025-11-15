@@ -127,7 +127,7 @@
 }
 
 .showtimeContainer {
-    width: 266px;
+    width: 200px;
     height: fit-content;
     margin: 0 auto;
 }
@@ -135,7 +135,7 @@
 .showtimeContainer h1 {
     display: flex;
     justify-content: center;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 500;
 }
 
@@ -148,11 +148,11 @@
 
 .showtimeButton {
     background-color: #4c3b4d;
-    border: 3px solid #675068;
+    border: 2px solid #675068;
     border-radius: 2rem;
     height: fit-content;
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
+    padding: 0.25rem;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
@@ -177,21 +177,18 @@
 
 .imageWrapper {
   position: relative;
-  width: 200px;
-  aspect-ratio: 2 / 3;
+  width: 100%;
+  aspect-ratio: 2/3;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 0.5rem;
 }
 
 .posterWrapper {
   flex-shrink: 0;
-  
 }
 
 .posterPreview {
-  position: relative;
-  border-radius: 1px;
-  z-index: 1;
+  object-fit: cover; /* ensures images fill the container without distortion */
 }
 
 .movieInfo {
@@ -207,15 +204,17 @@
 }
 
 .moviePreviews {
-  padding: 2rem;
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
-  align-items: center;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .previewContainer {
+  width: 200px;
   display: flex;
+  flex-direction: column;
 }
 
 .previewTitle {
@@ -223,14 +222,17 @@
   justify-content: center;
   font-size: 1.2rem;
   font-weight: bold;
+  padding: 0 8px;
 }
 
 .previewDetails {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
-  padding: 0 8px 0 8px;
-  font-size: 0.8rem;
+  padding: 0 8px;
+  font-size: 0.7rem;
+  margin-bottom: 1rem;
 }
 
 .movieType {
@@ -253,13 +255,14 @@
   margin: 2rem 3rem;
 }
 
+
 .moviePreview {
-  padding: 3%;
-  max-height: 400;
-  aspect-ratio: 2/3;
+  display: flex;
+  flex-direction: column;
   border-radius: 0.25rem;
-  object-fit: cover;
-  z-index: 1;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
 .moviePreview:hover {

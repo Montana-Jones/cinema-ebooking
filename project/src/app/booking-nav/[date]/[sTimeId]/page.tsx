@@ -3,7 +3,6 @@ import React, { use, useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 import styles from "@/components/Card.module.css";
-import TopBar from "@/app/booking-nav/parts/topBar";
 import MoviePreview from "@/components/MoviePreview";
 import Image from "next/image";
 import Link from "next/link";
@@ -162,12 +161,13 @@ export default function MoviePage({
 
     router.push(
       `/checkout?movieTitle=${encodeURIComponent(movie?.title || "")}` +
-      `&showtimeId=${encodeURIComponent(showtime?.id || "")}` +
-      `&startTime=${encodeURIComponent(showtime?.start_time?.toString() || "")}` +
-      `&seats=${seatsParam}`
+        `&showtimeId=${encodeURIComponent(showtime?.id || "")}` +
+        `&startTime=${encodeURIComponent(
+          showtime?.start_time?.toString() || ""
+        )}` +
+        `&seats=${seatsParam}`
     );
   };
-
 
   if (!movie) {
     return <p>Movie not found.</p>;
@@ -182,7 +182,7 @@ export default function MoviePage({
         minHeight: "100vh",
       }}
     >
-      <TopBar/>
+      <Navbar />
       <div
         style={{
           padding: "1rem",
@@ -263,17 +263,13 @@ export default function MoviePage({
                     return (
                       <div key={seat.id} style={{ position: "relative" }}>
                         <div
-                          onClick={() =>
-                            !seat.occupied && toggleSeat(seat.id)
-                          }
+                          onClick={() => !seat.occupied && toggleSeat(seat.id)}
                           style={{
                             width: "25px",
                             height: "25px",
                             margin: "3px",
                             backgroundColor: getSeatColor(seat),
-                            cursor: seat.occupied
-                              ? "not-allowed"
-                              : "pointer",
+                            cursor: seat.occupied ? "not-allowed" : "pointer",
                             borderRadius: "4px",
                             fontSize: ".7rem",
                             fontWeight: "bold",
@@ -341,7 +337,64 @@ export default function MoviePage({
             alignItems: "center",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#555", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Occupied</span> </div> <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#0af", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Available</span> </div><div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem", }} > <div style={{ width: "25px", height: "25px", margin: "3px", backgroundColor: "#f00", borderRadius: "4px", }} /> <span style={{ marginLeft: "8px" }}>Selected</span> </div>  <span>--------------</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {" "}
+            <div
+              style={{
+                width: "25px",
+                height: "25px",
+                margin: "3px",
+                backgroundColor: "#555",
+                borderRadius: "4px",
+              }}
+            />{" "}
+            <span style={{ marginLeft: "8px" }}>Occupied</span>{" "}
+          </div>{" "}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {" "}
+            <div
+              style={{
+                width: "25px",
+                height: "25px",
+                margin: "3px",
+                backgroundColor: "#0af",
+                borderRadius: "4px",
+              }}
+            />{" "}
+            <span style={{ marginLeft: "8px" }}>Available</span>{" "}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {" "}
+            <div
+              style={{
+                width: "25px",
+                height: "25px",
+                margin: "3px",
+                backgroundColor: "#f00",
+                borderRadius: "4px",
+              }}
+            />{" "}
+            <span style={{ marginLeft: "8px" }}>Selected</span>{" "}
+          </div>{" "}
+          <span>--------------</span>
           <h3>Selected Seats:</h3>
           {selectedSeats.length > 0 ? (
             <ul>
@@ -370,7 +423,6 @@ export default function MoviePage({
           >
             Continue
           </button>
-
         </div>
       </div>
     </main>

@@ -19,9 +19,9 @@
   }
 }
 
-* {
+/* * {
   color: #ffffff
-}
+} */
 
 body {
   background: var(--background);
