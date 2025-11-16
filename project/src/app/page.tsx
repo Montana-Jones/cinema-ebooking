@@ -127,7 +127,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-      <AddMovieButton />
+      {user && user.role === "ADMIN" && <AddMovieButton />}
     </main>
   );
 }
