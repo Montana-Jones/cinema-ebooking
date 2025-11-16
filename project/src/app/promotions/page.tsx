@@ -9,12 +9,14 @@ interface Promotion {
   amount: number;
   code: string;
   state: string;
+  expiryDate: string;
 }
 
 interface NewPromotion {
   name: string;
   amount: string;
   code: string;
+  expiryDate: string;
 }
 
 const Promotions: React.FC = () => {
@@ -23,6 +25,7 @@ const Promotions: React.FC = () => {
     name: "",
     amount: "",
     code: "",
+    expiryDate: ""
   });
   const [selectedPromo, setSelectedPromo] = useState<string>("");
 
@@ -39,6 +42,7 @@ const Promotions: React.FC = () => {
         amount: p.amount,
         code: p.code,
         state: p.state,
+        expiryDate: p.expiryDate,
       }));
       setPromotions(data);
     } catch (err) {
@@ -59,11 +63,12 @@ const Promotions: React.FC = () => {
       amount: Number(newPromotion.amount),
       code: newPromotion.code,
       state: "Active",
+      expiryDate: newPromotion.expiryDate,
     };
 
     try {
       await axios.post("http://localhost:8080/api/promotions", newPromo);
-      setNewPromotion({ name: "", amount: "", code: "" });
+      setNewPromotion({ name: "", amount: "", code: "", expiryDate: "" });
       fetchPromotions();
       alert("Promotion added and sent to all registered users!");
     } catch (err) {
@@ -126,6 +131,7 @@ const Promotions: React.FC = () => {
                   <th className="border-b border-gray-700 p-3">Code</th>
                   <th className="border-b border-gray-700 p-3">State</th>
                   <th className="border-b border-gray-700 p-3">Actions</th>
+                  <th className="border-b border-gray-700 p-3">Expiry Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -146,6 +152,8 @@ const Promotions: React.FC = () => {
                       <td className="p-3 text-[#75D1A6]">{promo.code}</td>
                       <td className="p-3 text-green-400">{promo.state}</td>
                       <td className="p-3 flex gap-2">
+                      <td className="p-3">{promo.expiryDate}</td>
+
                         <button
                           onClick={() => handleDelete(promo.id)}
                           className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
@@ -188,8 +196,8 @@ const Promotions: React.FC = () => {
                 className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"
               />
             </div>
-
-            <div>
+          
+          <div>
               <label className="block mb-1 text-gray-400">Promotional Code</label>
               <input
                 type="text"
@@ -200,6 +208,18 @@ const Promotions: React.FC = () => {
                 className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"
               />
             </div>
+
+            <div>
+            <label className="block mb-1 text-gray-400">Expiry Date</label>
+            <input
+              type="date"
+              name="expiryDate"
+              value={newPromotion.expiryDate}
+              onChange={handleChange}
+              required
+              className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"/>
+          </div>
+
 
             <button
               type="submit"
