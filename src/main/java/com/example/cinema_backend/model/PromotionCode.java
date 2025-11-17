@@ -25,5 +25,4 @@ public class PromotionCode {
     public void setexpiry_date(String expiry_date) {
         this.expiry_date = expiry_date;
     }
-
 }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
+import Link from "next/link";
 
 interface Promotion {
   id: string;
@@ -19,7 +20,17 @@ interface NewPromotion {
   expiry_date: string;
 }
 
+interface User {
+  role: string;
+}
+
 const Promotions: React.FC = () => {
+
+  // ✅ Access control state
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  // Promotions state
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [newPromotion, setNewPromotion] = useState<NewPromotion>({
     name: "",
@@ -28,6 +39,13 @@ const Promotions: React.FC = () => {
     expiry_date: "",
   });
   const [selectedPromo, setSelectedPromo] = useState<string>("");
+
+   // Fetch user info from localStorage (or you can replace with API)
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+    setLoadingUser(false);
+  }, []);
 
   useEffect(() => {
     fetchPromotions();
@@ -113,6 +131,25 @@ const Promotions: React.FC = () => {
     }
   };
 
+  // ✅ Show loading while fetching user
+  if (loadingUser) return <p>Loading...</p>;
+
+  // ✅ Access control: only admins
+  if (!user || user.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Navbar />
+        <p className="mb-6 text-lg text-red-500">Access denied. Only admins can view this page.</p>
+        <Link href="/">
+          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]">
+            Go back home
+          </p>
+        </Link>
+      </div>
+    );
+  }
+
+  // ✅ Render promotions UI for admins
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
       <Navbar />

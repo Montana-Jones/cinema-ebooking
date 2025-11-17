@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 
+interface User {
+  email: string;
+  role: string;
+}
+
 interface Showtime {
   id: string;
   startTime: string;
@@ -15,6 +20,8 @@ interface Showtime {
 }
 
 export default function ManageShowtimes() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,10 +37,14 @@ export default function ManageShowtimes() {
   const [movies, setMovies] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
 
+  // Load user from localStorage
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+    setLoadingUser(false);
+  }, []);
 
-    
-
+  useEffect(() => {
     // Fetch movies
     fetch("http://localhost:8080/api/movies")
       .then((res) => res.json())
@@ -78,6 +89,28 @@ export default function ManageShowtimes() {
         setLoading(false);
       });
   }, [movies]); // dependency on movies ensures mapping works
+
+  // Admin access control
+  if (loadingUser) return <p>Loading user info...</p>;
+
+  if (!user || user.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Navbar />
+        <p className="mb-6 text-lg text-red-500">
+          Access denied. Only admins can view this page.
+        </p>
+        <a
+          href="/"
+          className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]"
+        >
+          Go back home
+        </a>
+      </div>
+    );
+  }
+
+  if (loading) return <p>Loading showtimes...</p>;
 
   const handleAddShowtime = async () => {
     if (!movieId || !roomName || !date) {
