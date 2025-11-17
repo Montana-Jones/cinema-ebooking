@@ -66,9 +66,11 @@ const Promotions: React.FC = () => {
       expiryDate: newPromotion.expiryDate,
     };
 
+    console.log(newPromo); //for debugging
+
     try {
       await axios.post("http://localhost:8080/api/promotions", newPromo);
-      setNewPromotion({ name: "", amount: "", code: "", expiryDate: "" });
+      setNewPromotion({ name: "", amount: "", code: "", expiryDate: ""});
       fetchPromotions();
       alert("Promotion added and sent to all registered users!");
     } catch (err) {
@@ -145,22 +147,24 @@ const Promotions: React.FC = () => {
                   promotions.map((promo) => (
                     <tr
                       key={promo.id}
-                      className="hover:bg-[#252525] transition border-b border-gray-800"
-                    >
+                      className="hover:bg-[#252525] transition border-b border-gray-800">
                       <td className="p-3">{promo.name}</td>
                       <td className="p-3">{promo.amount}</td>
                       <td className="p-3 text-[#75D1A6]">{promo.code}</td>
                       <td className="p-3 text-green-400">{promo.state}</td>
-                      <td className="p-3 flex gap-2">
-                      <td className="p-3">{promo.expiryDate}</td>
-
-                        <button
-                          onClick={() => handleDelete(promo.id)}
-                          className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
-                        >
-                          Delete
-                        </button>
+                      <td className="p-3">
+      
+                         <div className="flex gap-2">
+                            <button
+                                onClick={() => handleDelete(promo.id)}
+                                className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
+                            >
+                                 Delete
+                            </button>
+                          </div>
                       </td>
+                      <td className="p-3">{promo.expiryDate ? new Date(promo.expiryDate).toLocaleDateString() : ""}</td>
+                      
                     </tr>
                   ))
                 )}

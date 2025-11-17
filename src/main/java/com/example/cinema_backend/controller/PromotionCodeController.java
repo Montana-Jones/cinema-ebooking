@@ -7,7 +7,7 @@ import com.example.cinema_backend.repository.UserRepository;
 import com.example.cinema_backend.model.PromotionCode;
 import com.example.cinema_backend.model.User;
 import com.example.cinema_backend.service.EmailService;
-
+import com.example.cinema_backend.model.Promotion;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ public class PromotionCodeController {
         PromotionCode savedPromo = promotionCodeRepository.save(promo);
 
         // Send emails to opted-in users
-        List<User> users = userRepository.findByPromotion("REGISTERED");
+        List<User> users = userRepository.findByPromotion(Promotion.REGISTERED);
         for (User user : users) {
 
             try {
@@ -76,7 +76,7 @@ public class PromotionCodeController {
         }
 
         PromotionCode promo = promoOpt.get();
-        List<User> users = userRepository.findByPromotion("REGISTERED");
+        List<User> users = userRepository.findByPromotion(Promotion.REGISTERED);
         int sentCount = 0;
 
         for (User user : users) {

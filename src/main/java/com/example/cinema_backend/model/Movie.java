@@ -5,12 +5,17 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
 
 @Document(collection = "movies")
 @Data // Lombok's annotation for getters, setters, toString, etc.
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Movie {
 
     @Id
@@ -29,6 +34,6 @@ public class Movie {
     private boolean comingSoon;
     private double rating;
 
-    @DBRef
-    private List<Showtime> showtime = new ArrayList<>(); 
+    @DBRef(lazy = true)
+    private List<Showtime> showtime;
 }
