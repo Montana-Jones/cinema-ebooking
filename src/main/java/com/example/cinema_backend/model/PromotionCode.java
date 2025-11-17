@@ -1,9 +1,9 @@
 package com.example.cinema_backend.model;
 
 import org.springframework.data.annotation.Id;
-import com.fasterxml.jackson.annotation.JsonProperty;
+// import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+// import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.Data;
 
@@ -16,16 +16,14 @@ public class PromotionCode {
     private double amount;
     private String name;
     private String state;
-    @JsonProperty("expiryDate")
-    @Field("expiryDate")
-    private String expiryDate;
+    private String expiry_date;
 
-    public String getExpiryDate() {
-        return expiryDate;
+    public String getexpiry_date() {
+        return expiry_date;
     }
 
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
+    public void setexpiry_date(String expiry_date) {
+        this.expiry_date = expiry_date;
     }
 
 }

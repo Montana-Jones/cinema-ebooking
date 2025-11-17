@@ -9,14 +9,14 @@ interface Promotion {
   amount: number;
   code: string;
   state: string;
-  expiryDate: string;
+  expiry_date: string;
 }
 
 interface NewPromotion {
   name: string;
   amount: string;
   code: string;
-  expiryDate: string;
+  expiry_date: string;
 }
 
 const Promotions: React.FC = () => {
@@ -25,7 +25,7 @@ const Promotions: React.FC = () => {
     name: "",
     amount: "",
     code: "",
-    expiryDate: ""
+    expiry_date: "",
   });
   const [selectedPromo, setSelectedPromo] = useState<string>("");
 
@@ -42,7 +42,7 @@ const Promotions: React.FC = () => {
         amount: p.amount,
         code: p.code,
         state: p.state,
-        expiryDate: p.expiryDate,
+        expiry_date: p.expiry_date,
       }));
       setPromotions(data);
     } catch (err) {
@@ -63,14 +63,14 @@ const Promotions: React.FC = () => {
       amount: Number(newPromotion.amount),
       code: newPromotion.code,
       state: "Active",
-      expiryDate: newPromotion.expiryDate,
+      expiry_date: newPromotion.expiry_date,
     };
 
     console.log(newPromo); //for debugging
 
     try {
       await axios.post("http://localhost:8080/api/promotions", newPromo);
-      setNewPromotion({ name: "", amount: "", code: "", expiryDate: ""});
+      setNewPromotion({ name: "", amount: "", code: "", expiry_date: "" });
       fetchPromotions();
       alert("Promotion added and sent to all registered users!");
     } catch (err) {
@@ -123,7 +123,9 @@ const Promotions: React.FC = () => {
 
         {/* Active Promotions Table */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Active Promotions</h2>
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
+            Active Promotions
+          </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -139,7 +141,10 @@ const Promotions: React.FC = () => {
               <tbody>
                 {promotions.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center text-gray-400 p-6 italic">
+                    <td
+                      colSpan={5}
+                      className="text-center text-gray-400 p-6 italic"
+                    >
                       No promotions added yet.
                     </td>
                   </tr>
@@ -147,24 +152,27 @@ const Promotions: React.FC = () => {
                   promotions.map((promo) => (
                     <tr
                       key={promo.id}
-                      className="hover:bg-[#252525] transition border-b border-gray-800">
+                      className="hover:bg-[#252525] transition border-b border-gray-800"
+                    >
                       <td className="p-3">{promo.name}</td>
                       <td className="p-3">{promo.amount}</td>
                       <td className="p-3 text-[#75D1A6]">{promo.code}</td>
                       <td className="p-3 text-green-400">{promo.state}</td>
                       <td className="p-3">
-      
-                         <div className="flex gap-2">
-                            <button
-                                onClick={() => handleDelete(promo.id)}
-                                className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
-                            >
-                                 Delete
-                            </button>
-                          </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDelete(promo.id)}
+                            className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
-                      <td className="p-3">{promo.expiryDate ? new Date(promo.expiryDate).toLocaleDateString() : ""}</td>
-                      
+                      <td className="p-3">
+                        {promo.expiry_date
+                          ? new Date(promo.expiry_date).toLocaleDateString()
+                          : ""}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -175,8 +183,13 @@ const Promotions: React.FC = () => {
 
         {/* Add New Promotion */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Add New Promotion</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-gray-300">
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
+            Add New Promotion
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-5 text-gray-300"
+          >
             <div>
               <label className="block mb-1 text-gray-400">Name</label>
               <input
@@ -190,7 +203,9 @@ const Promotions: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-gray-400">Promotional Amount</label>
+              <label className="block mb-1 text-gray-400">
+                Promotional Amount
+              </label>
               <input
                 type="number"
                 name="amount"
@@ -200,9 +215,11 @@ const Promotions: React.FC = () => {
                 className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"
               />
             </div>
-          
-          <div>
-              <label className="block mb-1 text-gray-400">Promotional Code</label>
+
+            <div>
+              <label className="block mb-1 text-gray-400">
+                Promotional Code
+              </label>
               <input
                 type="text"
                 name="code"
@@ -214,16 +231,16 @@ const Promotions: React.FC = () => {
             </div>
 
             <div>
-            <label className="block mb-1 text-gray-400">Expiry Date</label>
-            <input
-              type="date"
-              name="expiryDate"
-              value={newPromotion.expiryDate}
-              onChange={handleChange}
-              required
-              className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"/>
-          </div>
-
+              <label className="block mb-1 text-gray-400">Expiry Date</label>
+              <input
+                type="date"
+                name="expiry_date"
+                value={newPromotion.expiry_date}
+                onChange={handleChange}
+                required
+                className="w-full bg-[#2a2a2a] p-3 rounded-md border border-gray-700 focus:border-[#75D1A6] outline-none transition"
+              />
+            </div>
 
             <button
               type="submit"
@@ -236,7 +253,9 @@ const Promotions: React.FC = () => {
 
         {/* Send Promotion */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Send Promotion</h2>
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
+            Send Promotion
+          </h2>
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <select
               value={selectedPromo}
