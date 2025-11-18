@@ -14,7 +14,7 @@ interface Showtime {
   endTime: string;
   date: string;
   movieId: string;
-  movieName?: string; // store movie name
+  movieName: string;
   roomName: string;
   seatBinary: string;
 }
@@ -25,11 +25,10 @@ export default function ManageShowtimes() {
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Form state
   const [date, setDate] = useState("");
-  const [startHour, setStartHour] = useState(10); // 0-23
+  const [startHour, setStartHour] = useState(10);
   const [startMinute, setStartMinute] = useState(0);
-  const [endHour, setEndHour] = useState(12); // 0-23
+  const [endHour, setEndHour] = useState(12);
   const [endMinute, setEndMinute] = useState(0);
   const [movieId, setMovieId] = useState("");
   const [roomName, setRoomName] = useState("");
@@ -44,55 +43,71 @@ export default function ManageShowtimes() {
     setLoadingUser(false);
   }, []);
 
+  // Fetch movies and rooms
   useEffect(() => {
-    // Fetch movies
-    fetch("http://localhost:8080/api/movies")
-      .then((res) => res.json())
-      .then(setMovies)
-      .catch(console.error);
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/movies");
+        const data = await res.json();
+        setMovies(data);
+      } catch (err) {
+        console.error("Error fetching movies:", err);
+      }
+    };
 
-    // Fetch rooms
-    fetch("http://localhost:8080/api/showrooms")
-      .then((res) => res.json())
-      .then(setRooms)
-      .catch(console.error);
-    }, []);
+    const fetchRooms = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/showrooms");
+        const data = await res.json();
+        setRooms(data);
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
+      }
+    };
 
-    // Fetch showtimes
-    useEffect(() => {
+    fetchMovies();
+    fetchRooms();
+  }, []);
+
+  // Fetch showtimes after movies are loaded
+  useEffect(() => {
     if (movies.length === 0) return;
-    
-    fetch("http://localhost:8080/api/showtimes")
-      .then((res) => res.json())
-      .then((data) => {
-        const mappedShowtimes = data.map((s: any) => {
-          console.log("SHOWTIME MOVIE ID:", s.movie_id);
-  console.log("MOVIE LIST:", movies);
 
-          const movie = movies.find((m) => String(m.id) ===String(s.movie_id));
+    const fetchShowtimes = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/showtimes");
+        const data = await res.json();
+
+        const mappedShowtimes: Showtime[] = data.map((s: any) => {
+          const movie = movies.find(
+            (m) => String(m.id) === String(s.movie_id || s.movieId)
+          );
+
           return {
-            id: s._id,
-            startTime: s.start_time,
-            endTime: s.end_time,
+            id: s._id ?? crypto.randomUUID(), // fallback if _id missing
+            startTime: s.start_time || s.startTime,
+            endTime: s.end_time || s.endTime,
             date: s.date,
-            movieId: s.movie_id,
-            movieName: movie?.title || "Unknown", // fallback to ID if name not found
-            roomName: s.room_name,
-            seatBinary: s.seat_binary ?? "",
+            movieId: s.movie_id || s.movieId,
+            movieName: movie?.title || "Unknown",
+            roomName: s.room_name || s.roomName,
+            seatBinary: s.seat_binary || s.seatBinary || "",
           };
         });
+
         setShowtimes(mappedShowtimes);
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error fetching showtimes:", err);
         setLoading(false);
-      });
-  }, [movies]); // dependency on movies ensures mapping works
+      }
+    };
+
+    fetchShowtimes();
+  }, [movies]);
 
   // Admin access control
   if (loadingUser) return <p>Loading user info...</p>;
-
   if (!user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
@@ -112,13 +127,13 @@ export default function ManageShowtimes() {
 
   if (loading) return <p>Loading showtimes...</p>;
 
+  // Add showtime with clash detection
   const handleAddShowtime = async () => {
     if (!movieId || !roomName || !date) {
       alert("Please select movie, room, and date");
       return;
     }
 
-   // 2️⃣ Format start and end time as HH:mm
     const startTime = `${startHour.toString().padStart(2, "0")}:${startMinute
       .toString()
       .padStart(2, "0")}`;
@@ -126,8 +141,36 @@ export default function ManageShowtimes() {
       .toString()
       .padStart(2, "0")}`;
 
+    // Convert times to minutes for easy comparison
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+
+    if (endMinutes <= startMinutes) {
+      alert("End time must be after start time");
+      return;
+    }
+
+    // Check for clash with existing showtimes in the same room and date
+    const clash = showtimes.some((s) => {
+      if (s.date !== date || s.roomName !== roomName) return false;
+
+      const [sStartHour, sStartMin] = s.startTime.split(":").map(Number);
+      const [sEndHour, sEndMin] = s.endTime.split(":").map(Number);
+      const sStartMinutes = sStartHour * 60 + sStartMin;
+      const sEndMinutes = sEndHour * 60 + sEndMin;
+
+      // Overlap condition: start < existing end && end > existing start
+      return startMinutes < sEndMinutes && endMinutes > sStartMinutes;
+    });
+
+    if (clash) {
+      alert(
+        "Showtime clashes with an existing showtime in the same room and date"
+      );
+      return;
+    }
+
     try {
-      // 3️⃣ Send POST request to backend
       const res = await fetch("http://localhost:8080/api/showtimes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -136,23 +179,21 @@ export default function ManageShowtimes() {
 
       if (!res.ok) throw new Error("Failed to add showtime");
 
-      // 4️⃣ Get the new showtime returned by backend
       const newShowtime = await res.json();
       const movie = movies.find((m) => String(m.id) === String(movieId));
 
-      // 6️⃣ Add the new showtime to the state so table updates immediately
       setShowtimes((prev) => [
         ...prev,
         {
-        id: newShowtime.id || newShowtime._id,
-        startTime: newShowtime.startTime || newShowtime.start_time,
-        endTime: newShowtime.endTime || newShowtime.end_time,
-        date: newShowtime.date,
-        movieId: newShowtime.movieId || newShowtime.movie_id,
-        movieName: movie?.title || newShowtime.movieId || newShowtime.movie_id,
-        roomName: newShowtime.roomName || newShowtime.room_name,
-        seatBinary: newShowtime.seatBinary || newShowtime.seat_binary || "",
-      },
+          id: newShowtime._id ?? crypto.randomUUID(),
+          startTime: newShowtime.startTime || newShowtime.start_time,
+          endTime: newShowtime.endTime || newShowtime.end_time,
+          date: newShowtime.date,
+          movieId: newShowtime.movieId || newShowtime.movie_id,
+          movieName: movie?.title || "Unknown",
+          roomName: newShowtime.roomName || newShowtime.room_name,
+          seatBinary: newShowtime.seatBinary || newShowtime.seat_binary || "",
+        },
       ]);
 
       // Reset form
@@ -165,12 +206,13 @@ export default function ManageShowtimes() {
       setRoomName("");
 
       alert("Showtime added successfully!");
-    } catch (err:any) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error adding showtime" + err.message);
+      alert("Error adding showtime: " + err.message);
     }
   };
 
+  // Delete showtime (only selected one)
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this showtime?"
@@ -182,25 +224,23 @@ export default function ManageShowtimes() {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error("Failed to delete showtime");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to delete showtime");
+      }
 
       setShowtimes((prev) => prev.filter((s) => s.id !== id));
-
       alert("Showtime deleted successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting showtime.");
+    } catch (err: any) {
+      console.error("Error deleting showtime:", err);
+      alert("Error deleting showtime: " + err.message);
     }
   };
-
-  if (loading) return <p>Loading showtimes...</p>;
 
   return (
     <div className="min-h-screen bg-[#121212] text-white p-6">
       <Navbar />
-      <h1 className="text-3xl font-bold text-[#75D1A6] mb-6">
-        Manage Showtimes
-      </h1>
+      <h1 className="text-3xl font-bold text-[#75D1A6] mb-6">Manage Showtimes</h1>
 
       {/* Add Showtime Form */}
       <div className="bg-[#1f1f1f] p-6 rounded-2xl mb-8">
@@ -213,7 +253,6 @@ export default function ManageShowtimes() {
             className="border rounded px-3 py-2 text-black"
           />
 
-          {/* Start Time */}
           <div className="flex items-center space-x-2">
             <input
               type="number"
@@ -234,7 +273,6 @@ export default function ManageShowtimes() {
             />
           </div>
 
-          {/* End Time */}
           <div className="flex items-center space-x-2">
             <input
               type="number"
@@ -255,7 +293,6 @@ export default function ManageShowtimes() {
             />
           </div>
 
-          {/* Movie Dropdown */}
           <select
             value={movieId}
             onChange={(e) => setMovieId(e.target.value)}
@@ -263,11 +300,12 @@ export default function ManageShowtimes() {
           >
             <option value="">Select Movie</option>
             {movies.map((m) => (
-              <option key={m.id} value={m.id}>{m.title}</option>
+              <option key={m.id} value={m.id}>
+                {m.title}
+              </option>
             ))}
           </select>
 
-          {/* Room Dropdown */}
           <select
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
@@ -309,9 +347,7 @@ export default function ManageShowtimes() {
                 <td className="p-4 border border-gray-700">{s.date}</td>
                 <td className="p-4 border border-gray-700">{s.startTime}</td>
                 <td className="p-4 border border-gray-700">{s.endTime}</td>
-                <td className="p-4 border border-gray-700">
-                  {s.movieName || s.movieId}
-                </td>
+                <td className="p-4 border border-gray-700">{s.movieName}</td>
                 <td className="p-4 border border-gray-700">{s.roomName}</td>
                 <td className="p-4 border border-gray-700 text-center">
                   <button
