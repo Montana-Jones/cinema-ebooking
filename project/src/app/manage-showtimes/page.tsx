@@ -22,9 +22,13 @@ interface Showtime {
 export default function ManageShowtimes() {
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+
+  const [movies, setMovies] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // form states
   const [date, setDate] = useState("");
   const [startHour, setStartHour] = useState(10);
   const [startMinute, setStartMinute] = useState(0);
@@ -33,43 +37,33 @@ export default function ManageShowtimes() {
   const [movieId, setMovieId] = useState("");
   const [roomName, setRoomName] = useState("");
 
-  const [movies, setMovies] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-
-  // Load user from localStorage
+  // Load user
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
     setLoadingUser(false);
   }, []);
 
-  // Fetch movies and rooms
+  // Fetch movies & rooms
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/movies");
-        const data = await res.json();
-        setMovies(data);
+        const [moviesRes, roomsRes] = await Promise.all([
+          fetch("http://localhost:8080/api/movies"),
+          fetch("http://localhost:8080/api/showrooms"),
+        ]);
+
+        setMovies(await moviesRes.json());
+        setRooms(await roomsRes.json());
       } catch (err) {
-        console.error("Error fetching movies:", err);
+        console.error("Error loading movies or rooms:", err);
       }
     };
 
-    const fetchRooms = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/api/showrooms");
-        const data = await res.json();
-        setRooms(data);
-      } catch (err) {
-        console.error("Error fetching rooms:", err);
-      }
-    };
-
-    fetchMovies();
-    fetchRooms();
+    fetchData();
   }, []);
 
-  // Fetch showtimes after movies are loaded
+  // Fetch showtimes once movies are loaded (for name matching)
   useEffect(() => {
     if (movies.length === 0) return;
 
@@ -78,13 +72,15 @@ export default function ManageShowtimes() {
         const res = await fetch("http://localhost:8080/api/showtimes");
         const data = await res.json();
 
-        const mappedShowtimes: Showtime[] = data.map((s: any) => {
+        const mapped: Showtime[] = data.map((s: any) => {
           const movie = movies.find(
-            (m) => String(m.id) === String(s.movie_id || s.movieId)
+            (m) =>
+              String(m._id || m.id) ===
+              String(s.movie_id || s.movieId)
           );
 
           return {
-            id: s._id ?? crypto.randomUUID(), // fallback if _id missing
+            id: s._id || s.id,
             startTime: s.start_time || s.startTime,
             endTime: s.end_time || s.endTime,
             date: s.date,
@@ -95,10 +91,10 @@ export default function ManageShowtimes() {
           };
         });
 
-        setShowtimes(mappedShowtimes);
+        setShowtimes(mapped);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching showtimes:", err);
+        console.error("Error loading showtimes:", err);
         setLoading(false);
       }
     };
@@ -106,70 +102,58 @@ export default function ManageShowtimes() {
     fetchShowtimes();
   }, [movies]);
 
-  // Admin access control
-  if (loadingUser) return <p>Loading user info...</p>;
-  if (!user || user.role !== "ADMIN") {
+  if (loadingUser) return <p>Loading user...</p>;
+  if (!user || user.role !== "ADMIN")
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center">
         <Navbar />
-        <p className="mb-6 text-lg text-red-500">
-          Access denied. Only admins can view this page.
-        </p>
-        <a
-          href="/"
-          className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]"
-        >
-          Go back home
-        </a>
+        <p className="text-red-500 mt-6 text-xl">Access denied (Admin only)</p>
       </div>
     );
-  }
 
   if (loading) return <p>Loading showtimes...</p>;
 
-  // Add showtime with clash detection
+  // ----------------- ADD SHOWTIME -----------------
   const handleAddShowtime = async () => {
     if (!movieId || !roomName || !date) {
-      alert("Please select movie, room, and date");
+      alert("Please fill all fields.");
       return;
     }
 
-    const startTime = `${startHour.toString().padStart(2, "0")}:${startMinute
-      .toString()
-      .padStart(2, "0")}`;
-    const endTime = `${endHour.toString().padStart(2, "0")}:${endMinute
-      .toString()
-      .padStart(2, "0")}`;
+    const startTime = `${String(startHour).padStart(2, "0")}:${String(
+      startMinute
+    ).padStart(2, "0")}`;
+    const endTime = `${String(endHour).padStart(2, "0")}:${String(
+      endMinute
+    ).padStart(2, "0")}`;
 
-    // Convert times to minutes for easy comparison
-    const startMinutes = startHour * 60 + startMinute;
-    const endMinutes = endHour * 60 + endMinute;
+    const startMin = startHour * 60 + startMinute;
+    const endMin = endHour * 60 + endMinute;
 
-    if (endMinutes <= startMinutes) {
-      alert("End time must be after start time");
+    // basic validation
+    if (endMin <= startMin) {
+      alert("End time must be AFTER start time.");
       return;
     }
 
-    // Check for clash with existing showtimes in the same room and date
+    // clash detection
     const clash = showtimes.some((s) => {
       if (s.date !== date || s.roomName !== roomName) return false;
 
-      const [sStartHour, sStartMin] = s.startTime.split(":").map(Number);
-      const [sEndHour, sEndMin] = s.endTime.split(":").map(Number);
-      const sStartMinutes = sStartHour * 60 + sStartMin;
-      const sEndMinutes = sEndHour * 60 + sEndMin;
+      const [sh, sm] = s.startTime.split(":").map(Number);
+      const [eh, em] = s.endTime.split(":").map(Number);
+      const sMin = sh * 60 + sm;
+      const eMin = eh * 60 + em;
 
-      // Overlap condition: start < existing end && end > existing start
-      return startMinutes < sEndMinutes && endMinutes > sStartMinutes;
+      return startMin < eMin && endMin > sMin;
     });
 
     if (clash) {
-      alert(
-        "Showtime clashes with an existing showtime in the same room and date"
-      );
+      alert("Showtime conflicts with an existing one.");
       return;
     }
 
+    // send to backend
     try {
       const res = await fetch("http://localhost:8080/api/showtimes", {
         method: "POST",
@@ -177,47 +161,45 @@ export default function ManageShowtimes() {
         body: JSON.stringify({ date, startTime, endTime, movieId, roomName }),
       });
 
-      if (!res.ok) throw new Error("Failed to add showtime");
+      if (!res.ok) throw new Error("Failed to create showtime");
 
-      const newShowtime = await res.json();
-      const movie = movies.find((m) => String(m.id) === String(movieId));
+      const newShow = await res.json();
+      const movie = movies.find(
+        (m) => String(m._id || m.id) === String(movieId)
+      );
 
       setShowtimes((prev) => [
         ...prev,
         {
-          id: newShowtime._id ?? crypto.randomUUID(),
-          startTime: newShowtime.startTime || newShowtime.start_time,
-          endTime: newShowtime.endTime || newShowtime.end_time,
-          date: newShowtime.date,
-          movieId: newShowtime.movieId || newShowtime.movie_id,
+          id: newShow._id,
+          startTime: newShow.startTime,
+          endTime: newShow.endTime,
+          date: newShow.date,
+          movieId: newShow.movieId,
           movieName: movie?.title || "Unknown",
-          roomName: newShowtime.roomName || newShowtime.room_name,
-          seatBinary: newShowtime.seatBinary || newShowtime.seat_binary || "",
+          roomName: newShow.roomName,
+          seatBinary: newShow.seatBinary || "",
         },
       ]);
 
-      // Reset form
+      alert("Showtime added!");
+
+      // reset form
       setDate("");
+      setMovieId("");
+      setRoomName("");
       setStartHour(10);
       setStartMinute(0);
       setEndHour(12);
       setEndMinute(0);
-      setMovieId("");
-      setRoomName("");
-
-      alert("Showtime added successfully!");
     } catch (err: any) {
-      console.error(err);
       alert("Error adding showtime: " + err.message);
     }
   };
 
-  // Delete showtime (only selected one)
+  // ----------------- DELETE SHOWTIME -----------------
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this showtime?"
-    );
-    if (!confirmDelete) return;
+    if (!confirm("Delete this showtime?")) return;
 
     try {
       const res = await fetch(`http://localhost:8080/api/showtimes/${id}`, {
@@ -225,32 +207,33 @@ export default function ManageShowtimes() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to delete showtime");
+        const msg = await res.json();
+        throw new Error(msg.error || "Cannot delete showtime");
       }
 
       setShowtimes((prev) => prev.filter((s) => s.id !== id));
-      alert("Showtime deleted successfully!");
+      alert("Showtime deleted.");
     } catch (err: any) {
-      console.error("Error deleting showtime:", err);
       alert("Error deleting showtime: " + err.message);
     }
   };
 
+  // ----------------- UI -----------------
   return (
     <div className="min-h-screen bg-[#121212] text-white p-6">
       <Navbar />
-      <h1 className="text-3xl font-bold text-[#75D1A6] mb-6">Manage Showtimes</h1>
+      <h1 className="text-3xl text-[#75D1A6] font-bold mb-6">Manage Showtimes</h1>
 
-      {/* Add Showtime Form */}
-      <div className="bg-[#1f1f1f] p-6 rounded-2xl mb-8">
-        <h2 className="text-xl font-semibold mb-4">Add Showtime</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* Add Form */}
+      <div className="bg-[#1f1f1f] p-6 rounded-xl mb-8">
+        <h2 className="text-xl font-bold mb-4">Add Showtime</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border rounded px-3 py-2 text-black"
+            className="text-black px-3 py-2 rounded"
           />
 
           <div className="flex items-center space-x-2">
@@ -259,8 +242,8 @@ export default function ManageShowtimes() {
               min={0}
               max={23}
               value={startHour}
-              onChange={(e) => setStartHour(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-16 text-black"
+              onChange={(e) => setStartHour(+e.target.value)}
+              className="w-16 px-2 py-1 text-black rounded"
             />
             :
             <input
@@ -268,8 +251,8 @@ export default function ManageShowtimes() {
               min={0}
               max={59}
               value={startMinute}
-              onChange={(e) => setStartMinute(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-16 text-black"
+              onChange={(e) => setStartMinute(+e.target.value)}
+              className="w-16 px-2 py-1 text-black rounded"
             />
           </div>
 
@@ -279,8 +262,8 @@ export default function ManageShowtimes() {
               min={0}
               max={23}
               value={endHour}
-              onChange={(e) => setEndHour(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-16 text-black"
+              onChange={(e) => setEndHour(+e.target.value)}
+              className="w-16 px-2 py-1 text-black rounded"
             />
             :
             <input
@@ -288,19 +271,19 @@ export default function ManageShowtimes() {
               min={0}
               max={59}
               value={endMinute}
-              onChange={(e) => setEndMinute(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-16 text-black"
+              onChange={(e) => setEndMinute(+e.target.value)}
+              className="w-16 px-2 py-1 text-black rounded"
             />
           </div>
 
           <select
             value={movieId}
             onChange={(e) => setMovieId(e.target.value)}
-            className="border rounded px-3 py-2 bg-[#1f1f1f] text-white focus:outline-none"
+            className="bg-[#1f1f1f] border px-3 py-2 rounded"
           >
             <option value="">Select Movie</option>
             {movies.map((m) => (
-              <option key={m.id} value={m.id}>
+              <option key={m._id || m.id} value={m._id || m.id}>
                 {m.title}
               </option>
             ))}
@@ -309,7 +292,7 @@ export default function ManageShowtimes() {
           <select
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
-            className="border rounded px-3 py-2 bg-[#1f1f1f] text-white focus:outline-none"
+            className="bg-[#1f1f1f] border px-3 py-2 rounded"
           >
             <option value="">Select Room</option>
             {rooms.map((r) => (
@@ -321,7 +304,7 @@ export default function ManageShowtimes() {
 
           <button
             onClick={handleAddShowtime}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mt-2"
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg"
           >
             Add Showtime
           </button>
@@ -333,26 +316,27 @@ export default function ManageShowtimes() {
         <table className="min-w-full border-collapse border border-gray-700">
           <thead>
             <tr className="bg-[#2a2a2a] text-[#75D1A6]">
-              <th className="p-4 border border-gray-700 text-left">Date</th>
-              <th className="p-4 border border-gray-700 text-left">Start Time</th>
-              <th className="p-4 border border-gray-700 text-left">End Time</th>
-              <th className="p-4 border border-gray-700 text-left">Movie</th>
-              <th className="p-4 border border-gray-700 text-left">Room</th>
-              <th className="p-4 border border-gray-700 text-center">Actions</th>
+              <th className="p-4 border">Date</th>
+              <th className="p-4 border">Start</th>
+              <th className="p-4 border">End</th>
+              <th className="p-4 border">Movie</th>
+              <th className="p-4 border">Room</th>
+              <th className="p-4 border">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {showtimes.map((s) => (
               <tr key={s.id} className="hover:bg-[#2a2a2a] transition">
-                <td className="p-4 border border-gray-700">{s.date}</td>
-                <td className="p-4 border border-gray-700">{s.startTime}</td>
-                <td className="p-4 border border-gray-700">{s.endTime}</td>
-                <td className="p-4 border border-gray-700">{s.movieName}</td>
-                <td className="p-4 border border-gray-700">{s.roomName}</td>
-                <td className="p-4 border border-gray-700 text-center">
+                <td className="p-4 border">{s.date}</td>
+                <td className="p-4 border">{s.startTime}</td>
+                <td className="p-4 border">{s.endTime}</td>
+                <td className="p-4 border">{s.movieName}</td>
+                <td className="p-4 border">{s.roomName}</td>
+                <td className="p-4 border">
                   <button
                     onClick={() => handleDelete(s.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
+                    className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
                   >
                     Delete
                   </button>
@@ -360,6 +344,7 @@ export default function ManageShowtimes() {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>
