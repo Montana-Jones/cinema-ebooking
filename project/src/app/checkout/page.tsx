@@ -1,7 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+<<<<<<< HEAD
 import TopBar from "@/app/checkout/parts/topBar";
+=======
+import TopBar from "@/app/checkout/parts/topBar"
+>>>>>>> parent of affec76 (minor CSS changes)
 
 // --- Interfaces ---
 interface Seat {
@@ -191,6 +195,7 @@ export default function CheckoutPage() {
       <div style={{
         backgroundColor: "#2b0f0f",
         padding: "2rem",
+<<<<<<< HEAD
         borderRadius: "10px",
         maxWidth: "600px",
         margin: "0 auto"
@@ -200,6 +205,27 @@ export default function CheckoutPage() {
         <p><strong>Movie:</strong> {movieTitle}</p>
         <p><strong>Showtime:</strong> {startTime}</p>
         <p><strong>Room:</strong> {showtime?.room_name}</p>
+=======
+        backgroundColor: "#150707",
+        color: "white",
+      }}
+    >
+      <TopBar/>
+
+      <div
+        style={{
+          backgroundColor: "#2b0f0f",
+          padding: "2rem",
+          borderRadius: "10px",
+          width: "100%",
+          maxWidth: "600px",
+          boxShadow: "0 0 10px rgba(255,255,255,0.2)",
+        }}
+      >
+        <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
+          Checkout Summary
+        </h1>
+>>>>>>> parent of affec76 (minor CSS changes)
 
         <hr />
 

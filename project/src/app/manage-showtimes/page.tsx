@@ -227,12 +227,13 @@ export default function ManageShowtimes() {
 
   // ----------------- UI -----------------
   return (
-    <div className="min-h-screen bg-[#121212] text-white">
+    <div className="min-h-screen bg-[#121212] text-white p-6">
       <Navbar />
+      <h1 className="text-3xl text-[#75D1A6] font-bold mb-6">Manage Showtimes</h1>
 
       {/* Add Form */}
-      <div className="bg-[#1f1f1f] p-6 rounded-xl mt-20 mb-8">
-        <h2 className="text-xl font-bold p-6 mb-4">Add Showtime</h2>
+      <div className="bg-[#1f1f1f] p-6 rounded-xl mb-8">
+        <h2 className="text-xl font-bold mb-4">Add Showtime</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
