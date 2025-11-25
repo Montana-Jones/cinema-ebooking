@@ -12,7 +12,7 @@ interface Showtime {
   start_time: string;
   end_time: string;
   movie_id: string;
-  date: string; // e.g., "2023-10-15"
+  date: string;
 }
 
 export interface MovieProps {

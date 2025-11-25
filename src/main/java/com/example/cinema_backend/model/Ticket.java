@@ -15,6 +15,7 @@ public class Ticket {
 
     private double ticketPrice;
     private TicketType ticketType;
+    private int numTickets;
 
 
 }

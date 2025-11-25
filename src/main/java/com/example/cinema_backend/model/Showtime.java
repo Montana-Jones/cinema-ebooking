@@ -29,7 +29,7 @@ public class Showtime {
 
     // Ignore these during JSON serialization to prevent infinite recursion
     @DBRef
-    @JsonIgnore
+    //@JsonIgnore
     private Movie movie;
 
     @DBRef

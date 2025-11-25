@@ -21,11 +21,14 @@ public class Booking {
     private String showTimeId;
     private String email;
     private String roomName;
+    private String date;
+    private String startTime;
+    private String seats;
+    private double totalPrice;
 
     private String movieId;
 
 
-    @DBRef
     private List<Ticket> tickets;
 
 
