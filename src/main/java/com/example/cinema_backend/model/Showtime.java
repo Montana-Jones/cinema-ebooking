@@ -4,43 +4,35 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// Creates getters, setters, toString, etc. automatically
-@NoArgsConstructor // Creates a no-argument constructor
-@AllArgsConstructor // Creates a constructor with all arguments
-@Document(collection = "showtime")
 @Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "showtime")
 public class Showtime {
 
     @Id
-    private String id; // MongoDB will auto-generate this and it maps to the '_id' field
+    private String id;
 
-    @JsonProperty("startTime")
     private String startTime;
-
-    @JsonProperty("endTime")
     private String endTime;
-
     private String date;
     private String duration;
-
-    @JsonProperty("movieId")
     private String movieId;
-    @JsonProperty("roomName")
     private String roomName;
     private String seatBinary;
+
+    // Ignore these during JSON serialization to prevent infinite recursion
     @DBRef
+    @JsonIgnore
     private Movie movie;
 
     @DBRef
+    @JsonIgnore
     private Showroom showroom;
-
 }

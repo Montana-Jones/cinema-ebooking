@@ -7,7 +7,8 @@ import Navbar from "@/components/Navbar";
 import AddMovieButton from "@/components/AddMovieButton";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
-import { useRouter } from "next/navigation";
+import { Show } from "mongoose";
+
 interface User {
   role: string;
 }
@@ -17,25 +18,39 @@ interface Date {
   date: string; // e.g., "2023-10-15"
 }
 
+interface Showtime {
+  id: string;
+  start_time: string;
+  end_time: string;
+  movie_id: string;
+  date: string; // e.g., "2023-10-15"
+}
+
+interface Movie {
+  id: string;
+  title: string;
+  genre: string;
+  mpaa_rating: string;
+  rating: number;
+  director: string;
+  producer: string;
+  cast: string;
+  synopsis: string;
+  poster_url: string;
+  trailer_url: string;
+  now_showing: boolean;
+  coming_soon: boolean;
+  showtime: Showtime[];
+}
+
 export default function Home() {
-    const router = useRouter(); 
   const [showNowShowing, setShowNowShowing] = useState(true);
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [dates, setDates] = useState<Date[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
 
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-
-      if (user.role === "admin") {
-        router.push("/admin-dash");
-      }
-    }
-  }, []);
   // Fetch movies
   useEffect(() => {
     fetch("http://localhost:8080/api/movies")
@@ -76,10 +91,11 @@ export default function Home() {
     (movie) =>
       (showNowShowing ? movie.now_showing : movie.coming_soon) &&
       (selectedDate && showNowShowing
-        ? movie.showtime.some(
+        ? (movie.showtime?.some(
             (sTime: any) =>
-              sTime.date === selectedDate.toISOString().split("T")[0]
-          )
+              sTime.date === selectedDate.toLocaleDateString("en-CA") // YYYY-MM-DD
+
+          ) ?? false)
         : true)
   );
 
@@ -138,7 +154,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-      <AddMovieButton />
+      {user && user.role === "ADMIN" && <AddMovieButton />}
     </main>
   );
 }

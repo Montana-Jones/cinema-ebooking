@@ -153,13 +153,21 @@ export default function ManageShowtimes() {
       return;
     }
 
-    // send to backend
+    // send to backend with snake_case keys
     try {
       const res = await fetch("http://localhost:8080/api/showtimes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, startTime, endTime, movieId, roomName }),
+        body: JSON.stringify({
+          date,
+          start_time: startTime,
+          end_time: endTime,
+          movie_id: movieId,
+          room_name: roomName,
+          seat_binary: "", // initialize empty
+        }),
       });
+      console.log({ date, startTime, endTime, movieId, roomName });
 
       if (!res.ok) throw new Error("Failed to create showtime");
 
@@ -171,14 +179,14 @@ export default function ManageShowtimes() {
       setShowtimes((prev) => [
         ...prev,
         {
-          id: newShow._id,
-          startTime: newShow.startTime,
-          endTime: newShow.endTime,
+          id: newShow.id || newShow._id,
+          startTime: newShow.start_time || newShow.startTime,
+          endTime: newShow.end_time || newShow.endTime,
           date: newShow.date,
-          movieId: newShow.movieId,
+          movieId: newShow.movie_id || newShow.movieId,
           movieName: movie?.title || "Unknown",
-          roomName: newShow.roomName,
-          seatBinary: newShow.seatBinary || "",
+          roomName: newShow.room_name || newShow.roomName,
+          seatBinary: newShow.seat_binary || "",
         },
       ]);
 
@@ -344,7 +352,6 @@ export default function ManageShowtimes() {
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
     </div>
