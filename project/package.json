@@ -6,14 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start:all": "concurrently \"npm run dev\" \"cd .. && mvn spring-boot:run\"",
+    "start:all-temp": "concurrently \"C:\\Users\\mgj58820\\Downloads\\node-v24.11.1-win-x64\\node-v24.11.1-win-x64\\npm.cmd install\" \"C:\\Users\\mgj58820\\Downloads\\node-v24.11.1-win-x64\\node-v24.11.1-win-x64\\npm.cmd run dev\" \"cd .. && set JAVA_HOME=C:\\Users\\mgj58820\\Downloads\\jdk-21-x64 && set PATH=%JAVA_HOME%\\bin;%PATH% && C:\\Users\\mgj58820\\Downloads\\apache-maven-3.9.11-bin\\apache-maven-3.9.11\\bin\\mvn.cmd spring-boot:run\"",
     "lint": "eslint"
   },
   "dependencies": {
-    "axiom": "^0.26.0",
-    "axios": "^1.13.2",
-    "next": "^16.0.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-datepicker": "^8.9.0",
+    "react-dom": "19.1.0",
     "react-horizontal-scrolling-menu": "^8.2.0",
     "react-youtube": "^10.1.0"
   },
