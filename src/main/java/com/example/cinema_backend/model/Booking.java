@@ -23,10 +23,12 @@ public class Booking {
     private String roomName;
     private String date;
     private String startTime;
-    private String seats;
+    private double subtotalPrice;
     private double totalPrice;
-
-    private String movieId;
+    private double tax;
+    private double bookingFee;
+    private double discount;
+    private String movieTitle;
 
 
     private List<Ticket> tickets;

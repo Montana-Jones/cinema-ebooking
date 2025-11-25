@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.Data;
@@ -20,6 +23,7 @@ public class Showroom {
     private int numCols;
 
     @DBRef
+    @JsonIgnore
     private List<Showtime> showtimes = new ArrayList<>();
 
 }
