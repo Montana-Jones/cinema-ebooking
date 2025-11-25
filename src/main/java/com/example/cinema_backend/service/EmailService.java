@@ -7,6 +7,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.example.cinema_backend.model.PromotionCode;
+
 @Service
 public class EmailService {
 
@@ -15,11 +17,23 @@ public class EmailService {
 
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("your_email@gmail.com"); // change to your sender email
+        message.setFrom("nguyenuy1509@gmail.com"); // change to your sender email
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
         mailSender.send(message);
+    }
+
+    public void sendEmail(String to, PromotionCode promo) {
+        String subject = "🎉 New Promotion Available!";
+        String text = "Hello!\n\nYou received a new promotion:\n\n" +
+                "Code: " + promo.getCode() + "\n" +
+                "Discount: " + promo.getAmount() + "%\n\n" +
+                "Use it soon!\n\n" +
+                "🍿 Cinema Booking Team";
+
+        // Call the original sendEmail() to send the message
+        sendEmail(to, subject, text);
     }
 
     public String sendVerificationEmail(String toEmail) {

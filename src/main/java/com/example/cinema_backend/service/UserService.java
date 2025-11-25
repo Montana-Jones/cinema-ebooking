@@ -17,8 +17,7 @@ import com.example.cinema_backend.repository.UserRepository;
 import com.example.cinema_backend.security.AESUtil;
 import com.example.cinema_backend.util.JwtUtil;
 import com.example.cinema_backend.repository.PaymentInfoRepository;
-
-
+import com.example.cinema_backend.model.Promotion;
 
 @Service
 public class UserService {
@@ -26,26 +25,27 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired private EmailService emailService;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JwtUtil jwtUtil;
-    @Autowired private PaymentInfoRepository paymentRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private PaymentInfoRepository paymentRepository;
 
-
-    
     public boolean verifyPassword(@PathVariable String email, @RequestBody Map<String, String> body) {
         String oldPassword = body.get("oldPassword");
         Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         return passwordEncoder.matches(oldPassword, opt.get().getPassword());
     }
 
-
-
-    
     public User updateUserByEmail(@PathVariable String email, @RequestBody User updated) {
         Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) throw new RuntimeException("User not found: " + email);
+        if (opt.isEmpty())
+            throw new RuntimeException("User not found: " + email);
 
         User user = opt.get();
         boolean changed = false;
@@ -90,8 +90,10 @@ public class UserService {
         if (updated.getPaymentInfo() != null) {
             paymentRepository.deleteAll(user.getPaymentInfo());
             updated.getPaymentInfo().forEach(p -> {
-                if (p.getCardNumber() != null) p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
-                if (p.getCvv() != null) p.setCvv(AESUtil.encrypt(p.getCvv()));
+                if (p.getCardNumber() != null)
+                    p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
+                if (p.getCvv() != null)
+                    p.setCvv(AESUtil.encrypt(p.getCvv()));
                 paymentRepository.save(p);
             });
             user.setPaymentInfo(updated.getPaymentInfo());
@@ -99,23 +101,25 @@ public class UserService {
             changed = true;
         }
 
-        if (!changed) return user;
+        if (!changed)
+            return user;
 
         User saved = userRepository.save(user);
 
         try {
             sb.append("\nIf this wasn't you, contact support.\nCinema Team");
             emailService.sendEmail(user.getEmail(), "Account Update", sb.toString());
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         return saved;
     }
 
-    
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");
         String newPassword = body.get("password");
-        if (token == null || newPassword == null) return ResponseEntity.badRequest().body("Missing fields");
+        if (token == null || newPassword == null)
+            return ResponseEntity.badRequest().body("Missing fields");
 
         Optional<User> opt = userRepository.findByResetToken(token);
         if (opt.isEmpty() || opt.get().getTokenExpiration().isBefore(LocalDateTime.now()))
@@ -130,13 +134,13 @@ public class UserService {
         return ResponseEntity.ok("Password updated");
     }
 
-    
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         // String email = data.get("email");
         // String password = data.get("password");
 
         Optional<User> opt = userRepository.findByEmail(request.getEmail());
-        if (opt.isEmpty()) return ResponseEntity.status(404).body("User not found");
+        if (opt.isEmpty())
+            return ResponseEntity.status(404).body("User not found");
 
         User user = opt.get();
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
@@ -149,39 +153,59 @@ public class UserService {
         return ResponseEntity.ok(new LoginResponse(token, user.getEmail(), user.isAdmin()));
     }
 
-    
     public ResponseEntity<?> signup(@RequestBody User u) {
+        // Check if email already exists
         Optional<User> existing = userRepository.findByEmail(u.getEmail());
-        if (existing.isPresent()) return ResponseEntity.status(409).body("Email exists");
-
-        u.setPassword(passwordEncoder.encode(u.getPassword()));
-
-        if (u.getPaymentInfo() != null) {
-            u.getPaymentInfo().forEach(p -> {
-                if (p.getCardNumber() != null) p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
-                if (p.getCvv() != null) p.setCvv(AESUtil.encrypt(p.getCvv()));
-                paymentRepository.save(p);
-            });
+        if (existing.isPresent()) {
+            return ResponseEntity.status(409).body("Email already exists");
         }
 
-        u.setId(null);
-        u.setStatus(Status.UNVERIFIED);
-        u.setVerified(false);
-        u.setRole("CUSTOMER");
+        // Create new user entity and map fields explicitly
+        User user = new User();
+        user.setFirstName(u.getFirstName()); // always set firstName
+        user.setLastName(u.getLastName()); // always set lastName
+        user.setEmail(u.getEmail());
+        user.setPassword(passwordEncoder.encode(u.getPassword()));
+        user.setRole("CUSTOMER");
+        user.setStatus(Status.UNVERIFIED);
+        user.setVerified(false);
 
-        String code = emailService.sendVerificationEmail(u.getEmail());
-        u.setVerificationCode(code);
+        // Handle promotion registration
+        if (u.getPromotion() != null && u.getPromotion().equals(Promotion.REGISTERED)) {
+            user.setPromotion(Promotion.REGISTERED);
+        } else {
+            user.setPromotion(Promotion.UNREGISTERED);
+        }
 
-        return ResponseEntity.ok(userRepository.save(u));
+        // Encrypt and save payment info if present
+        if (u.getPaymentInfo() != null) {
+            u.getPaymentInfo().forEach(p -> {
+                if (p.getCardNumber() != null)
+                    p.setCardNumber(AESUtil.encrypt(p.getCardNumber()));
+                if (p.getCvv() != null)
+                    p.setCvv(AESUtil.encrypt(p.getCvv()));
+                paymentRepository.save(p);
+            });
+            user.setPaymentInfo(u.getPaymentInfo());
+        }
+
+        // Send verification email
+        String code = emailService.sendVerificationEmail(user.getEmail());
+        user.setVerificationCode(code);
+
+        // Save user and return
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(savedUser);
     }
 
-    
     public ResponseEntity<?> verify(@PathVariable String id, @RequestBody VerificationRequest req) {
         Optional<User> opt = userRepository.findById(id);
-        if (opt.isEmpty()) return ResponseEntity.badRequest().body("User not found");
+        if (opt.isEmpty())
+            return ResponseEntity.badRequest().body("User not found");
 
         User u = opt.get();
-        if (!u.getVerificationCode().equals(req.getCode())) return ResponseEntity.badRequest().body("Invalid code");
+        if (!u.getVerificationCode().equals(req.getCode()))
+            return ResponseEntity.badRequest().body("Invalid code");
 
         u.setVerified(true);
         u.setStatus(Status.ACTIVE);
@@ -191,12 +215,12 @@ public class UserService {
         return ResponseEntity.ok("Verified");
     }
 
-    
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
 
         Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) return ResponseEntity.ok().build();
+        if (opt.isEmpty())
+            return ResponseEntity.ok().build();
 
         User u = opt.get();
         String token = UUID.randomUUID().toString();
@@ -211,7 +235,8 @@ public class UserService {
     }
 
     private void decryptAndMaskPaymentInfo(User u) {
-        if (u.getPaymentInfo() == null) return;
+        if (u.getPaymentInfo() == null)
+            return;
         u.getPaymentInfo().forEach(p -> {
             try {
                 if (p.getCardNumber() != null) {
@@ -221,16 +246,25 @@ public class UserService {
                         p.setCardNumber("**** **** **** " + last4);
                     }
                 }
-                if (p.getCvv() != null) p.setCvv("***");
-            } catch (Exception ignored) {}
+                if (p.getCvv() != null)
+                    p.setCvv("***");
+            } catch (Exception ignored) {
+            }
         });
     }
 
-    public static class VerificationRequest { 
+    public static class VerificationRequest {
         private String code;
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
     }
+
     public static class LoginRequest {
         private String email;
         private String password;
@@ -275,5 +309,5 @@ public class UserService {
             return isAdmin;
         }
     }
-    
+
 }

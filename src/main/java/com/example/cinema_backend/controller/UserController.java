@@ -11,12 +11,11 @@ import com.example.cinema_backend.security.AESUtil;
 import com.example.cinema_backend.model.User;
 import com.example.cinema_backend.service.UserService;
 
-
 @RestController
 @RequestMapping("/api/users") // or keep /api/customers for compatibility
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*")
 public class UserController {
-    
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -42,10 +41,10 @@ public class UserController {
         u.ifPresent(this::decryptAndMaskPaymentInfo);
         return u;
     }
-    
+
     @PostMapping("/verify-password/{email}")
     public boolean verifyPassword(@PathVariable String email, @RequestBody Map<String, String> body) {
-        return userService.verifyPassword(email, body); 
+        return userService.verifyPassword(email, body);
     }
 
     @PutMapping("/email/{email}")
@@ -70,28 +69,41 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User u) {
-        return userService.signup(u);   
+        return userService.signup(u);
     }
 
     @PostMapping("/verify/{id}")
     public ResponseEntity<?> verify(@PathVariable String id, @RequestBody UserService.VerificationRequest req) {
-        return userService.verify(id, req); 
+        return userService.verify(id, req);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("User deleted successfully");
     }
 
     private void decryptAndMaskPaymentInfo(User u) {
-            if (u.getPaymentInfo() == null) return;
-            u.getPaymentInfo().forEach(p -> {
-                try {
-                    if (p.getCardNumber() != null) {
-                        p.setCardNumber(AESUtil.decrypt(p.getCardNumber()));
-                        if (p.getCardNumber().length() > 4) {
-                            String last4 = p.getCardNumber().substring(p.getCardNumber().length() - 4);
-                            p.setCardNumber("**** **** **** " + last4);
-                        }
+        if (u.getPaymentInfo() == null)
+            return;
+        u.getPaymentInfo().forEach(p -> {
+            try {
+                if (p.getCardNumber() != null) {
+                    p.setCardNumber(AESUtil.decrypt(p.getCardNumber()));
+                    if (p.getCardNumber().length() > 4) {
+                        String last4 = p.getCardNumber().substring(p.getCardNumber().length() - 4);
+                        p.setCardNumber("**** **** **** " + last4);
                     }
-                    if (p.getCvv() != null) p.setCvv("***");
-                } catch (Exception ignored) {}
-            });
-        }
+                }
+                if (p.getCvv() != null)
+                    p.setCvv("***");
+            } catch (Exception ignored) {
+            }
+        });
+    }
 
 }

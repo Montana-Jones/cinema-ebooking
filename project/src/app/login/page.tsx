@@ -34,6 +34,7 @@ export default function LoginPage() {
       );
       if (!userRes.ok) throw new Error("Failed to fetch user");
       const user = await userRes.json();
+      console.log("USER OBJECT:", user);
 
       if (!user.verified) {
         alert("Please verify your account via the link sent to your email.");
@@ -42,9 +43,14 @@ export default function LoginPage() {
       }
 
       localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
+setUser(user);
 
-      window.location.href = "/";
+// Redirect based on role
+if (user.role === "ADMIN") {
+  window.location.href = "/admin-dash";   // your admin dashboard
+}else {
+  window.location.href = "/";             // normal users
+}
     } catch (err) {
       alert("Invalid email or password");
       console.error(err);
