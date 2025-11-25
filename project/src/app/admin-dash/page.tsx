@@ -36,7 +36,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#121212] text-white flex flex-col items-center">
       <Navbar />
 
-      <div className="max-w-md w-full mt-12 p-8 bg-[#1f1f1f] rounded-2xl border border-gray-700 shadow-lg">
+      <div className="max-w-md w-full mt-30 p-8 bg-[#1f1f1f] rounded-2xl border border-gray-700 shadow-lg">
         <h1 className="text-3xl font-bold mb-10 text-center text-[#75D1A6]">
           Admin Dashboard
         </h1>
