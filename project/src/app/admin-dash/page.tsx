@@ -61,7 +61,7 @@ export default function AdminDashboard() {
             href="/promotions"
             className="bg-[#2b2b2b] p-5 rounded-xl border border-gray-700 hover:border-[#75D1A6] hover:bg-[#252525] transition text-center text-xl font-semibold"
           >
-            💰 Promotions
+            💰 Manage Promotions
           </Link>
 
           <Link
