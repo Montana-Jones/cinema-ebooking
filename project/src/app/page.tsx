@@ -7,13 +7,12 @@ import Navbar from "@/components/Navbar";
 import AddMovieButton from "@/components/AddMovieButton";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ShowtimePanel from "@/components/ShowtimePanel";
-import { Show } from "mongoose";
 
 interface User {
   role: string;
 }
 
-interface Date {
+interface DateItem {
   id: string;
   date: string; // e.g., "2023-10-15"
 }
@@ -47,9 +46,9 @@ export default function Home() {
   const [showNowShowing, setShowNowShowing] = useState(true);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dates, setDates] = useState<Date[]>([]);
+  const [dates, setDates] = useState<DateItem[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string>("");
 
   // Fetch movies
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function Home() {
       .then((data) => {
         setDates(data);
         if (data.length > 0) {
-          setSelectedDate(new Date(data[0].date));
+          setSelectedDate(data[0].date); // store as string YYYY-MM-DD
         }
       })
       .catch((err) => {
@@ -86,18 +85,19 @@ export default function Home() {
       });
   }, []);
 
-  // Filter movies based on toggle
-  const filteredMovies = movies.filter(
-    (movie) =>
-      (showNowShowing ? movie.now_showing : movie.coming_soon) &&
-      (selectedDate && showNowShowing
-        ? (movie.showtime?.some(
-            (sTime: any) =>
-              sTime.date === selectedDate.toLocaleDateString("en-CA") // YYYY-MM-DD
+  // Filter movies based on toggle and selected date
+  const filteredMovies = movies.filter((movie) => {
+    const matchesToggle = showNowShowing ? movie.now_showing : movie.coming_soon;
 
-          ) ?? false)
-        : true)
-  );
+    if (!matchesToggle) return false;
+
+    if (showNowShowing && selectedDate) {
+      // Filter for movies that have at least one showtime on selected date
+      return movie.showtime?.some((sTime) => sTime.date === selectedDate) ?? false;
+    }
+
+    return true;
+  });
 
   if (loading) {
     return (
@@ -120,10 +120,9 @@ export default function Home() {
         <div className={styles.daySelector}>
           <span className={styles.selectDayLabel}>Select Date:</span>
           {dates.map((d, i) => {
-            const date = new Date(d.date);
+            const isSelected = selectedDate === d.date;
 
-            const isSelected =
-              selectedDate.toDateString() === date.toDateString();
+            const dateObj = new Date(d.date);
 
             return (
               <button
@@ -131,9 +130,9 @@ export default function Home() {
                 className={`${styles.dayButton} ${
                   isSelected ? styles.selectedDay : ""
                 }`}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => setSelectedDate(d.date)}
               >
-                {date.toLocaleDateString("en-US", {
+                {dateObj.toLocaleDateString("en-US", {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
@@ -148,12 +147,13 @@ export default function Home() {
         {filteredMovies.map((movie) => (
           <div key={movie.id}>
             <MoviePreview movie={movie} />
-            {movie.now_showing && (
+            {movie.now_showing && selectedDate && (
               <ShowtimePanel movie={movie} selectedDate={selectedDate} />
             )}
           </div>
         ))}
       </div>
+
       {user && user.role === "ADMIN" && <AddMovieButton />}
     </main>
   );

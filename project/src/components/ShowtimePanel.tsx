@@ -1,5 +1,6 @@
 "use client";
 // src/components/ShowtimePanel.tsx
+
 import React from "react";
 import styles from "./Card.module.css";
 import Link from "next/link";
@@ -24,35 +25,37 @@ interface MovieProps {
       start_time: string;
       end_time: string;
       movie_id: string;
-      date: string; // e.g., "2023-10-15"
+      date: string;
     }[];
   };
-  selectedDate?: Date;
+  selectedDate?: string;   // <-- CHANGED: now a string, not Date
+  showDate?: boolean;
 }
 
-const ShowtimePanel: React.FC<MovieProps> = ({ movie, selectedDate }) => {
-  // Filter showtimes to only include those for the selected date
-  const filteredShowtimes = movie.showtime.filter((s) => {
-  if (!selectedDate) return false;
+const ShowtimePanel: React.FC<MovieProps> = ({ movie, selectedDate, showDate }) => {
+  // Filter showtimes by exact date string (no timezone issues)
+  const filteredShowtimes = movie.showtime.filter((s) => s.date === selectedDate);
 
-  const year = selectedDate.getFullYear();
-  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-  const day = selectedDate.getDate().toString().padStart(2, "0");
-
-  const localDateStr = `${year}-${month}-${day}`;
-  return s.date === localDateStr;
-});
-
+  // Format header date
+  const formattedDate =
+    selectedDate
+      ? new Date(selectedDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
 
   return (
     <div className={styles.showtimeContainer}>
-      <h1>Showtimes</h1>
+      {showDate ? <h1>{formattedDate}</h1> : <h1>Showtimes</h1>}
+
       <div className={styles.showtimes}>
         {filteredShowtimes.map((sTime) => (
           <Link
             key={sTime.id}
             className={styles.showtimeButton}
-            href={`/booking-nav/${selectedDate?.toISOString().split("T")[0]}/${sTime.id}`}
+            href={`/booking-nav/${selectedDate}/${sTime.id}`}
           >
             <p>{sTime.start_time}</p>
           </Link>

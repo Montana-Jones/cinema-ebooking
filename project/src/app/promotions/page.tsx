@@ -1,7 +1,7 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import axios from "axios";
 import Link from "next/link";
 
 interface Promotion {
@@ -25,12 +25,9 @@ interface User {
 }
 
 const Promotions: React.FC = () => {
-
-  // ✅ Access control state
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  // Promotions state
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [newPromotion, setNewPromotion] = useState<NewPromotion>({
     name: "",
@@ -40,21 +37,23 @@ const Promotions: React.FC = () => {
   });
   const [selectedPromo, setSelectedPromo] = useState<string>("");
 
-   // Fetch user info from localStorage (or you can replace with API)
+  // Fetch user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
     setLoadingUser(false);
   }, []);
 
+  // Fetch promotions
   useEffect(() => {
     fetchPromotions();
   }, []);
 
   const fetchPromotions = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/promotions");
-      const data = response.data.map((p: any) => ({
+      const res = await fetch("http://localhost:8080/api/promotions");
+      const rawData = await res.json();
+      const data = rawData.map((p: any) => ({
         id: p.id || p._id,
         name: p.name,
         amount: p.amount,
@@ -76,6 +75,7 @@ const Promotions: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const newPromo = {
       name: newPromotion.name,
       amount: Number(newPromotion.amount),
@@ -84,10 +84,12 @@ const Promotions: React.FC = () => {
       expiry_date: newPromotion.expiry_date,
     };
 
-    console.log(newPromo); //for debugging
-
     try {
-      await axios.post("http://localhost:8080/api/promotions", newPromo);
+      await fetch("http://localhost:8080/api/promotions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPromo),
+      });
       setNewPromotion({ name: "", amount: "", code: "", expiry_date: "" });
       fetchPromotions();
       alert("Promotion added and sent to all registered users!");
@@ -110,7 +112,9 @@ const Promotions: React.FC = () => {
     }
 
     try {
-      await axios.post(`http://localhost:8080/api/promotions/send/${promo.id}`);
+      await fetch(`http://localhost:8080/api/promotions/send/${promo.id}`, {
+        method: "POST",
+      });
       alert(`Promotion "${promo.name}" sent successfully!`);
     } catch (err) {
       console.error("Error sending promotion:", err);
@@ -122,7 +126,9 @@ const Promotions: React.FC = () => {
     if (!confirm("Are you sure you want to delete this promotion?")) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/promotions/${id}`);
+      await fetch(`http://localhost:8080/api/promotions/${id}`, {
+        method: "DELETE",
+      });
       setPromotions(promotions.filter((promo) => promo.id !== id));
       alert("Promotion deleted successfully!");
     } catch (err) {
@@ -131,15 +137,15 @@ const Promotions: React.FC = () => {
     }
   };
 
-  // ✅ Show loading while fetching user
   if (loadingUser) return <p>Loading...</p>;
 
-  // ✅ Access control: only admins
   if (!user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
         <Navbar />
-        <p className="mb-6 text-lg text-red-500">Access denied. Only admins can view this page.</p>
+        <p className="mb-6 text-lg text-red-500">
+          Access denied. Only admins can view this page.
+        </p>
         <Link href="/">
           <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]">
             Go back home
@@ -149,7 +155,6 @@ const Promotions: React.FC = () => {
     );
   }
 
-  // ✅ Render promotions UI for admins
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
       <Navbar />
@@ -178,10 +183,7 @@ const Promotions: React.FC = () => {
               <tbody>
                 {promotions.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center text-gray-400 p-6 italic"
-                    >
+                    <td colSpan={6} className="text-center text-gray-400 p-6 italic">
                       No promotions added yet.
                     </td>
                   </tr>
@@ -240,9 +242,7 @@ const Promotions: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-gray-400">
-                Promotional Amount
-              </label>
+              <label className="block mb-1 text-gray-400">Promotional Amount</label>
               <input
                 type="number"
                 name="amount"
@@ -254,9 +254,7 @@ const Promotions: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-gray-400">
-                Promotional Code
-              </label>
+              <label className="block mb-1 text-gray-400">Promotional Code</label>
               <input
                 type="text"
                 name="code"
@@ -290,9 +288,7 @@ const Promotions: React.FC = () => {
 
         {/* Send Promotion */}
         <section className="bg-[#1b1b1b] rounded-2xl p-6 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
-            Send Promotion
-          </h2>
+          <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">Send Promotion</h2>
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <select
               value={selectedPromo}

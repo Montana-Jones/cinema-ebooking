@@ -15,23 +15,30 @@ interface Showtime {
   date: string;
 }
 
-export interface MovieProps {
+interface MovieProps {
   movie: {
     id: string;
     title: string;
     genre: string;
     mpaa_rating: string;
-    rating: number; //a star rating between 0 and 5
-    director: string; //list all directors in a single string
-    producer: string; //list all producers in a single string
-    cast: string; //list all major cast members in a single string
+    rating: number;
+    director: string;
+    producer: string;
+    cast: string;
     synopsis: string;
     poster_url: string;
     trailer_url: string;
     now_showing: boolean;
     coming_soon: boolean;
-    showtime: Showtime[];
+    showtime: {
+      id: string;
+      start_time: string;
+      end_time: string;
+      movie_id: string;
+      date: string; // e.g., "2023-10-15"
+    }[];
   };
+  selectedDate?: string;
 }
 
 const Movie: React.FC<MovieProps> = ({ movie }) => {
@@ -84,8 +91,32 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
           </div>
         </div>
         <div className={styles.showtimesContainer}>
-          {movie.now_showing && <ShowtimePanel movie={movie} />}
-        </div>
+  {movie.now_showing && (
+    <>
+      {[
+        "2025-12-05",
+        "2025-12-06",
+        "2025-12-07",
+      ].map((date) => {
+        const hasShowtimes = movie.showtime.some((s) => s.date === date);
+
+        if (!hasShowtimes) return null;
+
+        return (
+          <div key={date} className={styles.showtimeDayBlock}>
+            <ShowtimePanel
+              movie={movie}
+              selectedDate={date}
+              showDate={true}
+            />
+          </div>
+        );
+      })}
+    </>
+  )}
+</div>
+
+
       </div>
     </Card>
   );
