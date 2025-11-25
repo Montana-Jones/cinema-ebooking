@@ -167,7 +167,6 @@ export default function ManageShowtimes() {
           seat_binary: "", // initialize empty
         }),
       });
-      console.log({ date, startTime, endTime, movieId, roomName });
 
       if (!res.ok) throw new Error("Failed to create showtime");
 
