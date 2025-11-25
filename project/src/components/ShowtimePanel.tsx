@@ -5,12 +5,7 @@ import React from "react";
 import styles from "./Card.module.css";
 import Link from "next/link";
 
-// interface Showtime {
-//   id: number;
-//   movieId: number;
-//   theatreNum: number;
-//   startTime: Date;
-// }
+
 
 interface MovieProps {
   movie: {
@@ -31,7 +26,8 @@ interface MovieProps {
       id: string;
       start_time: String;
       end_time: String;
-
+      movie_id: string;
+      date: string; // e.g., "2023-10-15"
     }[] ;
   };
   selectedDate?: Date;

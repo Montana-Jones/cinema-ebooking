@@ -8,10 +8,11 @@ import Trailer from "./Trailer";
 import ShowtimePanel from "./ShowtimePanel";
 
 interface Showtime {
-  id: number;
-  movieId: number;
-  theatreNum: number;
-  startTime: Date;
+  id: string;
+  start_time: string;
+  end_time: string;
+  movie_id: string;
+  date: string; // e.g., "2023-10-15"
 }
 
 export interface MovieProps {
@@ -29,7 +30,7 @@ export interface MovieProps {
     trailer_url: string;
     now_showing: boolean;
     coming_soon: boolean;
-    showtimes: Showtime[];
+    showtime: Showtime[];
   };
 }
 
