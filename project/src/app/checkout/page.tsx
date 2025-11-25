@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import TopBar from "@/app/checkout/parts/topBar";
 
 // --- Interfaces ---
 interface Seat {
@@ -61,7 +61,6 @@ export default function CheckoutPage() {
   const [config, setConfig] = useState<Config | null>(null);
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [booking, setBooking] = useState<booking | null>(null);
 
   // Promo state
   const [enteredCode, setEnteredCode] = useState("");
@@ -187,30 +186,20 @@ export default function CheckoutPage() {
   // ✅ UI
   return (
     <main style={{ minHeight: "100vh", padding: "2rem", background: "#150707", color: "white" }}>
-     
+      <TopBar />
 
       <div style={{
         backgroundColor: "#2b0f0f",
         padding: "2rem",
-        color: "white",
-      }}
-    >
-      <Navbar/>
+        borderRadius: "10px",
+        maxWidth: "600px",
+        margin: "0 auto"
+      }}>
+        <h1 style={{ textAlign: "center" }}>Checkout Summary</h1>
 
-      <div
-        style={{
-          backgroundColor: "#2b0f0f",
-          padding: "2rem",
-          marginTop: "4rem",
-          borderRadius: "10px",
-          width: "100%",
-          maxWidth: "600px",
-          boxShadow: "0 0 10px rgba(255,255,255,0.2)",
-        }}
-      >
-        <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
-          Checkout Summary
-        </h1>
+        <p><strong>Movie:</strong> {movieTitle}</p>
+        <p><strong>Showtime:</strong> {startTime}</p>
+        <p><strong>Room:</strong> {showtime?.room_name}</p>
 
         <hr />
 
@@ -245,7 +234,16 @@ export default function CheckoutPage() {
             placeholder="Promo code"
             style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem" }}
           />
-          <button onClick={handleApplyPromo} style={{ width: "100%" }}>
+          <button onClick={handleApplyPromo} 
+            style={{
+                backgroundColor: "#b52727ff",
+                border: "none",
+                borderRadius: "6px",
+                color: "white",
+                fontWeight: "bold",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+              }}>
             Apply Promo
           </button>
 
@@ -253,20 +251,34 @@ export default function CheckoutPage() {
         </div>
 
         <button
-          onClick={handleConfirm}
+          onClick={() => {
+            const token = localStorage.getItem("user");
+
+            if (!token) {
+              router.push(
+                `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+              );
+            } else {
+              handleConfirm();
+            }
+          }}
           style={{
-            marginTop: "1rem",
+            marginTop: "1.5rem",
             width: "100%",
             padding: "1rem",
             backgroundColor: "#00b14f",
-            color: "white",
+            border: "none",
             borderRadius: "6px",
+            color: "white",
+            fontSize: "1rem",
             fontWeight: "bold",
+            cursor: "pointer",
           }}
         >
           Confirm & Pay
         </button>
-      </div>
+
+
       </div>
     </main>
   );

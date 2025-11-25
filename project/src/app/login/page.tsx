@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
@@ -11,6 +12,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState(""); // for forgot password feedback
   const { setUser } = useUser();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +52,11 @@ setUser(user);
 if (user.role === "ADMIN") {
   window.location.href = "/admin-dash";   // your admin dashboard
 }else {
-  window.location.href = "/";             // normal users
+  const redirect = searchParams.get("redirect") || "/";
+
+  
+    router.push(redirect);
+             // normal users
 }
     } catch (err) {
       alert("Invalid email or password");
