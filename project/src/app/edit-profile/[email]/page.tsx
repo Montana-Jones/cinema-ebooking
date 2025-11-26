@@ -38,6 +38,7 @@ export default function EditProfile({
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   const [isHomeAddressValid, setIsHomeAddressValid] = useState(true);
   const [isBillingAddressValid, setIsBillingAddressValid] = useState(true);
+  const [showCardEditor, setShowCardEditor] = useState(false);
 
   // Password change states
   const [showOldPasswordPrompt, setShowOldPasswordPrompt] = useState(false);
@@ -48,7 +49,7 @@ export default function EditProfile({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
-  const [showCardEditor, setShowCardEditor] = useState(false);
+  
 
   useEffect(() => {
     const fetchCustomer = async () => {

@@ -223,6 +223,7 @@ export default function CheckoutPage() {
       booking_fee: config.booking_fee,
       discount: appliedPromo?.discount_percentage ?? 0,
       movie_title: movieTitle,
+      original_binary: originalBinary,
       seats: seats
     };
 
@@ -252,6 +253,7 @@ export default function CheckoutPage() {
     } catch (err) {
       console.error("locking seats failed:", err);
     }
+    router.push(`/finish-checkout/${bookingData.booking_num}`);
 
   };
 
@@ -352,7 +354,7 @@ export default function CheckoutPage() {
 
 
       </div>
-      {confirmed && (
+      {/* {confirmed && (
         <div style={{ marginTop: "2rem", textAlign: "center", color: "#00ff99" }}>
           <h2>Booking Confirmed!</h2>
           <p>Your booking number is: <strong>{}</strong></p>
@@ -373,7 +375,7 @@ export default function CheckoutPage() {
             Return to Home
           </button>
         </div>
-      )}
+      )} */}
     </main>
   );
 }

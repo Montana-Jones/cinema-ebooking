@@ -29,6 +29,7 @@ public class Booking {
     private double bookingFee;
     private double discount;
     private String movieTitle;
+    private String originalBinary;
     private List<Seat> seats;
 
     private List<Ticket> tickets;
