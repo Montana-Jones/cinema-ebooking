@@ -17,19 +17,19 @@ public class Booking {
     @Id
     private String id; // MongoDB will auto-generate this and it maps to the '_id' field
     private String bookingNum;
-    private int numTickets;
-    private String showTimeId;
+    //private int numTickets;
+    private String showtimeId;
     private String email;
     private String roomName;
     private String date;
     private String startTime;
     private double subtotalPrice;
     private double totalPrice;
-    private double tax;
+    private double taxRate;
     private double bookingFee;
     private double discount;
     private String movieTitle;
-
+    private List<Seat> seats;
 
     private List<Ticket> tickets;
 
