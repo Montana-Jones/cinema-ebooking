@@ -5,8 +5,8 @@ import TopBar from "@/app/edit-profile/parts/topBar";
 
 interface Customer {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
   password: string;
   status: string;
@@ -38,7 +38,6 @@ export default function EditProfile({
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   const [isHomeAddressValid, setIsHomeAddressValid] = useState(true);
   const [isBillingAddressValid, setIsBillingAddressValid] = useState(true);
-  const [showCardEditor, setShowCardEditor] = useState(false);
 
   // Password change states
   const [showOldPasswordPrompt, setShowOldPasswordPrompt] = useState(false);
@@ -49,7 +48,7 @@ export default function EditProfile({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
-  
+  const [showCardEditor, setShowCardEditor] = useState(false);
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -62,8 +61,8 @@ export default function EditProfile({
 
         const customer: Customer = {
           id: data.id || data._id,
-          firstName: data.first_name,
-          lastName: data.last_name,
+          firstname: data.first_name,
+          lastname: data.last_name,
           email: data.email,
           password: data.password,
           status: data.status,
@@ -259,8 +258,8 @@ const hasDuplicateCard = (index: number): boolean => {
       try {
         const basePayload = {
           id: customer.id,
-          first_name: customer.firstName,
-          last_name: customer.lastName,
+          firstname: customer.firstname,
+          lastname: customer.lastname,
           promotion: customer.promotion,
           home_address: customer.homeAddress,
           billing_address: customer.billingAddress,
@@ -354,7 +353,7 @@ const hasDuplicateCard = (index: number): boolean => {
             <input
               type="text"
               name="firstName"
-              value={customer?.firstName || ""}
+              value={customer?.firstname || ""}
               onChange={handleChange}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
@@ -365,7 +364,7 @@ const hasDuplicateCard = (index: number): boolean => {
             <input
               type="text"
               name="lastName"
-              value={customer?.lastName || ""}
+              value={customer?.lastname || ""}
               onChange={handleChange}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />

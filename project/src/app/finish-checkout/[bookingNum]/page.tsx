@@ -16,6 +16,7 @@ interface booking {
   movie_title: string;
   showtime_id: string;
   email: string;
+
   room_name: string;
   date: string;
   start_time: string;
@@ -62,7 +63,7 @@ export default function FinshCheckoutPage({
   const [newBillingAddress, setNewBillingAddress] = useState(""); 
   
   // Timer State
-  const [timeLeft, setTimeLeft] = useState(4); 
+  const [timeLeft, setTimeLeft] = useState(40); 
   const [isExpired, setIsExpired] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -255,7 +256,7 @@ useEffect(() => {
     alert("Payment Processed Successfully!");
     
     // Here you would likely make an API call to finalize the booking status to 'PAID'
-    // router.push("/confirmation"); 
+    router.push(`/confirmation/${bookingNum}`); 
   };
 
   // --- Render Loading ---

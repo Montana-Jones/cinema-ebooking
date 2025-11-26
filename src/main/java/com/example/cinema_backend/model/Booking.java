@@ -20,6 +20,7 @@ public class Booking {
     //private int numTickets;
     private String showtimeId;
     private String email;
+    private String firstName;
     private String roomName;
     private String date;
     private String startTime;
