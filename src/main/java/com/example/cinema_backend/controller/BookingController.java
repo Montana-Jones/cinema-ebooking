@@ -1,6 +1,8 @@
 package com.example.cinema_backend.controller;
  
 import com.example.cinema_backend.repository.BookingRepository;
+ 
+import com.example.cinema_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
 import com.example.cinema_backend.model.Booking;
 import com.example.cinema_backend.service.EmailService;
-import com.example.cinema_backend.model.SendBookingRequest;
+
+import com.example.cinema_backend.model.User;
 
 
 @RestController
@@ -21,6 +24,8 @@ public class BookingController {
     private BookingRepository bookingRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     // -------------------------------
     // GET all bookings
@@ -65,9 +70,15 @@ public class BookingController {
         }
 
         Booking booking = b.get(); 
+        Optional<User> u = userRepository.findByEmail(booking.getEmail());
+        if (u.isEmpty()) {
+            throw new RuntimeException("User not found for email: " + booking.getEmail());
+        }
+        User user = u.get();
+
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Hello ").append(booking.getEmail()).append(",\n\n");
+        sb.append("Hello ").append(user.getFirstName()).append(",\n\n");
         sb.append("Thank you for your booking at our cinema! Here are your booking details:\n");
         sb.append("Booking Number: ").append(booking.getBookingNum()).append("\n");
         sb.append("Movie: ").append(booking.getMovieTitle()).append("\n");

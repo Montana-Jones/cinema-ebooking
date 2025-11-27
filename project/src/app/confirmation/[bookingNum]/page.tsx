@@ -9,6 +9,8 @@ interface Seat {
   type: string;
 }
 
+
+
 interface booking {
   id: string;
   booking_num: string;
@@ -37,6 +39,7 @@ export default function ConfirmationPage({
   
   const [bookingData, setBookingData] = useState<booking | null>(null);
 
+
   useEffect(() => {
       const fetchBookingData = async () => {
         try {
@@ -53,6 +56,8 @@ export default function ConfirmationPage({
         fetchBookingData();
       }
     }, [bookingNum]);
+
+   
 
     useEffect(() => {
       const handleEmailConfirmation = async () => {

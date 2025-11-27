@@ -31,6 +31,7 @@ interface booking {
   seats: Seat[]; 
 }
 
+
 interface Showtime {
   id: string;
   start_time: string;
@@ -66,7 +67,7 @@ export default function CheckoutPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<booking[]>([]);
-  const [confirmed, setConfirmed] = useState(false);
+
 
   // Promo state
   const [enteredCode, setEnteredCode] = useState("");
@@ -235,8 +236,6 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
       });
-
-      setConfirmed(true);
       
     } catch (err) {
       console.error("Booking failed:", err);
@@ -354,28 +353,6 @@ export default function CheckoutPage() {
 
 
       </div>
-      {/* {confirmed && (
-        <div style={{ marginTop: "2rem", textAlign: "center", color: "#00ff99" }}>
-          <h2>Booking Confirmed!</h2>
-          <p>Your booking number is: <strong>{}</strong></p>
-          <button
-            onClick={() => router.push("/")}
-            style={{
-              marginTop: "1rem",
-              padding: "0.75rem 1.5rem",
-              backgroundColor: "#b52727ff",
-              border: "none",
-              borderRadius: "6px",
-              color: "white",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Return to Home
-          </button>
-        </div>
-      )} */}
     </main>
   );
 }

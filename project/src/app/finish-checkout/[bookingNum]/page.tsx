@@ -38,14 +38,16 @@ interface PaymentCard {
 
 interface Customer {
   id: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  password: string;
+  status: string;
   promotion: string;
-  home_address: string;
-  billing_address: string;
-  phone_number: string;
-  paymentInfo?: PaymentCard[];
+  homeAddress: string;
+  billingAddress: string;
+  phoneNumber: string;
+  paymentInfo?: { cardHolder: string; cardNumber: string; expirationDate: string; cvv?: string }[];
 }
 
 export default function FinshCheckoutPage({
@@ -79,19 +81,9 @@ export default function FinshCheckoutPage({
     cvv: "",
     zip: "",
   });
-  // --- Determine button disabled state ---
-  const billingAddressRequired = !customerData?.billing_address || customerData.billing_address.trim() === "";
-  const billingAddressIncomplete = billingAddressRequired && !newBillingAddress.trim();
+ 
 
-  let paymentIncomplete = false;
-  if (useNewCard) {
-    paymentIncomplete = !cardForm.name || !cardForm.number || !cardForm.exp || !cardForm.cvv || !cardForm.zip;
-  } else {
-    paymentIncomplete = !customerData?.paymentInfo?.[selectedCardIndex];
-  }
-
-  const isPayDisabled = paymentSuccess || isExpired || billingAddressIncomplete || paymentIncomplete;
-
+  
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -116,10 +108,28 @@ export default function FinshCheckoutPage({
       try {
         const res = await fetch(`http://localhost:8080/api/users/email/${bookingData?.email}`);
         if (!res.ok) throw new Error("Failed to fetch customer data");
-        const data: Customer = await res.json();
-        setCustomerData(data);
+        const data = await res.json();
+
+        const customer: Customer = {
+          id: data.id || data._id,
+          firstName: data.firstname,
+          lastName: data.lastname,
+          email: data.email,
+          password: data.password,
+          status: data.status,
+          promotion: data.promotion,
+          homeAddress: data.homeaddress,
+          billingAddress: data.billingaddress,
+          phoneNumber: data.phonenumber,
+          paymentInfo: data.payment_info?.map((p: any) => ({
+            cardHolder: p.card_holder,
+            cardNumber: p.card_number,
+            expirationDate: p.expiration_date,
+          })),
+        };
+        setCustomerData(customer);
         
-        if (!data.paymentInfo || data.paymentInfo.length === 0) {
+        if (!customerData?.paymentInfo || customerData?.paymentInfo.length === 0) {
           setUseNewCard(true);
         }
       } catch (error) {
@@ -131,6 +141,21 @@ export default function FinshCheckoutPage({
       fetchCustomerData();
     }
   }, [bookingData?.email]);
+
+  // --- Determine button disabled state ---
+  const billingAddressRequired = !customerData?.billingAddress || customerData.billingAddress.trim() === "";
+  const billingAddressIncomplete = billingAddressRequired && !newBillingAddress.trim();
+
+  let paymentIncomplete = false;
+  if (useNewCard) {
+    paymentIncomplete = !cardForm.name || !cardForm.number || !cardForm.exp || !cardForm.cvv || !cardForm.zip;
+  } else {
+    paymentIncomplete = !customerData?.paymentInfo?.[selectedCardIndex];
+  }
+
+  const isPayDisabled = paymentSuccess || isExpired || billingAddressIncomplete || paymentIncomplete;
+
+
 
   // --- Timer Logic ---
  useEffect(() => {
@@ -228,7 +253,7 @@ useEffect(() => {
     if (isExpired) return;
 
     // Check if billing address is missing and the user hasn't typed anything
-    const billingAddressRequired = !customerData?.billing_address || customerData.billing_address.trim() === "";
+    const billingAddressRequired = !customerData?.billingAddress || customerData.billingAddress.trim() === "";
     if (billingAddressRequired && !newBillingAddress.trim()) {
         alert("Please enter a billing address to proceed.");
         return;
@@ -289,7 +314,7 @@ useEffect(() => {
   }
 
   // Determine if billing address input should be shown
-  const showBillingAddressInput = !customerData?.billing_address || customerData.billing_address.trim() === "";
+  const showBillingAddressInput = !customerData?.billingAddress || customerData.billingAddress.trim() === "";
 
   // --- Render Main Checkout ---
   return (
@@ -368,7 +393,7 @@ useEffect(() => {
               </h2>
               {/* Display existing address OR show the input field */}
               {!showBillingAddressInput ? (
-                <p className="text-gray-300">{customerData?.billing_address}</p>
+                <p className="text-gray-300">{customerData?.billingAddress}</p>
               ) : (
                 <div className="space-y-3">
                     <p className="text-yellow-500 italic text-sm">Please provide your **billing address** to proceed.</p>
@@ -413,7 +438,7 @@ useEffect(() => {
               {/* SCENARIO A: Saved Cards */}
               {!useNewCard && customerData?.paymentInfo && customerData.paymentInfo.length > 0 && (
                 <div className="space-y-3">
-                  {customerData.paymentInfo.map((card, idx) => (
+                  {customerData.paymentInfo.filter(card => card.cardHolder?.trim() !== "").map((card, idx) => (
                     <label
                       key={idx}
                       className={`block border p-4 rounded cursor-pointer transition ${
@@ -431,9 +456,9 @@ useEffect(() => {
                           className="accent-[#00ff99]"
                         />
                         <div>
-                          <p className="font-bold">{card.card_holder}</p>
+                          <p className="font-bold">{card.cardHolder}</p>
                           <p className="text-sm text-gray-400">
-                            Ends in {card.card_number.slice(-4)} | Exp: {card.expiration_date}
+                            Ends in {card.cardNumber.slice(-4)} | Exp: {card.expirationDate}
                           </p>
                         </div>
                       </div>

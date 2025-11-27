@@ -15,13 +15,6 @@ interface Customer {
   homeAddress: string;
   billingAddress: string;
   phoneNumber: string;
-  bookings?: {
-    id: string;
-    bookingNum: string;
-    numTickets: number;
-    showTime: string;
-    movieTitle: string;
-  }[];
   paymentInfo?: { cardHolder: string; cardNumber: string; expirationDate: string; cvv?: string }[];
 }
 interface Seat {
