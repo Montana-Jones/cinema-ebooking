@@ -88,9 +88,9 @@ export default function ConfirmationPage({
     <div>
       <TopBar /> 
     <div className="min-h-screen bg-[#150707] text-white">
-     <h1 className="text-3xl font-bold mb-4">.</h1>
+     <h1 className="text-3xl font-bold mb-4"> .</h1>
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-4">.</h1>
+        <h1 className="text-3xl font-bold mb-4"> ------------------------------------------------------------------------</h1>
 
         <h1 className="text-3xl font-bold mb-4">Booking Confirmation</h1>
         <p className="mb-2">Thank you for your purchase!</p>
@@ -115,6 +115,12 @@ export default function ConfirmationPage({
           <strong>Total Paid:</strong> ${bookingData.total_price.toFixed(2)}
         </p>
         <div className="mt-6">
+          <button
+              onClick={() => router.push("/")}
+              className="px-6 py-3 bg-[#b52727] text-white font-bold rounded hover:bg-[#962020] transition"
+            >
+              Return to Home
+            </button>
          
         </div>
       </div>
