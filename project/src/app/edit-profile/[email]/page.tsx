@@ -477,7 +477,7 @@ const hasDuplicateCard = (index: number): boolean => {
               </div> 
               {customer?.paymentInfo && customer.paymentInfo.length > 0 ? ( 
                 <ul className="divide-y divide-gray-200"> 
-                  {customer.paymentInfo.map((p, index) => ( 
+                  {customer.paymentInfo.filter(card => card.cardHolder?.trim() !== "").map((p, index) => ( 
                     <li key={index} className="py-2 text-sm"> 
                       <p className="font-medium">Card Number: {p.cardNumber}</p>
                       <p className="text-gray-500">Experation Date: {p.expirationDate}</p>
