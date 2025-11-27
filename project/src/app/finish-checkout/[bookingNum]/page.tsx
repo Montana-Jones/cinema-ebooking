@@ -370,7 +370,7 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* 2. Time Banner (Moved here) */}
+            {/* 2. Time Banner */}
             <div 
               className={`p-4 rounded-lg font-bold text-center border-2 
                 ${timeLeft <= 20 ? ' border-red-500' : 'bg-[#1a332a] text-[#00ff99] border-[#00ff99]'}`

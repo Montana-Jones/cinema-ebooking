@@ -19,7 +19,7 @@ export default function Navbar() {
 
       <div>
         <strong style={{ color: "#ffffffff", fontSize: "1.25rem" }}>
-          Booking Confirmation
+          Thank you for your purchase!
         </strong>
       </div>
 

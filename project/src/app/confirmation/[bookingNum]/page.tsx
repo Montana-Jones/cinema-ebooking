@@ -92,44 +92,62 @@ export default function ConfirmationPage({
   return (
     <div>
       <TopBar /> 
-    <div className="min-h-screen bg-[#150707] text-white">
-     <h1 className="text-3xl font-bold mb-4"> .</h1>
-      <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-4"> ------------------------------------------------------------------------</h1>
+      <h1 className="text-3xl font-bold mb-4"> .</h1>
+      <h1 className="text-3xl font-bold mb-4"> ------------------------------------------------------------------------</h1>
 
-        <h1 className="text-3xl font-bold mb-4">Booking Confirmation</h1>
-        <p className="mb-2">Thank you for your purchase!</p>
-        <p className="mb-2">The Booking Confirmation was sent to {bookingData.email}!</p>
-        <p className="mb-2">
-          <strong>Booking Number:</strong> {bookingData.booking_num}
-        </p>
-        <p className="mb-2">
-          <strong>Movie Title:</strong> {bookingData.movie_title}
-        </p>
-        <p className="mb-2">
-          <strong>Date & Time:</strong> {bookingData.date} at {bookingData.start_time}
-        </p>
-        <p className="mb-2">
-          <strong>Room:</strong> {bookingData.room_name}
-        </p>
-        <p className="mb-2">
-          <strong>Seats:</strong>{" "}
-          {bookingData.seats.map((seat) => seat.id).join(", ")}
-        </p>
-        <p className="mb-2">
-          <strong>Total Paid:</strong> ${bookingData.total_price.toFixed(2)}
-        </p>
-        <div className="mt-6">
-          <button
-              onClick={() => router.push("/")}
-              className="px-6 py-3 bg-[#b52727] text-white font-bold rounded hover:bg-[#962020] transition"
-            >
-              Return to Home
-            </button>
-         
+      <div className="min-h-screen bg-[#150707] text-white">
+      
+        <div className="bg-[#2b0f0f] p-6 rounded-lg h-fit">
+          <h2 className="text-xl font-semibold mb-4 border-b border-gray-600 pb-2">
+            Booking Confirmation
+          </h2>
+          <div className="space-y-2 text-gray-300">
+            <p><strong className="text-white">Booking #:</strong> {bookingData.booking_num}</p>
+            <p><strong className="text-white">Movie:</strong> {bookingData.movie_title}</p>
+            <p><strong className="text-white">Time:</strong> {bookingData.start_time} on {bookingData.date}</p>
+            <p><strong className="text-white">Room:</strong> {bookingData.room_name}</p>
+            <p><strong className="text-white">Seats:</strong> {bookingData.seats.map((seat) => seat.id).join(", ")}</p>
+            <p>The confirmation email was sent to {bookingData.email} </p>
+
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-gray-600 space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>${bookingData.subtotal_price.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Booking Fee:</span>
+              <span>${bookingData.booking_fee.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Tax:</span>
+              <span>${(bookingData.total_price - bookingData.subtotal_price - bookingData.booking_fee + bookingData.discount).toFixed(2)}</span>
+            </div>
+            {bookingData.discount > 0 && (
+              <div className="flex justify-between text-[#00ff99]">
+                <span>Discount:</span>
+                <span>-${bookingData.discount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-xl font-bold mt-4 pt-2 border-t border-gray-500">
+              <span>Total:</span>
+              <span>${bookingData.total_price.toFixed(2)}</span>
+            </div>
+          </div>
+          <div className="mt-6">
+            <button
+                onClick={() => router.push("/")}
+                className="px-6 py-3 bg-[#b52727] text-white font-bold rounded hover:bg-[#962020] transition"
+              >
+                Return to Home
+              </button>
+          
+          </div> 
         </div>
       </div>
     </div>
-    </div>
   );    
 }
+
+ 
