@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import TopBar from "@/app/edit-profile/parts/topBar";
+import { set } from "mongoose";
 
 interface Customer {
   id: string;
@@ -14,14 +15,29 @@ interface Customer {
   homeAddress: string;
   billingAddress: string;
   phoneNumber: string;
-  bookings?: {
-    id: string;
-    bookingNum: string;
-    numTickets: number;
-    showTime: string;
-    movieTitle: string;
-  }[];
   paymentInfo?: { cardHolder: string; cardNumber: string; expirationDate: string; cvv?: string }[];
+}
+interface Seat {
+  id: string;
+  type: string;
+}
+
+interface booking {
+  id: string;
+  booking_num: string;
+  movie_title: string;
+  showtime_id: string;
+  email: string;
+  room_name: string;
+  date: string;
+  start_time: string;
+  subtotal_price: number;
+  booking_fee: number;
+  tax_rate: number;
+  discount: number;
+  total_price: number;
+  original_binary: string; 
+  seats: Seat[];
 }
 
 export default function EditProfile({
@@ -38,6 +54,7 @@ export default function EditProfile({
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   const [isHomeAddressValid, setIsHomeAddressValid] = useState(true);
   const [isBillingAddressValid, setIsBillingAddressValid] = useState(true);
+  const [bookings, setBookings] = useState<booking[]>([]);
 
   // Password change states
   const [showOldPasswordPrompt, setShowOldPasswordPrompt] = useState(false);
@@ -61,22 +78,15 @@ export default function EditProfile({
 
         const customer: Customer = {
           id: data.id || data._id,
-          firstName: data.first_name,
-          lastName: data.last_name,
+          firstName: data.firstname,
+          lastName: data.lastname,
           email: data.email,
           password: data.password,
           status: data.status,
           promotion: data.promotion,
-          homeAddress: data.home_address,
-          billingAddress: data.billing_address,
-          phoneNumber: data.phone_number,
-          bookings: data.bookings?.map((b: any) => ({
-            id: b.id || b._id,
-            bookingNum: b.bookingNum,
-            numTickets: b.num_tickets,
-            showTime: b.show_time,
-            movieTitle: b.movie_title,
-          })),
+          homeAddress: data.homeaddress,
+          billingAddress: data.billingaddress,
+          phoneNumber: data.phonenumber,
           paymentInfo: data.payment_info?.map((p: any) => ({
             cardHolder: p.card_holder,
             cardNumber: p.card_number,
@@ -85,6 +95,8 @@ export default function EditProfile({
         };
 
         setCustomer(customer);
+        console.log("Fetched customer:", data);
+        console.log("Payment Info:", customer?.paymentInfo);
       } catch (err) {
         console.error(err);
       } finally {
@@ -94,6 +106,32 @@ export default function EditProfile({
     fetchCustomer();
   }, [email]);
 
+  useEffect(() => {
+    const fetchBooking = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/bookings/email/${email}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch customer");
+        const data = await res.json();
+
+    
+        setBookings(data);
+        console.log("Fetched bookings:", data);
+       
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBooking();
+  }, [email]);
+
+  
+
+
+  console.log("Name:", customer?.firstName, customer?.lastName);
 
 // Handle card input changes
 type PaymentCard = {
@@ -258,12 +296,12 @@ const hasDuplicateCard = (index: number): boolean => {
       try {
         const basePayload = {
           id: customer.id,
-          first_name: customer.firstName,
-          last_name: customer.lastName,
+          firstname: customer.firstName,
+          lastname: customer.lastName,
           promotion: customer.promotion,
-          home_address: customer.homeAddress,
-          billing_address: customer.billingAddress,
-          phone_number: customer.phoneNumber,
+          homeaddress: customer.homeAddress,
+          billingaddress: customer.billingAddress,
+          phonenumber: customer.phoneNumber,
         };
 
         const payload = verifiedOldPassword && newPassword
@@ -439,7 +477,7 @@ const hasDuplicateCard = (index: number): boolean => {
               </div> 
               {customer?.paymentInfo && customer.paymentInfo.length > 0 ? ( 
                 <ul className="divide-y divide-gray-200"> 
-                  {customer.paymentInfo.map((p, index) => ( 
+                  {customer.paymentInfo.filter(card => card.cardHolder?.trim() !== "").map((p, index) => ( 
                     <li key={index} className="py-2 text-sm"> 
                       <p className="font-medium">Card Number: {p.cardNumber}</p>
                       <p className="text-gray-500">Experation Date: {p.expirationDate}</p>
@@ -687,12 +725,14 @@ const hasDuplicateCard = (index: number): boolean => {
         {/* Bookings Section */}
          <div className="mt-10 p-6 rounded-2xl shadow"> 
           <h3 className="font-semibold text-lg mb-2">Past Bookings</h3> 
-          {customer?.bookings && customer.bookings.length > 0 ? 
+          {bookings && bookings.length > 0 ? 
           ( <ul className="divide-y divide-gray-200"> 
-          {customer.bookings.map((b, index) => 
+          {bookings.map((b, index) => 
             ( <li key={index} className="py-3 text-sm"> 
-            <p className="font-medium">{b.movieTitle}</p> 
-            <p className="text-gray-500">{b.showTime}</p> 
+            <p className="font-medium">{b.movie_title}</p> 
+            <p className="text-gray-500">Show time: {b.date} at {b.start_time}</p> 
+            <p className="text-gray-500">Booking Number: {b.booking_num}</p> 
+            <p className="text-gray-500">Total: ${b.total_price}</p> 
             </li> ))} 
             </ul> ) : 
             ( <p className="text-gray-500 text-sm">No bookings found.</p> )} 

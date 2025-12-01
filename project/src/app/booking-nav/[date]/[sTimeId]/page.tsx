@@ -165,7 +165,7 @@ export default function MoviePage({
         `&startTime=${encodeURIComponent(
           showtime?.start_time?.toString() || ""
         )}` +
-        `&seats=${seatsParam}`
+        `&seats=${seatsParam}` +`&cols=${encodeURIComponent(cols.toString())}`
     );
   };
 

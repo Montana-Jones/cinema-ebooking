@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.cinema_backend.repository.ShowtimeRepository;
@@ -102,15 +103,24 @@ public class ShowtimeController {
 
     // ------------------ UPDATE SEATS ------------------
     @PutMapping("/saveSeats/{id}")
-    public ResponseEntity<?> updateSeats(@PathVariable String id, @RequestBody String seatBinary) {
+    public ResponseEntity<?> updateSeats(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body
+    ) {
         Optional<Showtime> opt = showtimeRepository.findById(id);
+
         if (opt.isEmpty()) {
-            return ResponseEntity.status(404).body("Showtime not found: " + id);
+            return ResponseEntity.notFound().build();
         }
+
         Showtime showtime = opt.get();
+        String seatBinary = body.get("seatBinary");
+
         showtime.setSeatBinary(seatBinary);
         showtimeRepository.save(showtime);
+
         return ResponseEntity.ok(showtime);
     }
+
 
 }

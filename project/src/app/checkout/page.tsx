@@ -1,11 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-<<<<<<< HEAD
-import TopBar from "@/app/checkout/parts/topBar";
-=======
 import TopBar from "@/app/checkout/parts/topBar"
->>>>>>> parent of affec76 (minor CSS changes)
 
 // --- Interfaces ---
 interface Seat {
@@ -31,14 +27,16 @@ interface booking {
   tax_rate: number; 
   discount_amount: number; 
   total: number; 
-  tickets?: {ticket_type: string; ticket_price: string; ticket_num: number}[]; 
+  seats: Seat[]; 
 }
+
 
 interface Showtime {
   id: string;
   start_time: string;
   room_name: string;
   seat_binary: string;
+  date: string;
 }
 
 interface Config {
@@ -51,6 +49,7 @@ interface PromoCode {
   discount_percentage: number; // 10 = 10%
 }
 
+
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -58,6 +57,7 @@ export default function CheckoutPage() {
   const movieTitle = searchParams.get("movieTitle") ?? "";
   const showtimeId = searchParams.get("showtimeId");
   const startTime = searchParams.get("startTime");
+  const cols = parseInt(searchParams.get("cols") || "0", 10);
 
   const [showtime, setShowtime] = useState<Showtime | null>(null);
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -65,6 +65,8 @@ export default function CheckoutPage() {
   const [config, setConfig] = useState<Config | null>(null);
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<booking[]>([]);
+
 
   // Promo state
   const [enteredCode, setEnteredCode] = useState("");
@@ -91,7 +93,7 @@ export default function CheckoutPage() {
         const [ticketRes, configRes, promoRes, showtimeRes] = await Promise.all([
           fetch("http://localhost:8080/api/tickets"),
           fetch("http://localhost:8080/api/fees-and-taxes"),
-          fetch("http://localhost:8080/api/promotion-codes"),
+          fetch("http://localhost:8080/api/promotions"),
           fetch(`http://localhost:8080/api/showtimes/${showtimeId}`),
         ]);
 
@@ -115,9 +117,38 @@ export default function CheckoutPage() {
 
     fetchAll();
   }, [showtimeId]);
+  const lockedBinary = React.useMemo(() => {
+    if (!showtime?.seat_binary || !seats.length || cols <= 0) return "";
+
+    const arr = showtime.seat_binary.split("");
+
+    seats.forEach(({ id }) => {
+      const [r, c] = id.split("-").map(Number);
+      const idx = r * cols + c;
+
+      if (idx >= 0 && idx < arr.length) {
+        arr[idx] = "1";
+      }
+    });
+
+    return arr.join("");
+  }, [showtime?.seat_binary, seats, cols]);
+
 
   if (loading) return <p style={{ color: "white" }}>Loading checkout...</p>;
   if (!config) return <p style={{ color: "white" }}>Config failed to load.</p>;
+
+  // lock seat binary
+  
+
+  // original seat binary
+  const originalBinary = showtime?.seat_binary || "";
+
+  console.log("Original binary:", originalBinary);
+  console.log("Locked binary:", lockedBinary);
+  console.log("Seats:", seats);
+  console.log("Cols:", cols);
+
 
   // ✅ Calculations
   const subtotal = seats.reduce((sum, seat) => {
@@ -154,6 +185,9 @@ export default function CheckoutPage() {
     setPromoMessage(`Promo applied! ${found.discount_percentage}% off`);
   };
 
+ 
+
+
   // ✅ Confirm handler
   const handleConfirm = async () => {
     if (!seats.length) {
@@ -162,29 +196,48 @@ export default function CheckoutPage() {
     }
 
     const bookingData = {
-      movieTitle,
-      showtimeId,
-      seats,
-      subtotal,
-      bookingFee: config.booking_fee,
-      taxRate: config.tax_rate,
-      promoCode: appliedPromo?.code ?? null,
-      discountPercentage: appliedPromo?.discount_percentage ?? 0,
-      total,
+      booking_num: `BK-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      showtime_id: showtimeId,
+      email: JSON.parse(localStorage.getItem("user") || "{}").email,
+      room_name: showtime?.room_name,
+      date: showtime?.date,
+      start_time: startTime,
+      subtotal_price: subtotal,
+      total_price: total,
+      tax_rate: config.tax_rate,
+      booking_fee: config.booking_fee,
+      discount: appliedPromo?.discount_percentage ?? 0,
+      movie_title: movieTitle,
+      original_binary: originalBinary,
+      seats: seats
     };
 
+
+
     try {
-      await fetch("http://localhost:8080/api/bookings", {
+      await fetch("http://localhost:8080/api/bookings/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
       });
-
-      alert("Booking confirmed!");
-      router.push("/");
+      
     } catch (err) {
       console.error("Booking failed:", err);
     }
+    try {
+      await fetch(`http://localhost:8080/api/showtimes/saveSeats/${showtimeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seatBinary: lockedBinary })
+
+      });
+
+      
+    } catch (err) {
+      console.error("locking seats failed:", err);
+    }
+    router.push(`/finish-checkout/${bookingData.booking_num}`);
+
   };
 
   // ✅ UI
@@ -195,17 +248,6 @@ export default function CheckoutPage() {
       <div style={{
         backgroundColor: "#2b0f0f",
         padding: "2rem",
-<<<<<<< HEAD
-        borderRadius: "10px",
-        maxWidth: "600px",
-        margin: "0 auto"
-      }}>
-        <h1 style={{ textAlign: "center" }}>Checkout Summary</h1>
-
-        <p><strong>Movie:</strong> {movieTitle}</p>
-        <p><strong>Showtime:</strong> {startTime}</p>
-        <p><strong>Room:</strong> {showtime?.room_name}</p>
-=======
         backgroundColor: "#150707",
         color: "white",
       }}
@@ -225,7 +267,6 @@ export default function CheckoutPage() {
         <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
           Checkout Summary
         </h1>
->>>>>>> parent of affec76 (minor CSS changes)
 
         <hr />
 
@@ -279,7 +320,7 @@ export default function CheckoutPage() {
         <button
           onClick={() => {
             const token = localStorage.getItem("user");
-
+            console.log("Token:", token);
             if (!token) {
               router.push(
                 `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
