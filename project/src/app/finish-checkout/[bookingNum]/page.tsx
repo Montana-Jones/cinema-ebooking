@@ -65,7 +65,7 @@ export default function FinshCheckoutPage({
   const [newBillingAddress, setNewBillingAddress] = useState(""); 
   
   // Timer State
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(40); 
   const [isExpired, setIsExpired] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -370,7 +370,7 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* 2. Time Banner */}
+            {/* 2. Time Banner (Moved here) */}
             <div 
               className={`p-4 rounded-lg font-bold text-center border-2 
                 ${timeLeft <= 20 ? ' border-red-500' : 'bg-[#1a332a] text-[#00ff99] border-[#00ff99]'}`

@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import TopBar from "@/app/checkout/parts/topBar"
+import TopBar from "@/app/checkout/parts/topBar";
+import { set } from "mongoose";
 
 // --- Interfaces ---
 interface Seat {
@@ -150,7 +151,6 @@ export default function CheckoutPage() {
   console.log("Cols:", cols);
 
 
-  // ✅ Calculations
   const subtotal = seats.reduce((sum, seat) => {
     const ticket = tickets.find(
       (t) => t.ticket_type.toUpperCase() === seat.type.toUpperCase()
@@ -169,7 +169,6 @@ export default function CheckoutPage() {
 
   const total = preDiscountTotal - discount;
 
-  // ✅ Promo handler
   const handleApplyPromo = () => {
     const found = promoCodes.find(
       (p) => p.code.toUpperCase() === enteredCode.trim().toUpperCase()
@@ -188,12 +187,12 @@ export default function CheckoutPage() {
  
 
 
-  // ✅ Confirm handler
   const handleConfirm = async () => {
     if (!seats.length) {
       alert("No seats selected.");
       return;
     }
+
 
     const bookingData = {
       booking_num: `BK-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -240,7 +239,6 @@ export default function CheckoutPage() {
 
   };
 
-  // ✅ UI
   return (
     <main style={{ minHeight: "100vh", padding: "2rem", background: "#150707", color: "white" }}>
       <TopBar />
@@ -248,25 +246,15 @@ export default function CheckoutPage() {
       <div style={{
         backgroundColor: "#2b0f0f",
         padding: "2rem",
-        backgroundColor: "#150707",
-        color: "white",
-      }}
-    >
-      <TopBar/>
+        borderRadius: "10px",
+        maxWidth: "600px",
+        margin: "0 auto"
+      }}>
+        <h1 style={{ textAlign: "center" }}>Checkout Summary</h1>
 
-      <div
-        style={{
-          backgroundColor: "#2b0f0f",
-          padding: "2rem",
-          borderRadius: "10px",
-          width: "100%",
-          maxWidth: "600px",
-          boxShadow: "0 0 10px rgba(255,255,255,0.2)",
-        }}
-      >
-        <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
-          Checkout Summary
-        </h1>
+        <p><strong>Movie:</strong> {movieTitle}</p>
+        <p><strong>Showtime:</strong> {startTime}</p>
+        <p><strong>Room:</strong> {showtime?.room_name}</p>
 
         <hr />
 
