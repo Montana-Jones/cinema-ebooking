@@ -90,36 +90,32 @@ const Movie: React.FC<MovieProps> = ({ movie }) => {
             <Trailer trailerUrl={movie.trailer_url} />
           </div>
         </div>
+        {/* Showtimes */}
         <div className={styles.showtimesContainer}>
-  {movie.now_showing && (
-    <>
-      {[
-        "2025-12-05",
-        "2025-12-06",
-        "2025-12-07",
-      ].map((date) => {
-        const hasShowtimes = movie.showtime.some((s) => s.date === date);
-
-        if (!hasShowtimes) return null;
-
-        return (
-          <div key={date} className={styles.showtimeDayBlock}>
-            <ShowtimePanel
+          {movie.now_showing && (
+            <div className={styles.showtimeDayBlock}>
+              <ShowtimePanel
               movie={movie}
-              selectedDate={date}
+              selectedDate={new Date("2025-12-06")}
               showDate={true}
             />
-          </div>
-        );
-      })}
-    </>
-  )}
-</div>
-
-
+              <ShowtimePanel
+              movie={movie}
+              selectedDate={new Date("2025-12-07")}
+              showDate={true}
+            />
+              <ShowtimePanel
+              movie={movie}
+              selectedDate={new Date("2025-12-08")}
+              showDate={true}
+            />
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   );
 };
+
 
 export default Movie;
