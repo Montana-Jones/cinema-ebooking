@@ -139,21 +139,20 @@ const Promotions: React.FC = () => {
 
   if (loadingUser) return <p>Loading...</p>;
 
-  if (!user || user.role !== "ADMIN") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-        <Navbar />
-        <p className="mb-6 text-lg text-red-500">
-          Access denied. Only admins can view this page.
-        </p>
-        <Link href="/">
-          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium cursor-pointer hover:bg-[#5d4561]">
+   if (!user || user.role !== "ADMIN") {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+          <Navbar />
+          <p className="text-lg mb-6">Access denied. Admins only.</p>
+          <Link
+            href="/"
+            className="bg-[#4c3b4d] px-4 py-3 rounded-2xl text-lg font-medium hover:bg-[#5d4561]"
+          >
             Go back home
-          </p>
-        </Link>
-      </div>
-    );
-  }
+          </Link>
+        </div>
+      );
+    }
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">

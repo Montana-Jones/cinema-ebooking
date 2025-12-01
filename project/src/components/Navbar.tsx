@@ -62,14 +62,10 @@ export default function Navbar() {
 
         {/* Logged-in user section */}
         {user ? (
-          <div className="flex items-center space-x-4 ml-4">
-            <span>
-              Hello {user.email} {user.role === "ADMIN" ? "(Admin)" : ""}
-            </span>
-
+          <div className="flex items-center space-x-4">
             {/* Admin-only manage movies icon */}
             {user.role === "ADMIN" && (
-              <Link href="/manage-movies">
+              <Link href="/admin-dash">
                 <Image
                   src={gear}
                   alt="manage movies"

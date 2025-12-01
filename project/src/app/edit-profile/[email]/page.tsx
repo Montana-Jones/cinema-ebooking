@@ -2,7 +2,8 @@
 
 import React, { use, useEffect, useState } from "react";
 import TopBar from "@/app/edit-profile/parts/topBar";
-import { set } from "mongoose";
+import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 interface Customer {
   id: string;
@@ -17,6 +18,11 @@ interface Customer {
   phoneNumber: string;
   paymentInfo?: { cardHolder: string; cardNumber: string; expirationDate: string; cvv?: string }[];
 }
+
+interface User {
+  email: string;
+}
+
 interface Seat {
   id: string;
   type: string;
@@ -50,6 +56,7 @@ export default function EditProfile({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   const [isHomeAddressValid, setIsHomeAddressValid] = useState(true);
@@ -66,6 +73,11 @@ export default function EditProfile({
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
   const [showCardEditor, setShowCardEditor] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -95,8 +107,6 @@ export default function EditProfile({
         };
 
         setCustomer(customer);
-        console.log("Fetched customer:", data);
-        console.log("Payment Info:", customer?.paymentInfo);
       } catch (err) {
         console.error(err);
       } finally {
@@ -377,6 +387,21 @@ const hasDuplicateCard = (index: number): boolean => {
   if (loading)
     return <div className="text-center mt-10">Loading profile...</div>;
 
+  if (!user || !customer || user.email !== customer.email) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+        <Navbar />
+        <p className="text-lg mb-6">Access denied.</p>
+        <Link
+          href="/"
+          className="bg-[#4c3b4d] px-4 py-3 rounded-2xl text-lg font-medium hover:bg-[#5d4561]"
+        >
+          Go back home
+        </Link>
+      </div>
+    );
+  }
+  
   return (
     <div className="flex flex-col items-center mb-2">
       <TopBar />
@@ -477,7 +502,7 @@ const hasDuplicateCard = (index: number): boolean => {
               </div> 
               {customer?.paymentInfo && customer.paymentInfo.length > 0 ? ( 
                 <ul className="divide-y divide-gray-200"> 
-                  {customer.paymentInfo.filter(card => card.cardHolder?.trim() !== "").map((p, index) => ( 
+                  {customer.paymentInfo.map((p, index) => ( 
                     <li key={index} className="py-2 text-sm"> 
                       <p className="font-medium">Card Number: {p.cardNumber}</p>
                       <p className="text-gray-500">Experation Date: {p.expirationDate}</p>

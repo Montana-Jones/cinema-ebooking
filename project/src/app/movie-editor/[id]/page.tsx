@@ -1,8 +1,14 @@
 import MovieEditor from "@/components/MovieEditor";
 import Navbar from "@/components/Navbar";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface MoviePageProps {
   params: { id: string };
+}
+
+interface User {
+  role: string;
 }
 
 export default async function MoviePage({ params }: MoviePageProps) {
