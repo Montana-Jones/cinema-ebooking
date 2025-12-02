@@ -1,11 +1,13 @@
 "use client";
 
+import AccessDenied from "@/components/AccessDenied";
 import AddMovie from "@/components/AddMovie";
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 
 interface User {
   role: string;
+  status: string;
 }
 
 export default function AddMoviePage() {
@@ -27,19 +29,7 @@ export default function AddMoviePage() {
 
   if (!user || user.role !== "ADMIN") {
     return (
-      <main
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          flexDirection: "column",
-        }}
-      >
-        <Navbar />
-        <h1 style={{ fontSize: "2rem", color: "red" }}>403 Forbidden</h1>
-        <p>You do not have permission to access this page.</p>
-      </main>
+      <AccessDenied />
     );
   }
 
