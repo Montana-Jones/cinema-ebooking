@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import NotLoggedIn from "@/components/NotLoggedIn";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
@@ -10,6 +11,13 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+
+
+  if (!token) {
+    return (
+      <NotLoggedIn />
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

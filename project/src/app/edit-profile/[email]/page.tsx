@@ -5,6 +5,7 @@ import TopBar from "@/app/edit-profile/parts/topBar";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Unverified from "@/components/Unverified";
+import NotLoggedIn from "@/components/NotLoggedIn";
 
 interface Customer {
   id: string;
@@ -141,10 +142,6 @@ export default function EditProfile({
   }, [email]);
 
   
-
-
-  console.log("Name:", customer?.firstName, customer?.lastName);
-
 // Handle card input changes
 type PaymentCard = {
   cardHolder: string;
@@ -178,8 +175,6 @@ const hasDuplicateCard = (index: number): boolean => {
 };
 
 // Save updated cards to backend — removed duplicate; the validated handleSaveCards implementation appears later in the file.
-
-
 
 
   const validateAddress = (address: string) => {
@@ -389,7 +384,12 @@ const hasDuplicateCard = (index: number): boolean => {
   if (loading)
     return <div className="text-center mt-10">Loading profile...</div>;
 
-  if (!user || !customer || user.email !== customer.email) {
+
+  if (!user) {
+    return (
+      <NotLoggedIn />
+    )
+  }else if (!customer || user.email !== customer.email) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
         <Navbar />
