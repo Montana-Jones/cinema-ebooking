@@ -4,6 +4,7 @@ import React, { use, useEffect, useState } from "react";
 import TopBar from "@/app/edit-profile/parts/topBar";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Unverified from "@/components/Unverified";
 
 interface Customer {
   id: string;
@@ -21,6 +22,7 @@ interface Customer {
 
 interface User {
   email: string;
+  status: string;
 }
 
 interface Seat {
@@ -401,6 +403,12 @@ const hasDuplicateCard = (index: number): boolean => {
       </div>
     );
   }
+
+  if (user?.status === "SUSPENDED") {
+      return (
+        <Unverified />
+      );
+    }
   
   return (
     <div className="flex flex-col items-center mb-2">

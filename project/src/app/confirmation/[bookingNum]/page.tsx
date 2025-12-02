@@ -2,6 +2,7 @@
 import React, { use, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import TopBar from "@/app/confirmation/parts/topBar";
+import Unverified from "@/components/Unverified";
 
 // --- Interfaces ---
 interface Seat {
@@ -9,7 +10,9 @@ interface Seat {
   type: string;
 }
 
-
+interface User {
+  status: string;
+}
 
 interface booking {
   id: string;
@@ -38,7 +41,12 @@ export default function ConfirmationPage({
   const { bookingNum } = React.use(params);
   
   const [bookingData, setBookingData] = useState<booking | null>(null);
-
+  const [user, setUser] = useState<User | null>(null);
+  
+    useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+    }, []);
 
   useEffect(() => {
       const fetchBookingData = async () => {
@@ -88,6 +96,12 @@ export default function ConfirmationPage({
   if (!bookingData) {
     return <div>Loading...</div>;
   }
+
+  if (user?.status === "SUSPENDED") {
+      return (
+        <Unverified />
+      );
+    }
 
   return (
     <div>

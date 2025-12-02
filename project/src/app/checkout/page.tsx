@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import TopBar from "@/app/checkout/parts/topBar";
-import { set } from "mongoose";
+import Unverified from "@/components/Unverified";
 
 // --- Interfaces ---
 interface Seat {
@@ -40,6 +40,10 @@ interface Showtime {
   date: string;
 }
 
+interface User {
+  status: string;
+}
+
 interface Config {
   booking_fee: number;
   tax_rate: number;
@@ -67,6 +71,7 @@ export default function CheckoutPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<booking[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
 
   // Promo state
@@ -138,6 +143,13 @@ export default function CheckoutPage() {
 
   if (loading) return <p style={{ color: "white" }}>Loading checkout...</p>;
   if (!config) return <p style={{ color: "white" }}>Config failed to load.</p>;
+
+  if (user?.status === "SUSPENDED") {
+      return (
+        <Unverified />
+      );
+    }
+
 
   // lock seat binary
   
@@ -240,7 +252,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", padding: "2rem", background: "#150707", color: "white" }}>
+    <main style={{ minHeight: "100vh", background: "#150707", color: "white" }}>
       <TopBar />
 
       <div style={{
