@@ -46,6 +46,21 @@ export default function Signup() {
     return errs;
   };
 
+  const formatCardNumber = (value: string) => {
+    return value
+      .replace(/\D/g, "")          // remove non-digits
+      .replace(/(.{4})/g, "$1 ")   // insert space every 4 digits
+      .trim();
+  };
+
+  const formatExpiration = (value: string) => {
+    const cleaned = value.replace(/\D/g, "");
+    if (cleaned.length <= 2) return cleaned;
+    return cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4);
+  };
+
+  const formatCVV = (value: string) => value.replace(/\D/g, "").slice(0, 4);
+
   const handleCardChange = (
     index: number,
     field: keyof PaymentCard,
@@ -308,17 +323,20 @@ export default function Signup() {
 
               <input
                 type="text"
-                placeholder="Card Number"
+                maxLength={19}
+                className="w-full border rounded-lg px-3 py-2 mb-1"
+                placeholder="0000 0000 0000 0000"
                 value={paymentInfo[i]?.cardNumber || ""}
                 onChange={(e) =>
-                  handleCardChange(i, "cardNumber", e.target.value)
+                  handleCardChange(i, "cardNumber", formatCardNumber(e.target.value))
                 }
-                className="w-full border rounded-lg px-3 py-2 mb-1"
               />
+
 
               <input
                 type="text"
                 placeholder="Card Holder Name"
+                maxLength={40}
                 value={paymentInfo[i]?.cardHolder || ""}
                 onChange={(e) =>
                   handleCardChange(i, "cardHolder", e.target.value)
@@ -328,20 +346,25 @@ export default function Signup() {
 
               <input
                 type="text"
-                placeholder="Expiration (MM/YY)"
+                placeholder="MM/YY"
+                maxLength={5}
+                className="w-full border rounded-lg px-3 py-2"
                 value={paymentInfo[i]?.expirationDate || ""}
                 onChange={(e) =>
-                  handleCardChange(i, "expirationDate", e.target.value)
+                  handleCardChange(i, "expirationDate", formatExpiration(e.target.value))
                 }
-                className="w-full border rounded-lg px-3 py-2 mb-1"
               />
+
 
               <input
                 type="text"
                 placeholder="CVV"
-                value={paymentInfo[i]?.cvv || ""}
-                onChange={(e) => handleCardChange(i, "cvv", e.target.value)}
+                maxLength={4}
                 className="w-full border rounded-lg px-3 py-2"
+                value={paymentInfo[i]?.cvv || ""}
+                onChange={(e) =>
+                  handleCardChange(i, "cvv", formatCVV(e.target.value))
+                }
               />
             </div>
           ))}
