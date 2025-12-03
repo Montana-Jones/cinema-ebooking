@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import Link from "next/link";
+import Loading from "@/components/Loading";
 import AccessDenied from "@/components/AccessDenied";
 
 interface User {
@@ -19,6 +19,7 @@ export default function ManageUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/users")
@@ -27,8 +28,6 @@ export default function ManageUsers() {
         return res.json();
       })
       .then((data) => {
-        console.log("Users API response:", data);
-
         const mappedUsers = data.map((u: any) => ({
           id: u.id || u._id,
           firstName: u.firstName || u.firstname || u.first_name || "",
@@ -37,8 +36,6 @@ export default function ManageUsers() {
           subscribedToPromotions: u.promotion === "REGISTERED",
           suspended: u.status === "SUSPENDED" || false,
         }));
-
-        console.log("Mapped users:", mappedUsers);
 
         setUsers(mappedUsers);
         setLoading(false);
@@ -49,6 +46,12 @@ export default function ManageUsers() {
       });
   }, []);
 
+  useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+      setLoadingUser(false);
+    }, []);
+
   const handleSuspend = async (userId: string) => {
     const confirmSuspend = window.confirm(
       "Are you sure you want to suspend this user? This will delete their account."
@@ -57,10 +60,8 @@ export default function ManageUsers() {
 
     try {
       const url = `http://localhost:8080/api/users/${userId}`;
-      console.log("Deleting user with URL:", url);
 
       const res = await fetch(url, { method: "DELETE" });
-      console.log("Response:", res.status, res.statusText);
 
       if (!res.ok) throw new Error(`Failed to suspend user: ${res.status}`);
 
@@ -72,12 +73,9 @@ export default function ManageUsers() {
     }
   };
 
-  if (loading) {
+  if (loading || loadingUser) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Navbar />
-        <p>Loading users...</p>
-      </div>
+      <Loading />
     );
   }
 
