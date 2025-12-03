@@ -27,6 +27,10 @@ public class BookingController {
     @Autowired
     private UserRepository userRepository;
 
+    private double roundToCents(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
     // -------------------------------
     // GET all bookings
     // -------------------------------
@@ -54,8 +58,17 @@ public class BookingController {
     @PostMapping("/add")
     public Booking addBooking(@RequestBody Booking newBooking) {
         newBooking.setId(null);
+
+        // Round all monetary fields
+        newBooking.setSubtotalPrice(roundToCents(newBooking.getSubtotalPrice()));
+        newBooking.setDiscount(roundToCents(newBooking.getDiscount()));
+        newBooking.setTaxRate(roundToCents(newBooking.getTaxRate()));
+        newBooking.setBookingFee(roundToCents(newBooking.getBookingFee()));
+        newBooking.setTotalPrice(roundToCents(newBooking.getTotalPrice()));
+
         return bookingRepository.save(newBooking);
     }
+
 
     // -------------------------------
     // SEND booking confirmation email
