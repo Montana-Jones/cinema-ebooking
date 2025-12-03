@@ -15,7 +15,7 @@ const AddMovie: React.FC = () => {
     const formData = new FormData(form);
     const movieData = Object.fromEntries(formData.entries()) as Record<
       string,
-      string
+      any
     >;
 
     // Convert status string to booleans
