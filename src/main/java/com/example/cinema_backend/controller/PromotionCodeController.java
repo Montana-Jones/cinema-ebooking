@@ -25,13 +25,6 @@ public class PromotionCodeController {
     @Autowired
     private EmailService emailService;
 
-    // @GetMapping("/test-email")
-    // public String testEmail() {
-    // emailService.sendEmail("samruddhi020202@gmail.com", "Test Email", "This is a
-    // test.");
-    // return "Email sent (if configuration is correct)";
-    // }
-
     @GetMapping
     public List<PromotionCode> getAllPromotionCodes() {
         return promotionCodeRepository.findAll();
