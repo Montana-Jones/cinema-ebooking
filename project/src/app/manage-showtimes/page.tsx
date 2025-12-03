@@ -258,7 +258,7 @@ export default function ManageShowtimes() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="text-black px-3 py-2 rounded"
+            className="text-white px-3 py-2 rounded"
           />
 
           <div className="flex items-center space-x-2">
@@ -268,7 +268,7 @@ export default function ManageShowtimes() {
               max={23}
               value={startHour}
               onChange={(e) => setStartHour(+e.target.value)}
-              className="w-16 px-2 py-1 text-black rounded"
+              className="w-16 px-2 py-1 text-white rounded"
             />
             :
             <input
@@ -277,7 +277,7 @@ export default function ManageShowtimes() {
               max={59}
               value={startMinute}
               onChange={(e) => setStartMinute(+e.target.value)}
-              className="w-16 px-2 py-1 text-black rounded"
+              className="w-16 px-2 py-1 text-white rounded"
             />
           </div>
 
@@ -288,7 +288,7 @@ export default function ManageShowtimes() {
               max={23}
               value={endHour}
               onChange={(e) => setEndHour(+e.target.value)}
-              className="w-16 px-2 py-1 text-black rounded"
+              className="w-16 px-2 py-1 text-white rounded"
             />
             :
             <input
@@ -297,7 +297,7 @@ export default function ManageShowtimes() {
               max={59}
               value={endMinute}
               onChange={(e) => setEndMinute(+e.target.value)}
-              className="w-16 px-2 py-1 text-black rounded"
+              className="w-16 px-2 py-1 text-white rounded"
             />
           </div>
 
