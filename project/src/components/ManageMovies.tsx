@@ -88,7 +88,7 @@ export default function ManageMovies() {
       {movies.map((movie) => (
         <div
           key={movie.id}
-          className="flex flex-col justify-between bg-[#1f1f1f] rounded-2xl shadow-lg border border-gray-700 p-6 h-[250px]"
+          className="flex flex-col justify-between bg-[#1f1f1f] rounded-2xl shadow-lg border border-gray-700 p-6 h-[270px]"
         >
           <div>
             <h2 className="text-xl font-bold mb-2">
