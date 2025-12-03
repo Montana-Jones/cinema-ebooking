@@ -363,7 +363,7 @@ useEffect(() => {
                 {bookingData.discount > 0 && (
                   <div className="flex justify-between text-[#00ff99]">
                     <span>Discount:</span>
-                    <span>-${bookingData.discount.toFixed(2)}</span>
+                    <span>-{bookingData.discount.toFixed(2)}%</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xl font-bold mt-4 pt-2 border-t border-gray-500">
