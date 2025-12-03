@@ -218,8 +218,8 @@ export default function MoviePage({
               <Image
                 src={movie.poster_url}
                 alt={movie.title}
-                width={300}
-                height={350}
+                width={250}
+                height={291}
                 className={styles.posterPreview}
               />
             </Link>
@@ -244,7 +244,6 @@ export default function MoviePage({
                   width: "60%",
                   height: "auto",
                   margin: "1rem 0",
-                  paddingRight: "4rem",
                 }}
               />
             </div>

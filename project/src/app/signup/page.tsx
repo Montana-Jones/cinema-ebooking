@@ -105,12 +105,6 @@ export default function Signup() {
         })),
     };
 
-    // ✅ Debug logging
-    console.log("=== SIGNUP DATA ===");
-    console.log("promotionsOptIn checkbox value:", promotionsOptIn);
-    console.log("promotion field being sent:", signupData.promotion);
-    console.log("Full signup data:", JSON.stringify(signupData, null, 2));
-
     try {
       const res = await fetch("http://localhost:8080/api/users/signup", {
         method: "POST",

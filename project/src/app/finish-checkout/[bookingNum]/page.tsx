@@ -65,7 +65,7 @@ export default function FinshCheckoutPage({
   const [newBillingAddress, setNewBillingAddress] = useState(""); 
   
   // Timer State
-  const [timeLeft, setTimeLeft] = useState(40); 
+  const [timeLeft, setTimeLeft] = useState(300); 
   const [isExpired, setIsExpired] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
