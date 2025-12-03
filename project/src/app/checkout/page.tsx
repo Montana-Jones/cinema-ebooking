@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import TopBar from "@/app/checkout/parts/topBar";
 import Unverified from "@/components/Unverified";
+import Loading from "@/components/Loading";
 
 // --- Interfaces ---
 interface Seat {
@@ -141,7 +142,7 @@ export default function CheckoutPage() {
   }, [showtime?.seat_binary, seats, cols]);
 
 
-  if (loading) return <p style={{ color: "white" }}>Loading checkout...</p>;
+  if (loading) return <Loading />;
   if (!config) return <p style={{ color: "white" }}>Config failed to load.</p>;
 
   if (user?.status === "SUSPENDED") {

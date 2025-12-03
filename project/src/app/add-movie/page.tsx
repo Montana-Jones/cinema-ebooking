@@ -3,6 +3,7 @@
 import AccessDenied from "@/components/AccessDenied";
 import AddMovie from "@/components/AddMovie";
 import Navbar from "@/components/Navbar";
+import Loading from "@/components/Loading";
 import { useState, useEffect } from "react";
 
 interface User {
@@ -24,7 +25,7 @@ export default function AddMoviePage() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   if (!user || user.role !== "ADMIN") {

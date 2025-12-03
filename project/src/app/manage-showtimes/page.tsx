@@ -93,7 +93,25 @@ export default function ManageShowtimes() {
           };
         });
 
+        // sort by date, then by movie name, then by start time
+        mapped.sort((a, b) => {
+          // 1. Compare dates
+          const d1 = new Date(a.date);
+          const d2 = new Date(b.date);
+          if (d1.getTime() !== d2.getTime()) {
+            return d1.getTime() - d2.getTime();
+          }
+
+          // 2. Compare movie names
+          const movieCompare = a.movieName.localeCompare(b.movieName);
+          if (movieCompare !== 0) return movieCompare;
+
+          // 3. Compare start times (optional, but makes it neat)
+          return a.startTime.localeCompare(b.startTime);
+        });
+
         setShowtimes(mapped);
+
         setLoading(false);
       } catch (err) {
         console.error("Error loading showtimes:", err);
@@ -227,12 +245,12 @@ export default function ManageShowtimes() {
 
   // ----------------- UI -----------------
   return (
-    <div className="min-h-screen bg-[#121212] text-white p-6">
+    <div className="min-h-screen bg-[#121212] text-white">
       <Navbar />
       <h1 className="text-3xl text-[#75D1A6] font-bold mb-6">Manage Showtimes</h1>
 
       {/* Add Form */}
-      <div className="bg-[#1f1f1f] p-6 rounded-xl mb-8">
+      <div className="bg-[#1f1f1f] p-6 rounded-xl mt-16 mb-8 ml-4 mr-4">
         <h2 className="text-xl font-bold mb-4">Add Showtime</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
