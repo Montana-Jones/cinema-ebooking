@@ -109,10 +109,12 @@ public class BookingController {
         }
 
         sb.append("Subtotal Price: $").append(booking.getSubtotalPrice()).append("\n");
-        sb.append("Discount: $").append(booking.getDiscount()).append("\n");
-        sb.append("Tax Rate: ").append(booking.getTaxRate()).append("%\n");
+        sb.append("Discount: ").append(booking.getDiscount() + "%").append("\n");
+        sb.append("Tax Rate: ").append(booking.getTaxRate()).append("\n");
         sb.append("Booking Fee: $").append(booking.getBookingFee()).append("\n");
-        sb.append("Total Price: $").append(booking.getTotalPrice()).append("\n\n");
+        sb.append("Total Price: $").append(String.format("%.2f", booking.getTotalPrice()))
+        .append("\n\n");
+
         sb.append("We look forward to seeing you at the cinema!\n");
         sb.append("Cinema Team");
 
