@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import Link from "next/link";
+import Loading from "@/components/Loading";
 import AccessDenied from "@/components/AccessDenied";
 
 interface User {
@@ -122,14 +122,19 @@ export default function ManageShowtimes() {
     fetchShowtimes();
   }, [movies]);
 
-  if (loadingUser) return <p>Loading user...</p>;
+  if (loading || loadingUser) {
+      return (
+        <Loading />
+      );
+    }
+
   if (!user || user.role !== "ADMIN") {
       return (
         <AccessDenied />
       );
     }
 
-  if (loading) return <p>Loading showtimes...</p>;
+  
 
   // ----------------- ADD SHOWTIME -----------------
   const handleAddShowtime = async () => {
