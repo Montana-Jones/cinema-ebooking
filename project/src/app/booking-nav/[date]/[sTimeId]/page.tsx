@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import Movie from "@/components/Movie";
 import Navbar from "@/components/Navbar";
 import styles from "@/components/Card.module.css";
-import MoviePreview from "@/components/MoviePreview";
+import Loading from "@/components/Loading";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,6 +55,8 @@ export default function MoviePage({
   const [seats, setSeats] = useState<Seat[][]>([]);
   const [showtime, setShowtime] = useState<Showtime | null>(null);
   const [showroom, setShowroom] = useState<Showroom | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [delayDone, setDelayDone] = useState(false);
 
   // 🆕 stores seat id and seat type
   const [selectedSeats, setSelectedSeats] = useState<
@@ -116,7 +118,14 @@ export default function MoviePage({
     );
 
     setSeats(generatedSeats);
+    setLoading(false);
   }, [showtime, rows, cols]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDelayDone(true), 10000); // 10 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
 
   // upgraded toggle: open seat-type selector for adding, or remove if already selected
   const toggleSeat = (seatId: string | Seat) => {
@@ -169,8 +178,23 @@ export default function MoviePage({
     );
   };
 
-  if (!movie) {
-    return <p>Movie not found.</p>;
+  if (!movie && !delayDone) {
+    return <Loading />;
+  }
+
+  if (!movie && delayDone) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Navbar />
+        <h1 className="text-4xl font-bold mb-4">404 - Movie Not Found</h1>
+        <p className="mb-6 text-lg">Looks like someone's lost!</p>
+        <Link href="/">
+          <p className="bg-[#4c3b4d] border-3 border-[#675068] rounded-2xl px-4 py-3 text-lg font-medium">
+            Go back home
+          </p>
+        </Link>
+      </div>
+    );
   }
 
   return (

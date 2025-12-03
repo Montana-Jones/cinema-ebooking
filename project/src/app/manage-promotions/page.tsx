@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import Link from "next/link";
+import Loading from "@/components/Loading";
 import AccessDenied from "@/components/AccessDenied";
 
 interface Promotion {
@@ -138,7 +138,9 @@ const Promotions: React.FC = () => {
     }
   };
 
-  if (loadingUser) return <p>Loading...</p>;
+  if (loadingUser) return (
+      <Loading />
+  );
 
    if (!user || user.role !== "ADMIN") {
       return (
