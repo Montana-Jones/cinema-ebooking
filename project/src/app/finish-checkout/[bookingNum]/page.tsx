@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import TopBar from "@/app/checkout/parts/topBar";
+import Navbar from "@/components/Navbar";
 
 // --- Interfaces ---
 interface Seat {
@@ -293,7 +293,7 @@ useEffect(() => {
   
     return (
       <div className="min-h-screen bg-[#150707] text-white">
-        <TopBar />
+        <Navbar />
         <div className="container mx-auto p-10 max-w-2xl text-center mt-10">
           <div className="bg-[#2b0f0f] p-8 rounded-lg border border-red-800">
             <h1 className="text-3xl font-bold mb-4 text-[#b52727]">Session Expired</h1>
@@ -319,7 +319,7 @@ useEffect(() => {
   // --- Render Main Checkout ---
   return (
     <div className="min-h-screen bg-[#150707] text-white">
-      <TopBar /> 
+      <Navbar /> 
       
       <div className="container mx-auto p-6 max-w-4xl pt-4"> 
         <h1 className="text-3xl font-bold mb-8 text-[#00ff99] text-center">
@@ -355,7 +355,10 @@ useEffect(() => {
                 </div>
                 <div className="flex justify-between">
                   <span>Tax:</span>
-                  <span>${(bookingData.total_price - bookingData.subtotal_price - bookingData.booking_fee + bookingData.discount).toFixed(2)}</span>
+                  <span>${Number(bookingData.total_price 
+                    - bookingData.subtotal_price 
+                    - bookingData.booking_fee 
+                    + bookingData.discount).toFixed(2)}</span>
                 </div>
                 {bookingData.discount > 0 && (
                   <div className="flex justify-between text-[#00ff99]">

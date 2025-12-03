@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import TopBar from "@/app/checkout/parts/topBar";
+import Navbar from "@/components/Navbar";
 import Unverified from "@/components/Unverified";
 import Loading from "@/components/Loading";
 
@@ -254,7 +254,7 @@ export default function CheckoutPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "#150707", color: "white" }}>
-      <TopBar />
+      <Navbar />
 
       <div style={{
         backgroundColor: "#2b0f0f",

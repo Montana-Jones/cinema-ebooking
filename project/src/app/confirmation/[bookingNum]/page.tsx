@@ -1,7 +1,7 @@
 "use client";
 import React, { use, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import TopBar from "@/app/confirmation/parts/topBar";
+import Navbar from "@/components/Navbar";
 import Unverified from "@/components/Unverified";
 
 // --- Interfaces ---
@@ -105,7 +105,7 @@ export default function ConfirmationPage({
 
   return (
     <div>
-      <TopBar /> 
+      <Navbar /> 
     <div className="min-h-screen bg-[#150707] text-white">
      <h1 className="text-3xl font-bold mb-4"> .</h1>
       <div className="max-w-3xl mx-auto p-6">

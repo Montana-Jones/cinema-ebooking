@@ -1,9 +1,8 @@
 "use client";
 
 import React, { use, useEffect, useState } from "react";
-import TopBar from "@/app/edit-profile/parts/topBar";
-import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 import Unverified from "@/components/Unverified";
 import NotLoggedIn from "@/components/NotLoggedIn";
 
@@ -412,7 +411,7 @@ const hasDuplicateCard = (index: number): boolean => {
   
   return (
     <div className="flex flex-col items-center mb-2">
-      <TopBar />
+      <Navbar />
       <div className="max-w-md w-full pt-20">
         <form
           onSubmit={handleSubmit}
