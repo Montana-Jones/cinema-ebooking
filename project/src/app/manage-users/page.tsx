@@ -86,9 +86,9 @@ export default function ManageUsers() {
     }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white p-6">
+    <div className="min-h-screen bg-[#121212] text-white">
       <Navbar />
-      <div className="max-w-6xl mx-auto mt-10 bg-[#1f1f1f] p-8 rounded-2xl border border-gray-700 shadow-lg">
+      <div className="max-w-6xl mx-auto mt-24 bg-[#1f1f1f] p-8 rounded-2xl border border-gray-700 shadow-lg">
         <h1 className="text-3xl font-bold mb-8 text-center text-[#75D1A6]">
           Manage Users
         </h1>
