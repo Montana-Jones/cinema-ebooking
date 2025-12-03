@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import Link from "next/link";
 import AccessDenied from "@/components/AccessDenied";
 
 interface Promotion {
@@ -140,22 +139,20 @@ const Promotions: React.FC = () => {
 
   if (loadingUser) return <p>Loading...</p>;
 
-   if (!user || user.role !== "ADMIN") {
-      return (
-        <AccessDenied />
-      );
-    }
+  if (!user || user.role !== "ADMIN") return <AccessDenied />;
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
       <Navbar />
-      <div className="max-w-5xl mx-auto p-6 sm:p-10">
-        <h1 className="text-4xl font-bold text-center mb-10 text-[#75D1A6] drop-shadow-lg">
+
+      {/* Added mt-10 to push content below the Navbar */}
+      <div className="max-w-5xl mx-auto mt-20 p-6 sm:p-10 space-y-10">
+        <h1 className="text-4xl font-bold text-center text-[#75D1A6] drop-shadow-lg">
           Promotions Management
         </h1>
 
         {/* Active Promotions Table */}
-        <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
+        <section className="bg-[#1b1b1b] rounded-2xl p-6 border border-gray-800 shadow-lg">
           <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
             Active Promotions
           </h2>
@@ -189,14 +186,12 @@ const Promotions: React.FC = () => {
                       <td className="p-3 text-[#75D1A6]">{promo.code}</td>
                       <td className="p-3 text-green-400">{promo.state}</td>
                       <td className="p-3">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDelete(promo.id)}
-                            className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleDelete(promo.id)}
+                          className="bg-red-600 hover:bg-red-800 px-4 py-2 rounded-full text-white font-semibold transition-all duration-200"
+                        >
+                          Delete
+                        </button>
                       </td>
                       <td className="p-3">
                         {promo.expiry_date
@@ -212,14 +207,11 @@ const Promotions: React.FC = () => {
         </section>
 
         {/* Add New Promotion */}
-        <section className="bg-[#1b1b1b] rounded-2xl p-6 mb-10 border border-gray-800 shadow-lg">
+        <section className="bg-[#1b1b1b] rounded-2xl p-6 border border-gray-800 shadow-lg">
           <h2 className="text-2xl mb-6 text-[#75D1A6] font-semibold">
             Add New Promotion
           </h2>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-5 text-gray-300"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-gray-300">
             <div>
               <label className="block mb-1 text-gray-400">Name</label>
               <input

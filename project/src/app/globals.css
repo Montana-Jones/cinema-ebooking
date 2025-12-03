@@ -40,3 +40,8 @@ main {
   padding-top: 80px;
   padding-bottom: 4rem;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 1;
+}
