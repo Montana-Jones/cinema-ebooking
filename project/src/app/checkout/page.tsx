@@ -26,7 +26,7 @@ interface booking {
   subtotal: number; 
   booking_fee: number; 
   tax_rate: number; 
-  discount_amount: number; 
+  discount: number; 
   total: number; 
   seats: Seat[]; 
 }
@@ -49,9 +49,9 @@ interface Config {
   tax_rate: number;
 }
 
-interface PromoCode {
+interface PromotionCode {
   code: string;
-  discount_percentage: number; // 10 = 10%
+  amount: number; // 10 = 10%
 }
 
 
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [config, setConfig] = useState<Config | null>(null);
-  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
+  const [promotionCodes, setPromotionCodes] = useState<PromotionCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<booking[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -76,7 +76,7 @@ export default function CheckoutPage() {
 
   // Promo state
   const [enteredCode, setEnteredCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<PromotionCode | null>(null);
   const [promoMessage, setPromoMessage] = useState("");
 
   // ✅ Parse seats
@@ -112,7 +112,7 @@ export default function CheckoutPage() {
 
         setTickets(ticketData);
         setConfig(configData[0]); // ✅ single object
-        setPromoCodes(promoData);
+        setPromotionCodes(promoData);
         setShowtime(showt);
       } catch (e) {
         console.error("Failed to fetch:", e);
@@ -176,13 +176,13 @@ export default function CheckoutPage() {
 
   const discount =
     appliedPromo
-      ? preDiscountTotal * (appliedPromo.discount_percentage / 100)
+      ? preDiscountTotal * (appliedPromo.amount / 100)
       : 0;
 
   const total = preDiscountTotal - discount;
 
   const handleApplyPromo = () => {
-    const found = promoCodes.find(
+    const found = promotionCodes.find(
       (p) => p.code.toUpperCase() === enteredCode.trim().toUpperCase()
     );
 
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
     }
 
     setAppliedPromo(found);
-    setPromoMessage(`Promo applied! ${found.discount_percentage}% off`);
+    setPromoMessage(`Promo applied! ${found.amount}% off`);
   };
 
  
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
       total_price: total,
       tax_rate: config.tax_rate,
       booking_fee: config.booking_fee,
-      discount: appliedPromo?.discount_percentage ?? 0,
+      discount: appliedPromo?.amount ?? 0,
       movie_title: movieTitle,
       original_binary: originalBinary,
       seats: seats
