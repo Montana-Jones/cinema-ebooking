@@ -73,30 +73,40 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: string[] = [];
+    let errorCount = 0;
 
-    if (!/^\d{10}$/.test(phoneNumber))
-      newErrors.push("Phone number must be 10 digits");
-    if (!validateAddress(homeAddress)) newErrors.push("Home address invalid");
-    if (!validateAddress(billingAddress))
-      newErrors.push("Billing address invalid");
-    if (password.length < 8)
-      newErrors.push("Password must be at least 8 characters");
-    if (password !== confirmPassword) newErrors.push("Passwords do not match");
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      errorCount++;
+      alert("Phone number must be 10 digits");
+    }
+    if (!validateAddress(homeAddress)) {
+      errorCount++;
+      alert("Home address invalid");
+    }
+    if (!validateAddress(billingAddress)) {
+      errorCount++;
+      alert("Billing address is not valid");
+    }
+    if (password.length < 8) {
+      errorCount++;
+      alert("Password must be at least 8 characters");
+    }
+    if (password !== confirmPassword) {
+      errorCount++;
+      alert("Passwords do not match");
+    }
 
     paymentInfo.forEach((card, i) => {
       if (card.cardNumber || card.cardHolder || card.expirationDate || card.cvv) {
-        const cardErrors = validateCard(card).map(
-          (err) => `Card ${i + 1}: ${err}`
-        );
-        newErrors.push(...cardErrors);
+        const cardErrors = validateCard(card);
+        if (cardErrors.length > 0) {
+          errorCount++;
+          alert(`Card ${i + 1} Errors:\n- ${cardErrors.join("\n- ")}`);
+        }
       }
     });
 
-    if (newErrors.length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (errorCount > 0) return;
 
     setSubmitting(true);
 

@@ -164,6 +164,9 @@ public class UserService {
         User user = new User();
         user.setFirstName(u.getFirstName()); // always set firstName
         user.setLastName(u.getLastName()); // always set lastName
+        user.setPhoneNumber(u.getPhoneNumber());
+        user.setHomeAddress(u.getHomeAddress());
+        user.setBillingAddress(u.getBillingAddress());
         user.setEmail(u.getEmail());
         user.setPassword(passwordEncoder.encode(u.getPassword()));
         user.setRole("CUSTOMER");
