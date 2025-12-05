@@ -512,7 +512,7 @@ const hasDuplicateCard = (index: number): boolean => {
                   {customer.paymentInfo.map((p, index) => ( 
                     <li key={index} className="py-2 text-sm"> 
                       <p className="font-medium">Card Number: {p.cardNumber}</p>
-                      <p className="text-gray-500">Experation Date: {p.expirationDate}</p>
+                      <p className="text-gray-500">Expiration Date: {p.expirationDate}</p>
                       <p className="text-gray-500">Card Holder Name: {p.cardHolder}</p> 
                     </li> ))} 
                 </ul> ) 
