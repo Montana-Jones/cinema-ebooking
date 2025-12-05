@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import Loading from "@/components/Loading";
 
 const App = () => {
   const [allMovies, setAllMovies] = useState([]);
@@ -13,6 +14,7 @@ const App = () => {
   const [filterType, setFilterType] = useState("title");
   const [genre, setGenre] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/movies")
@@ -20,6 +22,7 @@ const App = () => {
       .then((data) => {
         setAllMovies(data);
         setFilteredMovies(data);
+        setLoading(false);
 
         // Extract unique genres dynamically
         const genreSet = new Set<string>();
@@ -99,6 +102,10 @@ const App = () => {
     setFilterType("title");
     handleSearch(title, genre);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <main>
